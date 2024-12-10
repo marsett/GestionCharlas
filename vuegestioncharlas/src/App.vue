@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Cookies from 'cookies-js';
+// import Cookies from 'cookies-js';
 
 export default {
   name: 'App',
@@ -15,15 +15,15 @@ export default {
   },
   methods: {
     checkAuthentication() {
-      const token = Cookies.get('bearer_token');
+      // const token = Cookies.get('bearer_token');
       
       // Si no existe el token, redirigimos a la página de login
-      if (!token) {
-        this.$router.push('/login');
-      } else {
-        // Si existe el token, redirigimos al Home
-        this.$router.push('/');
-      }
+      // if (!token) {
+      //   this.$router.push('/login');
+      // } else {
+      //   // Si existe el token, redirigimos al Home
+      //   this.$router.push('/');
+      // }
     }
   }
 }
