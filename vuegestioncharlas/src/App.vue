@@ -1,15 +1,30 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <router-view></router-view>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Cookies from 'cookies-js';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    
+  },
+  created() {
+    this.checkAuthentication();  // Llamamos al método para comprobar si el usuario está autenticado
+  },
+  methods: {
+    checkAuthentication() {
+      const token = Cookies.get('bearer_token');
+      
+      // Si no existe el token, redirigimos a la página de login
+      if (!token) {
+        this.$router.push('/login');
+      } else {
+        // Si existe el token, redirigimos al Home
+        this.$router.push('/');
+      }
+    }
   }
 }
 </script>
