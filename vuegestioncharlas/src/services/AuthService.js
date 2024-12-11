@@ -5,12 +5,18 @@ export default class AuthService {
     getToken(userName, password) {
         return new Promise((resolve, reject) => {
             const endpoint = 'api/auth/login';
+            const json = JSON.stringify({
+                userName,
+                password
+            });
+
+            console.log(json)
+
+
+
             axios.post(
                 Global.urlBase + endpoint,
-                JSON.stringify({
-                    userName,
-                    password
-                }),
+                json,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -21,6 +27,7 @@ export default class AuthService {
                 resolve(response.data.response);
             })
             .catch(error => {
+                console.error("Error al obtener el token:", error.response ? error.response.data : error);
                 reject(error);
             });
         });

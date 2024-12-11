@@ -63,7 +63,7 @@
     },
     methods: {
       loginUser() {
-        service.getToken(this.user)
+        service.getToken(this.userName, this.password)
           .then(response => {
             Cookies.set('bearer_token', 'Bearer ' + response, { expires: 2 / 24 }); // 2 horas
 
