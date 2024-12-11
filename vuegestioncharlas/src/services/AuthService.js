@@ -27,4 +27,52 @@ export default class AuthService {
             });
         });
     }
+
+    setUser(form){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/usuarios';
+            const json = JSON.stringify({
+                idUsuario: form.idUsuario,
+                nombre: form.nombre,
+                apellidos: form.apellidos,
+                email: form.email,
+                estadoUsuario: form.estadoUsuario,
+                imagen: form.imagen,
+                password: form.password,
+                idRole: form.idRole
+            });
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al crear el usuario:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    getRoles(){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/roles';
+            axios.get(
+                Global.urlBase + endpoint
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los roles: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
 }

@@ -33,7 +33,7 @@
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#"
+            <a class="nav-link" href="#" @click.prevent="logout"
               ><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a
             >
           </li>
@@ -44,13 +44,20 @@
 </template>
 
 <script>
+import Cookies from 'cookies-js';
+
 export default {
   name: "MenuComponent",
   data() {
     return {};
   },
   mounted() {},
-  methods: {},
+  methods: {
+    logout() {
+      Cookies.expire('bearer_token');
+      this.$router.push('/login');
+    },
+  },
 };
 </script>
 
