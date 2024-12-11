@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeComponent from './components/HomeComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
 import PerfilAlumnoComponent from './components/PerfilAlumnoComponent.vue';
+import CharlasComponent from './components/CharlasComponent.vue';
+import CharlasAlumnoComponent from './components/CharlasAlumnoComponent.vue';
 
 const routes = [
     {
@@ -32,6 +34,30 @@ const routes = [
     {
         path: '/perfilalumno',
         component: PerfilAlumnoComponent,
+        // beforeEnter: (to, from, next) => {
+        //     const token = Cookies.get('bearer_token'); // Verifica si la cookie 'bearer_token' existe
+        //     if (!token) {
+        //         next(); // Si no tiene token, accede a la página de login
+        //     } else {
+        //         next('/'); // Si tiene token, redirige al Home
+        //     }
+        // }
+    },
+    {
+        path: '/charlas',
+        component: CharlasComponent,
+        // beforeEnter: (to, from, next) => {
+        //     const token = Cookies.get('bearer_token'); // Verifica si la cookie 'bearer_token' existe
+        //     if (!token) {
+        //         next(); // Si no tiene token, accede a la página de login
+        //     } else {
+        //         next('/'); // Si tiene token, redirige al Home
+        //     }
+        // }
+    },
+    {
+        path: '/charlasalumno',
+        component: CharlasAlumnoComponent,
         // beforeEnter: (to, from, next) => {
         //     const token = Cookies.get('bearer_token'); // Verifica si la cookie 'bearer_token' existe
         //     if (!token) {

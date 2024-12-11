@@ -1,12 +1,12 @@
 <template>
     <MenuComponent />
-    <h1>Home</h1>
+    <h1>Charlas</h1>
 </template>
 
 <script>
 import MenuComponent from './MenuComponent.vue';
 export default {
-    name: "HomeComponent",
+    name: "CharlasComponent",
     components: {
         MenuComponent
     }
