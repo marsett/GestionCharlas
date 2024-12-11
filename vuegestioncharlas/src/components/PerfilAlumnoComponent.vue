@@ -1,5 +1,4 @@
 <template>
-  <MenuComponent />
   <div class="container mt-5">
     <div class="card shadow-lg p-4 rounded" style="width: 100%; max-width: 1100px;">
       <div class="row text-center text-md-start">
@@ -33,7 +32,6 @@
         </div>
       </div>
 
-      <!-- Botones con un ancho más controlado -->
       <div class="d-flex gap-3 mt-4 justify-content-center justify-content-md-start">
         <button class="btn btn-primary">Editar Perfil</button>
         <router-link class="nav-link" to="/charlasalumno">
@@ -45,12 +43,8 @@
 </template>
 
 <script>
-import MenuComponent from "./MenuComponent.vue";
 export default {
   name: "PerfilAlumnoComponent",
-  components: {
-    MenuComponent,
-  },
 };
 </script>
 
@@ -82,7 +76,7 @@ export default {
 
 .btn-primary {
   font-size: 1.1em;
-  padding: 12px 24px; /* Un poco más de padding horizontal para que los botones no estén tan grandes */
+  padding: 12px 24px;
   border-radius: 5px;
 }
 

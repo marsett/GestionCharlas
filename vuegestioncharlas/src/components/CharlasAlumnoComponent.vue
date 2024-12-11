@@ -1,5 +1,4 @@
 <template>
-  <MenuComponent />
   <div class="container mt-5">
     <h1 class="text-center mb-4">Charlas Alumno</h1>
     
@@ -39,13 +38,8 @@
 </template>
 
 <script>
-import MenuComponent from './MenuComponent.vue';
-
 export default {
   name: "CharlasAlumnoComponent",
-  components: {
-    MenuComponent
-  },
   data() {
     return {
       charlas: [

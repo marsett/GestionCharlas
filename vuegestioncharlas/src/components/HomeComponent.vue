@@ -1,15 +1,10 @@
 <template>
-    <MenuComponent />
     <h1>Home</h1>
 </template>
 
 <script>
-import MenuComponent from './MenuComponent.vue';
 export default {
     name: "HomeComponent",
-    components: {
-        MenuComponent
-    }
 }
 </script>
 
