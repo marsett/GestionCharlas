@@ -9,11 +9,6 @@ export default class AuthService {
                 userName,
                 password
             });
-
-            console.log(json)
-
-
-
             axios.post(
                 Global.urlBase + endpoint,
                 json,

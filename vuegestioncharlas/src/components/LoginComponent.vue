@@ -57,15 +57,19 @@
   export default {
     data() {
       return {
-        userName: "",
-        password: "",
+        userName: "amanda.crespo@tajamar365.com",
+        password: "Am123456",
       };
     },
     methods: {
       loginUser() {
         service.getToken(this.userName, this.password)
           .then(response => {
-            Cookies.set('bearer_token', 'Bearer ' + response, { expires: 2 / 24 }); // 2 horas
+            let fechaCaducidad = new Date();
+            fechaCaducidad.setTime(fechaCaducidad.getTime() + (2 * 60 * 60 * 1000)); // 2 horas en milisegundos
+
+            let token = 'bearer ' + response;
+            Cookies.set('bearer_token', token, { expires: fechaCaducidad });
 
             //& Emitimos el evento de actualización del estado de inicio de sesión
             //& this.$emit('updateLoginStatus', true);
