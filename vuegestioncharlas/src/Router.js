@@ -46,26 +46,26 @@ const routes = [
     {
         path: '/charlas',
         component: CharlasComponent,
-        // beforeEnter: (to, from, next) => {
-        //     const token = Cookies.get('bearer_token'); // Verifica si la cookie 'bearer_token' existe
-        //     if (!token) {
-        //         next(); // Si no tiene token, accede a la página de login
-        //     } else {
-        //         next('/'); // Si tiene token, redirige al Home
-        //     }
-        // }
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token');
+            if (token) {
+                next(); 
+            } else {
+                next('/login');
+            }
+        }
     },
     {
         path: '/charlasalumno',
         component: CharlasAlumnoComponent,
-        // beforeEnter: (to, from, next) => {
-        //     const token = Cookies.get('bearer_token'); // Verifica si la cookie 'bearer_token' existe
-        //     if (!token) {
-        //         next(); // Si no tiene token, accede a la página de login
-        //     } else {
-        //         next('/'); // Si tiene token, redirige al Home
-        //     }
-        // }
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token');
+            if (token) {
+                next(); 
+            } else {
+                next('/login');
+            }
+        }
     },
 ];
 
