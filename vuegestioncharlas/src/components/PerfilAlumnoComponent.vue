@@ -1,32 +1,31 @@
 <template>
-  <div class="container mt-5">
+  <div class="container mt-5" v-if="usuario">
     <div class="card shadow-lg p-4 rounded" style="width: 100%; max-width: 1100px;">
       <div class="row text-center text-md-start">
         <div class="col-12 col-md-3 mb-4 mb-md-0">
           <img
-            :src="'https://docomomoiberico.com/wp-content/uploads/2010/05/E_MA_A31_01-copia.jpg'"
+            :src="usuario.imagen"
             alt="Foto de perfil"
             class="profile-image img-fluid rounded-circle border-primary mb-3"
             style="width: 150px; height: 150px; object-fit: cover;"
           />
         </div>
-        
         <div class="col-12 col-md-9">
-          <h4 class="font-weight-bold">Mario Jiménez Marset</h4>
-          <p class="text-muted">Alumno</p>
+          <h4 class="font-weight-bold">{{ usuario.nombre }} {{ usuario.apellidos }}</h4>
+          <p class="text-muted">{{ usuario.idRole === 2 ? 'Alumno' : 'Profesor' }}</p>
 
           <div class="list-group">
             <div class="list-group-item">
-              <strong>Nombre:</strong> Mario
+              <strong>Nombre:</strong> {{ usuario.nombre }}
             </div>
             <div class="list-group-item">
-              <strong>Apellidos:</strong> Jiménez Marset
+              <strong>Apellidos:</strong> {{ usuario.apellidos }}
             </div>
             <div class="list-group-item">
-              <strong>Email:</strong> mario.jimenezmarset@tajamar365.com
+              <strong>Email:</strong> {{ usuario.email }}
             </div>
             <div class="list-group-item">
-              <strong>Contraseña:</strong> ************
+              <strong>Contraseña:</strong> {{ usuario.password }}
             </div>
           </div>
         </div>
@@ -40,11 +39,36 @@
       </div>
     </div>
   </div>
+  <div v-else>
+    <p>Cargando perfil...</p>
+  </div>
 </template>
 
+
 <script>
+import PerfilService from "@/services/PerfilService";
 export default {
   name: "PerfilAlumnoComponent",
+  data() {
+    return {
+      usuario: null, // Datos del usuario
+    };
+  },
+  methods: {
+    async cargarPerfil() {
+      const perfilService = new PerfilService();
+      try {
+        const data = await perfilService.getUsuarioPerfil();
+        this.usuario = data.usuario; // Guardamos los datos del usuario en el estado
+      } catch (error) {
+        console.error("Error al cargar el perfil:", error);
+        alert("No se pudo cargar la información del perfil.");
+      }
+    },
+  },
+  created() {
+    this.cargarPerfil(); // Cargamos los datos al montar el componente
+  },
 };
 </script>
 
