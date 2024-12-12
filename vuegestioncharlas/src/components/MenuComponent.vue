@@ -45,6 +45,7 @@
 
 <script>
 import Cookies from 'cookies-js';
+import Swal from 'sweetalert2'
 
 export default {
   name: "MenuComponent",
@@ -54,8 +55,21 @@ export default {
   mounted() {},
   methods: {
     logout() {
-      Cookies.expire('bearer_token');
-      this.$router.push('/login');
+      Swal.fire({
+        title: "¿Quieres cerrar la sesión?",
+        text: "Una vez cerrada, para volver a acceder al contenido, necesitarás iniciar sesión de nuevo.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Cerrar sesión",
+        cancelButtonText: "Cancelar"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Cookies.expire('bearer_token');
+          this.$router.push('/login');
+        }
+      });
     },
   },
 };
