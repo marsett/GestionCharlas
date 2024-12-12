@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
-        <i class="fas fa-chalkboard-teacher"></i> TAJAMAR COMANDA
+        <i class="fas fa-chalkboard-teacher"></i>
       </a>
       <button
         class="navbar-toggler"
@@ -18,22 +18,22 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link active" href="#"
-              ><i class="fas fa-home"></i> Home</a
+            <router-link class="nav-link" to="/"
+              ><i class="fas fa-home"></i> Home</router-link
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-comments"></i> Charlas</a
+            <router-link class="nav-link" to="/charlas"
+              ><i class="fas fa-comments"></i> Charlas</router-link
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#"
-              ><i class="fas fa-user-circle"></i> Perfil</a
+            <router-link class="nav-link" to="/perfilalumno"
+              ><i class="fas fa-user-circle"></i> Perfil</router-link
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#"
+            <a class="nav-link" href="#" @click.prevent="logout"
               ><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a
             >
           </li>
@@ -44,13 +44,20 @@
 </template>
 
 <script>
+import Cookies from 'cookies-js';
+
 export default {
   name: "MenuComponent",
   data() {
     return {};
   },
   mounted() {},
-  methods: {},
+  methods: {
+    logout() {
+      Cookies.expire('bearer_token');
+      this.$router.push('/login');
+    },
+  },
 };
 </script>
 
