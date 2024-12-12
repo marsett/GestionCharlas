@@ -2,7 +2,7 @@
   <div class="login-background">
     <div class="login-container">
       <div class="card shadow-lg mx-2 mx-md-0">
-        <div class="card-body">
+        <div class="card-body" >
           <h3 class="card-title text-center mb-4">Iniciar sesión</h3>
 
           <!-- Formulario -->
@@ -17,6 +17,7 @@
                 v-model="userName"
                 required
                 placeholder="username@tajamar365.com"
+                :readonly="isLoading"
               />
             </div>
 
@@ -29,15 +30,23 @@
                 class="form-control"
                 v-model="password"
                 required
-                placeholder="Zanah0ri4"
+                placeholder="12345"
+                :readonly="isLoading"
               />
             </div>
 
             <!-- Botón de envío -->
-            <button type="submit" class="btn btn-primary w-100">
+            <button type="submit" class="btn btn-primary w-100" :disabled="isLoading">
               Iniciar sesión
             </button>
           </form>
+
+          <!-- Spinner de carga -->
+          <div v-if="isLoading" class="position-absolute top-50 start-50 translate-middle">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+          </div>
 
           <p class="mt-3 text-center">
             ¿No tienes cuenta? <a href="#" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Regístrate aquí</a>
@@ -67,7 +76,7 @@
               <div class="row">
                 <!-- Nombre -->
                 <div class="col-12 col-lg-6 mb-3">
-                  <label for="nombre" class="form-label">Nombre</label>
+                  <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
                   <input
                     type="text"
                     class="form-control"
@@ -78,7 +87,7 @@
                 </div>
                 <!-- Apellidos -->
                 <div class="col-12 col-lg-6 mb-3">
-                  <label for="apellidos" class="form-label">Apellidos</label>
+                  <label for="apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
                   <input
                     type="text"
                     class="form-control"
@@ -91,7 +100,7 @@
               <div class="row">
                 <!-- Correo electrónico -->
                 <div class="col-12 col-lg-6 mb-3">
-                  <label for="email" class="form-label">Correo electrónico</label>
+                  <label for="email" class="form-label">Correo electrónico <span class="text-danger">*</span></label>
                   <input
                     type="email"
                     class="form-control"
@@ -103,7 +112,7 @@
                 </div>
                 <!-- Contraseña -->
                 <div class="col-12 col-lg-6 mb-3">
-                  <label for="password" class="form-label">Contraseña</label>
+                  <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
                   <input
                     type="password"
                     class="form-control"
@@ -126,7 +135,7 @@
                 </div>
                 <!-- Rol -->
                 <div class="col-12 col-lg-6 mb-3">
-                  <label for="idRole" class="form-label">Rol</label>
+                  <label for="idRole" class="form-label">Rol <span class="text-danger">*</span></label>
                   <select
                     class="form-select"
                     id="idRole"
@@ -143,7 +152,7 @@
                 <div class="col-12 col-lg-6 mb-3 text-end" v-if="form.idRole === 1">
                 </div>
                 <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 1">
-                  <label for="profesorPassword" class="form-label">Clave de acceso</label>
+                  <label for="profesorPassword" class="form-label">Clave de acceso <span class="text-danger">*</span></label>
                   <input
                     type="password"
                     id="profesorPassword"
@@ -157,7 +166,7 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cerrarFormCrear">Cancelar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cerrarFormCrear" @click="clearForm()">Cancelar</button>
             <button 
               type="button" 
               class="btn btn-primary" 
@@ -173,6 +182,7 @@
 
 <script>
   import Cookies from 'cookies-js';
+  import Swal from 'sweetalert2';
   import AuthService from '@/services/AuthService';
 
   const service = new AuthService();
@@ -182,6 +192,7 @@
       return {
         userName: "amanda.crespo@tajamar365.com",
         password: "Am123456",
+        isLoading: false,
         form: {
           idUsuario: 0,
           nombre: "",
@@ -194,13 +205,13 @@
         },
         roles: [],
         profesorPassword: "",
-        correctProfesorPassword: "AcC3soT4jaMar+Pr@ff", 
+        correctProfesorPassword: "T4jaMar+Pr@ff", 
       };
     },
     mounted(){
       service.getRoles()
       .then(response => {
-        this.roles = response;
+        this.roles = response.filter(role => role.roleName !== 'ADMINISTRADOR');
       })
       .catch(error => {
         console.error('Error al obtener los roles: ', error);
@@ -208,6 +219,7 @@
     },
     methods: {
       loginUser() {
+        this.isLoading = true;
         service.getToken(this.userName, this.password)
         .then(response => {
           let fechaCaducidad = new Date();
@@ -216,35 +228,72 @@
           let token = 'bearer ' + response;
           Cookies.set('bearer_token', token, { expires: fechaCaducidad });
 
+          this.isLoading = false; 
           this.$router.push('/');
         })
         .catch(error => {
           console.error('Error al obtener el token:', error);
-          alert('Usuario o contraseña incorrectos.'); //? Sweet alert 
+          Swal.fire({
+            icon: "error",
+            title: "¡Vaya, algo salió mal!",
+            text: "Verifica tus credenciales e inténtalo de nuevo.",
+          });
         });
       },
       registerUser() {
         if (!this.form.nombre || !this.form.apellidos || !this.form.email || !this.form.password || !this.form.idRole) {
-          alert("Por favor, complete todos los campos obligatorios.");
+          Swal.fire({
+            icon: "error",
+            title: "Campos incompletos",
+            text: "Por favor, asegúrate de rellenar los campos obligatorios.",
+          });
           return;
         }
 
         // Verificar si el rol seleccionado es "Profesor" y si se ingresó la contraseña correcta
         if (this.form.idRole === 1 && this.profesorPassword !== this.correctProfesorPassword) {
-          alert("Contraseña incorrecta para el rol de Profesor.");
+          Swal.fire({
+            icon: "error",
+            title: "Clave incorrecta",
+            text: "La clave proporcionada no es válida para este rol.",
+          });
           return;
+        }
+
+        if (!this.form.imagen) {
+          this.form.imagen = "https://cdn.pixabay.com/photo/2017/11/10/05/48/user-2935527_640.png";
         }
 
         service.setUser(this.form)
         .then(response => {
           console.log(response);
-          alert("Cuenta creada exitosamente!");
+
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "success",
+            title: "Cuenta creada exitosamente!"
+          });
+
           this.clearForm();
           document.getElementById('cerrarFormCrear').click();
         })
         .catch(error => {
           console.error('Error al crear el usuario: ', error);
-          alert('No se ha podido crear el usuario'); 
+          Swal.fire({
+            icon: "error",
+            title: "Error al crear el usuario",
+            text: "No se pudo crear el usuario. Por favor, inténtalo de nuevo más tarde.",
+          });
         });
       },
       clearForm() {
@@ -256,6 +305,7 @@
           imagen: "",
           idRole: "",
         };
+        this.profesorPassword = "";
       },
     },
   };

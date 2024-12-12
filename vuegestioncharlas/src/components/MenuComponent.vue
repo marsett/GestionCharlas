@@ -45,7 +45,7 @@
 
 <script>
 import Cookies from 'cookies-js';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 export default {
   name: "MenuComponent",
