@@ -30,7 +30,7 @@ export default class AuthService {
 
     setUser(form){
         return new Promise((resolve, reject) => {
-            const endpoint = 'api/usuarios';
+            const endpoint = 'api/usuarios/newalumno/'+form.idCurso;
             const json = JSON.stringify({
                 idUsuario: form.idUsuario,
                 nombre: form.nombre,
@@ -71,6 +71,22 @@ export default class AuthService {
             })
             .catch(error => {
                 console.error("Error al obtener los roles: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    getCursos(){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/cursos';
+            axios.get(
+                Global.urlBase + endpoint
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los cursos: ", error.response ? error.response.data : error);
                 reject(error);
             });
         });

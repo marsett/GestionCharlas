@@ -123,27 +123,6 @@
                 </div>
               </div>
               <div class="row">
-                <!-- Imagen de perfil -->
-                <div class="col-12 col-lg-6 mb-3">
-                  <label for="imagen" class="form-label">Imagen de perfil (URL)</label>
-                  <input
-                    type="url"
-                    class="form-control"
-                    id="imagen"
-                    v-model="form.imagen"
-                  />
-                </div>
-                <!-- Curso -->
-                <div class="col-12 col-lg-6 mb-3">
-                  <label for="profesorPassword" class="form-label">Código de curso <span class="text-danger">*</span></label>
-                  <input
-                    type="password"
-                    id="profesorPassword"
-                    v-model="form.idcurso"
-                    class="form-control" 
-                    placeholder="XXXX"
-                  />
-                </div>
                 <!-- Rol -->
                 <div class="col-12 col-lg-6 mb-3">
                   <label for="idRole" class="form-label">Rol <span class="text-danger">*</span></label>
@@ -159,18 +138,33 @@
                     </option>
                   </select>
                 </div>
+                <!-- Curso -->
+                <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 2">
+                  <label for="profesorPassword" class="form-label">Curso <span class="text-danger">*</span></label>
+                  <select
+                    class="form-select"
+                    id="idCurso"
+                    v-model="form.idcurso"
+                    required
+                  >
+                    <option value="" disabled selected>--- Seleccionar ---</option>
+                    <option v-for="curso in cursos" :key="curso.idCurso" :value="curso.idCurso">
+                      {{ curso.nombre }}
+                    </option>
+                  </select>
+                </div>
+               
                 <!-- Contraseña especial si seleccionan "Profesor" -->
-                
-                <div class="col-12 col-lg-6 mb-3">
+                <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 1">
                   <label for="profesorPassword" class="form-label">Clave de acceso <span class="text-danger">*</span></label>
                   <input
                     type="password"
                     id="profesorPassword"
                     v-model="profesorPassword"
                     class="form-control" 
+                    placeholder="Introduce tu clave de profesor"
                   />
                 </div>
-
               </div>
             </form>
           </div>
@@ -214,6 +208,7 @@
           idcurso: "",
         },
         roles: [],
+        cursos: [],
         profesorPassword: "",
         correctProfesorPassword: "T4jaMar+Pr@ff", 
       };
@@ -225,6 +220,14 @@
       })
       .catch(error => {
         console.error('Error al obtener los roles: ', error);
+      });
+
+      service.getCursos()
+      .then(response => {
+        this.cursos = response.filter(curso => curso.activo == true);
+      })
+      .catch(error => {
+        console.error('Error al obtener los cursos: ', error);
       });
     },
     methods: {
