@@ -133,6 +133,17 @@
                     v-model="form.imagen"
                   />
                 </div>
+                <!-- Curso -->
+                <div class="col-12 col-lg-6 mb-3">
+                  <label for="profesorPassword" class="form-label">Código de curso <span class="text-danger">*</span></label>
+                  <input
+                    type="password"
+                    id="profesorPassword"
+                    v-model="form.idcurso"
+                    class="form-control" 
+                    placeholder="XXXX"
+                  />
+                </div>
                 <!-- Rol -->
                 <div class="col-12 col-lg-6 mb-3">
                   <label for="idRole" class="form-label">Rol <span class="text-danger">*</span></label>
@@ -149,16 +160,14 @@
                   </select>
                 </div>
                 <!-- Contraseña especial si seleccionan "Profesor" -->
-                <div class="col-12 col-lg-6 mb-3 text-end" v-if="form.idRole === 1">
-                </div>
-                <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 1">
+                
+                <div class="col-12 col-lg-6 mb-3">
                   <label for="profesorPassword" class="form-label">Clave de acceso <span class="text-danger">*</span></label>
                   <input
                     type="password"
                     id="profesorPassword"
                     v-model="profesorPassword"
                     class="form-control" 
-                    placeholder="Introduce tu clave de profesor"
                   />
                 </div>
 
@@ -198,10 +207,11 @@
           nombre: "",
           apellidos: "",
           email: "",
-          estadoUsuario: true,
-          imagen: "",
+          estadoUsuario: false,
+          imagen: "https://cdn.pixabay.com/photo/2017/11/10/05/48/user-2935527_640.png",
           password: "",
           idRole: "",
+          idcurso: "",
         },
         roles: [],
         profesorPassword: "",
@@ -260,11 +270,7 @@
           });
           return;
         }
-
-        if (!this.form.imagen) {
-          this.form.imagen = "https://cdn.pixabay.com/photo/2017/11/10/05/48/user-2935527_640.png";
-        }
-
+        
         service.setUser(this.form)
         .then(response => {
           console.log(response);
