@@ -28,7 +28,7 @@ export default class AuthService {
         });
     }
 
-    setUser(form){
+    setAlumno(form){
         return new Promise((resolve, reject) => {
             const endpoint = 'api/usuarios/newalumno/'+form.idCurso;
             const json = JSON.stringify({
@@ -60,35 +60,51 @@ export default class AuthService {
         });
     }
 
-    getRoles(){
+    setProfesor(form, key){
         return new Promise((resolve, reject) => {
-            const endpoint = 'api/roles';
-            axios.get(
-                Global.urlBase + endpoint
+            const endpoint = 'api/profesor/newprofesor/'+key;
+            const json = JSON.stringify({
+                idUsuario: form.idUsuario,
+                nombre: form.nombre,
+                apellidos: form.apellidos,
+                email: form.email,
+                estadoUsuario: form.estadoUsuario,
+                imagen: form.imagen,
+                password: form.password,
+                idRole: form.idRole
+            });
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
             )
             .then(response => {
                 resolve(response.data);
             })
             .catch(error => {
-                console.error("Error al obtener los roles: ", error.response ? error.response.data : error);
+                console.error("Error al crear el usuario:", error.response ? error.response.data : error);
                 reject(error);
             });
         });
     }
 
-    getCursos(){
-        return new Promise((resolve, reject) => {
-            const endpoint = 'api/cursos';
-            axios.get(
-                Global.urlBase + endpoint
-            )
-            .then(response => {
-                resolve(response.data);
-            })
-            .catch(error => {
-                console.error("Error al obtener los cursos: ", error.response ? error.response.data : error);
-                reject(error);
-            });
-        });
-    }
+    // getRoles(){
+    //     return new Promise((resolve, reject) => {
+    //         const endpoint = 'api/roles';
+    //         axios.get(
+    //             Global.urlBase + endpoint
+    //         )
+    //         .then(response => {
+    //             resolve(response.data);
+    //         })
+    //         .catch(error => {
+    //             console.error("Error al obtener los roles: ", error.response ? error.response.data : error);
+    //             reject(error);
+    //         });
+    //     });
+    // }
 }

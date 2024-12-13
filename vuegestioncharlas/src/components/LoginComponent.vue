@@ -140,18 +140,14 @@
                 </div>
                 <!-- Curso -->
                 <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 2">
-                  <label for="profesorPassword" class="form-label">Curso <span class="text-danger">*</span></label>
-                  <select
-                    class="form-select"
+                  <label for="idCurso" class="form-label">Curso <span class="text-danger">*</span></label>
+                  <input
+                    type="number"
                     id="idCurso"
-                    v-model="form.idcurso"
-                    required
-                  >
-                    <option value="" disabled selected>--- Seleccionar ---</option>
-                    <option v-for="curso in cursos" :key="curso.idCurso" :value="curso.idCurso">
-                      {{ curso.nombre }}
-                    </option>
-                  </select>
+                    v-model="form.idCurso"
+                    class="form-control" 
+                    placeholder="XXXX"
+                  />
                 </div>
                
                 <!-- Contraseña especial si seleccionan "Profesor" -->
@@ -195,40 +191,39 @@
       return {
         userName: "amanda.crespo@tajamar365.com",
         password: "Am123456",
-        isLoading: false,
         form: {
           idUsuario: 0,
           nombre: "",
           apellidos: "",
           email: "",
-          estadoUsuario: false,
+          estadoUsuario: true,
           imagen: "https://cdn.pixabay.com/photo/2017/11/10/05/48/user-2935527_640.png",
           password: "",
           idRole: "",
-          idcurso: "",
+          idCurso: "",
         },
-        roles: [],
-        cursos: [],
+        roles: [
+          {
+            idRole: 1,
+            roleName: "PROFESOR"
+          },
+          {
+            idRole: 2,
+            roleName: "ALUMNO"
+          },
+        ],
+        isLoading: false,
         profesorPassword: "",
-        correctProfesorPassword: "T4jaMar+Pr@ff", 
       };
     },
     mounted(){
-      service.getRoles()
-      .then(response => {
-        this.roles = response.filter(role => role.roleName !== 'ADMINISTRADOR');
-      })
-      .catch(error => {
-        console.error('Error al obtener los roles: ', error);
-      });
-
-      service.getCursos()
-      .then(response => {
-        this.cursos = response.filter(curso => curso.activo == true);
-      })
-      .catch(error => {
-        console.error('Error al obtener los cursos: ', error);
-      });
+      // service.getRoles()
+      // .then(response => {
+      //   this.roles = response.filter(role => role.roleName !== 'ADMINISTRADOR');
+      // })
+      // .catch(error => {
+      //   console.error('Error al obtener los roles: ', error);
+      // });
     },
     methods: {
       loginUser() {
@@ -263,48 +258,72 @@
           });
           return;
         }
-
-        // Verificar si el rol seleccionado es "Profesor" y si se ingresó la contraseña correcta
-        if (this.form.idRole === 1 && this.profesorPassword !== this.correctProfesorPassword) {
-          Swal.fire({
-            icon: "error",
-            title: "Clave incorrecta",
-            text: "La clave proporcionada no es válida para este rol.",
-          });
-          return;
-        }
         
-        service.setUser(this.form)
-        .then(response => {
-          console.log(response);
+        if(this.form.idRole === 2){
+          service.setAlumno(this.form)
+          .then(response => {
+            console.log(response);
 
-          const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            }
-          });
-          Toast.fire({
-            icon: "success",
-            title: "Cuenta creada exitosamente!"
-          });
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+              }
+            });
+            Toast.fire({
+              icon: "success",
+              title: "Cuenta de alumno creada exitosamente!"
+            });
 
-          this.clearForm();
-          document.getElementById('cerrarFormCrear').click();
-        })
-        .catch(error => {
-          console.error('Error al crear el usuario: ', error);
-          Swal.fire({
-            icon: "error",
-            title: "Error al crear el usuario",
-            text: "No se pudo crear el usuario. Por favor, inténtalo de nuevo más tarde.",
+            this.clearForm();
+            document.getElementById('cerrarFormCrear').click();
+          })
+          .catch(error => {
+            console.error('Error al crear el usuario: ', error);
+            Swal.fire({
+              icon: "error",
+              title: "Error al crear el usuario",
+              text: "No se pudo crear el usuario. Por favor, inténtalo de nuevo más tarde.",
+            });
           });
-        });
+        } else {
+          service.setProfesor(this.form, this.profesorPassword)
+          .then(response => {
+            console.log(response);
+
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+              }
+            });
+            Toast.fire({
+              icon: "success",
+              title: "Cuenta de profesor creada exitosamente!"
+            });
+
+            this.clearForm();
+            document.getElementById('cerrarFormCrear').click();
+          })
+          .catch(error => {
+            console.error('Error al crear el usuario: ', error);
+            Swal.fire({
+              icon: "error",
+              title: "Error al crear el usuario",
+              text: "No se pudo crear el usuario. Por favor, inténtalo de nuevo más tarde.",
+            });
+          });
+        }        
       },
       clearForm() {
         this.form = {
