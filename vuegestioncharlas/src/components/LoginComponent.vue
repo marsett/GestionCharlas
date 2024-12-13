@@ -233,6 +233,7 @@
         })
         .catch(error => {
           console.error('Error al obtener el token:', error);
+          this.isLoading = false; 
           Swal.fire({
             icon: "error",
             title: "¡Vaya, algo salió mal!",
