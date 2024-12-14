@@ -106,12 +106,11 @@ export default {
   font-size: 24px;
   font-weight: bold;
   color: #B0B0B0; /* Gris claro */
-  transition: color 0.3s ease-in-out, transform 0.3s ease;
 }
 
 .navbar-custom .navbar-brand:hover {
   color: #4CAF50; /* Verde suave */
-  transform: scale(1.1);
+  transform: none; /* Sin transformación al hacer hover */
 }
 
 .navbar-custom .nav-link {
@@ -120,45 +119,28 @@ export default {
   font-weight: 500;
   padding: 10px 15px;
   border-radius: 5px;
-  transition: color 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .navbar-custom .nav-link:hover {
   color: #FFFFFF; /* Blanco */
   background-color: rgba(76, 175, 80, 0.2); /* Verde suave de fondo */
-  transform: translateY(-5px);
-  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+  transform: none; /* Sin transformación */
+  box-shadow: none; /* Sin sombra */
 }
 
 /* Animación de selección */
 .navbar-custom .nav-link.selected {
   background-color: rgba(76, 175, 80, 0.4); /* Fondo verde suave */
   color: #FFFFFF; /* Blanco */
-  transform: scale(1.1) translateX(5px); /* Desplazamiento hacia la derecha */
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3); /* Sombra más prominente */
-  transition: all 0.3s ease-in-out;
+  transform: none; /* Sin transformación */
+  box-shadow: none; /* Sin sombra */
 }
 
 .navbar-custom .nav-item {
   margin-left: 25px;
-  opacity: 0;
-  animation: fadeIn 0.5s forwards;
-}
-
-.navbar-custom .nav-item:nth-child(1) {
-  animation-delay: 0.2s;
-}
-
-.navbar-custom .nav-item:nth-child(2) {
-  animation-delay: 0.4s;
-}
-
-.navbar-custom .nav-item:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-.navbar-custom .nav-item:nth-child(4) {
-  animation-delay: 0.8s;
+  opacity: 1; /* Se elimina la animación */
+  animation: none; /* Sin animación */
 }
 
 .nav-link i {
@@ -168,7 +150,7 @@ export default {
 }
 
 .navbar-custom .nav-link:hover i {
-  transform: scale(1.3);
+  transform: none; /* Sin transformación en icono */
   color: #4CAF50; /* Verde suave */
 }
 
@@ -187,13 +169,6 @@ export default {
   }
   .navbar-custom .navbar-toggler-icon {
     background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"%3E%3Cpath stroke="white" stroke-width="3" d="M4 7h22M4 15h22M4 23h22"%3E%3C/path%3E%3C/svg%3E');
-  }
-}
-
-/* Animación de desvanecimiento */
-@keyframes fadeIn {
-  to {
-    opacity: 1;
   }
 }
 </style>
