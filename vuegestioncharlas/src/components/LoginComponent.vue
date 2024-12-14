@@ -82,6 +82,7 @@
                     class="form-control"
                     id="nombre"
                     v-model="form.nombre"
+                    :readonly="isLoading2"
                     required
                   />
                 </div>
@@ -93,6 +94,7 @@
                     class="form-control"
                     id="apellidos"
                     v-model="form.apellidos"
+                    :readonly="isLoading2"
                     required
                   />
                 </div>
@@ -106,6 +108,7 @@
                     class="form-control"
                     id="email"
                     v-model="form.email"
+                    :readonly="isLoading2"
                     placeholder="username@tajamar365.com"
                     required
                   />
@@ -118,6 +121,7 @@
                     class="form-control"
                     id="password"
                     v-model="form.password"
+                    :readonly="isLoading2"
                     required
                   />
                 </div>
@@ -130,6 +134,7 @@
                     class="form-select"
                     id="idRole"
                     v-model="form.idRole"
+                    :readonly="isLoading2"
                     required
                   >
                     <option value="" disabled selected>--- Seleccionar ---</option>
@@ -145,6 +150,7 @@
                     type="number"
                     id="idCurso"
                     v-model="form.idCurso"
+                    :readonly="isLoading2"
                     class="form-control" 
                     placeholder="XXXX"
                   />
@@ -157,6 +163,7 @@
                     type="password"
                     id="profesorPassword"
                     v-model="profesorPassword"
+                    :readonly="isLoading2"
                     class="form-control" 
                     placeholder="Introduce tu clave de profesor"
                   />
@@ -165,14 +172,21 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cerrarFormCrear" @click="clearForm()">Cancelar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cerrarFormCrear" @click="clearForm()" :disabled="isLoading2">Cancelar</button>
             <button 
               type="button" 
               class="btn btn-primary" 
-              :disabled="!form.nombre || !form.apellidos || !form.email || !form.password || !form.idRole" 
+              :disabled="!form.nombre || !form.apellidos || !form.email || !form.password || !form.idRole || isLoading2" 
               @click="registerUser"
             >Crear</button>
           </div>
+        </div>
+      </div>
+
+      <!-- Spinner de carga 2 -->
+      <div v-if="isLoading2" class="position-absolute top-50 start-50 translate-middle">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
         </div>
       </div>
     </div>
@@ -213,6 +227,7 @@
           },
         ],
         isLoading: false,
+        isLoading2: false,
         profesorPassword: "",
       };
     },
@@ -260,6 +275,7 @@
         }
         
         if(this.form.idRole === 2){
+          this.isLoading2 = true;
           service.setAlumno(this.form)
           .then(response => {
             console.log(response);
@@ -280,10 +296,12 @@
               title: "Cuenta de alumno creada exitosamente!"
             });
 
+            this.isLoading2 = false;
             this.clearForm();
             document.getElementById('cerrarFormCrear').click();
           })
           .catch(error => {
+            this.isLoading2 = false;
             console.error('Error al crear el usuario: ', error);
             Swal.fire({
               icon: "error",
@@ -292,6 +310,7 @@
             });
           });
         } else {
+          this.isLoading2 = true;
           service.setProfesor(this.form, this.profesorPassword)
           .then(response => {
             console.log(response);
@@ -312,10 +331,12 @@
               title: "Cuenta de profesor creada exitosamente!"
             });
 
+            this.isLoading2 = false;
             this.clearForm();
             document.getElementById('cerrarFormCrear').click();
           })
           .catch(error => {
+            this.isLoading2 = false;
             console.error('Error al crear el usuario: ', error);
             Swal.fire({
               icon: "error",
