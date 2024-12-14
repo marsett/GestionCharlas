@@ -1,6 +1,5 @@
 <template>
   <div class="container mt-5">
-    <h1 class="text-center mb-4">Charlas Alumno</h1>
     
     <div v-for="charla in charlas" :key="charla.charla.idCharla" class="card mb-4">
       <div class="card-header d-flex justify-content-between">

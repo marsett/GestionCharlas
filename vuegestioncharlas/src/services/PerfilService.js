@@ -25,7 +25,7 @@ export default class PerfilService {
     // Método para obtener las charlas del usuario
     getCharlasUsuario() {
         return new Promise((resolve, reject) => {
-            const endpoint = "api/Charlas/CharlasUser";
+            const endpoint = "api/Charlas/CharlasAlumno";
             const token = Cookies.get('bearer_token'); // Obtenemos el token
 
             axios.get(Global.urlBase + endpoint, {
@@ -42,4 +42,63 @@ export default class PerfilService {
                 });
         });
     }
+
+    
+    uploadUserImage(userId, fileName, fileContent) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/Files/UploadImagenUsuario/${userId}`;
+            const token = Cookies.get('bearer_token');
+    
+            axios.post(Global.urlBase + endpoint, {
+                fileName,
+                fileContent,
+            }, {
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
+                },
+            })
+                .then(response => {
+                    resolve(response.data);
+                })
+                .catch(error => {
+                    console.error("Error al subir la imagen:", error.response ? error.response.data : error);
+                    reject(error);
+                });
+        });
+    }
+    
+    editarPerfil(usuario) {
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/Usuarios";
+            const token = Cookies.get('bearer_token');
+    
+            // Construimos el payload para la actualización
+            const payload = {
+                idUsuario: usuario.idUsuario,
+                nombre: usuario.nombre,
+                apellidos: usuario.apellidos,
+                email: usuario.email,
+                estadoUsuario: usuario.estadoUsuario,
+                imagen: usuario.imagen,
+                password: usuario.password,
+                idRole: usuario.idRole,
+            };
+    
+            axios.put(Global.urlBase + endpoint, payload, {
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
+                },
+            })
+                .then(response => {
+                    resolve(response.data); // Devuelve la respuesta del servidor
+                })
+                .catch(error => {
+                    console.error("Error al editar el perfil:", error.response ? error.response.data : error);
+                    reject(error); // Propaga el error para ser manejado por el llamado
+                });
+        });
+    }
+    
 }
