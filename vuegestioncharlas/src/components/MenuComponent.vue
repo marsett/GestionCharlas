@@ -209,8 +209,6 @@ export default {
   .navbar-nav {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     padding-top: 20px;
   }
 
