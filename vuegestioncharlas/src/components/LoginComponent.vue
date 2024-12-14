@@ -36,7 +36,7 @@
             </div>
 
             <!-- Botón de envío -->
-            <button type="submit" class="btn btn-primary w-100" :disabled="isLoading">
+            <button type="submit" class="btn btn-primary w-100" :disabled="isLoading || !userName || !password">
               Iniciar sesión
             </button>
           </form>
