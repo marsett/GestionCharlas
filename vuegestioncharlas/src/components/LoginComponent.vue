@@ -69,7 +69,7 @@
         <div class="modal-content">
           <div class="modal-header bg-secondary-subtle">
             <h1 class="modal-title fs-5" id="staticBackdropLabel">Crear tu cuenta</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="cerrarFormCrear"></button>
           </div>
           <div class="modal-body">
             <form>
