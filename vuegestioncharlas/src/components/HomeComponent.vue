@@ -1,24 +1,33 @@
 <template>
-  <div class="container my-3 mt-md-4" v-if="role == 2">
-    <h1>Hola, {{ nombre }} !!</h1>
-
-    <div class="row row-cols-1 row-cols-md-2 my-4">
+  <div class="container my-3" v-if="role == 2">
+    <h1 class="fw-semibold mt-4 mt-md-5">Hola, {{ nombre }} !</h1>
+    <div class="row row-cols-1 row-cols-md-2 my-4 pt-2">
       <!-- Card para ronda abierta (no activa) -->
       <div class="col mb-3">
         <div :class="{'card': true, 'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
           <div class="card-body text-center">
             <h5 class="card-title">📢 Ronda Abierta</h5>
             <p class="card-text">
-              {{ isRondaAbierta ? 'Actualmente hay una ronda abierta para subir charlas. ¡Aprovecha la oportunidad de compartir tus ideas!' : 'No hay rondas abiertas para subir charlas.' }}
+              <!-- Mensaje para indicar si puede subir charla o no -->
+              <span v-if="isRondaAbierta">
+                {{ puedeSubirCharla 
+                  ? 'Actualmente hay una ronda abierta para subir charlas. ¡Aprovecha la oportunidad de compartir tus ideas!' 
+                  : 'Actualmente hay una ronda abierta, pero ya tienes una charla registrada para esta ronda.' }}
+              </span>
+              <span v-else>
+                No hay rondas abiertas para subir charlas.
+              </span>
             </p>
-            <router-link 
-              to="/charlas"
-              class="btn"
-              :class="isRondaAbierta ? 'btn-primary' : 'btn-secondary'"
-              :disabled="!isRondaAbierta"
-            >Subir charla</router-link>
+            <!-- Button en lugar de router link porque si pones 2 condiciones para que sea disabled, no tiene ningun efecto -->
+            <button 
+              :class="isRondaAbierta && puedeSubirCharla ? 'btn btn-primary' : 'btn btn-secondary'"
+              :disabled="!isRondaAbierta || !puedeSubirCharla"
+              @click="$router.push('/charlas')"
+            >
+              Subir charla
+            </button>
           </div>
-        </div>
+        </div>  
       </div>
     
       <!-- Card para votación activa (activa o no activa) -->
@@ -27,22 +36,33 @@
           <div class="card-body text-center">
             <h5 class="card-title">🔔 Votación Activa</h5>
             <p class="card-text">
-              {{ isVotacionActiva ? 'Actualmente hay una votación activa para elegir las próximas charlas. ¡Haz que tu voz cuente!' : 'No hay votaciones activas en este momento.' }}
+              <span v-if="isVotacionActiva">
+                {{ !puedeVotar 
+                  ? 'La votación está activa, pero ya has emitido tu voto. ¡Gracias por participar!' 
+                  : 'Actualmente hay una votación activa para elegir las próximas charlas. ¡Haz que tu voz cuente!' 
+                }}
+              </span>
+              <span v-else>
+                No hay votaciones activas en este momento.
+              </span>
             </p>
-            <router-link 
-              to="/charlas"
-              class="btn"
-              :class="isVotacionActiva ? 'btn-primary' : 'btn-secondary'"
-              :disabled="!isVotacionActiva"
-            >Ir a Votar</router-link>
+            <button 
+              :class="isVotacionActiva && puedeVotar ? 'btn btn-primary' : 'btn btn-secondary'"
+              :disabled="!isVotacionActiva || !puedeVotar"
+              @click="$router.push('/charlas')"
+            >
+              Ir a Votar
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-4">
+      <h1 class="mt-4 pt-0 mt-md-4 pt-md-3">Calendario</h1>
+      <hr class="  mb-4 pb-2">
       <!-- Guía de colores -->
-      <div class="mt-4 pt-0 mt-md-5 pt-md-3">
+      <div>
         <div class="row">
           <!-- Ronda Abierta -->
           <div class="col-md-auto">
@@ -72,8 +92,10 @@
       <!-- Calendario -->
       <div class="mt-3">
         <!-- Contenedor con scroll horizontal -->
-        <div class="calendar-wrapper">
-          <FullCalendar :options="calendarOptions" />
+        <div class="parent-container">
+          <div class="calendar-wrapper">
+            <FullCalendar :options="calendarOptions" />
+          </div>
         </div>
       </div>
     </div>
@@ -81,8 +103,6 @@
 </template>
 
 <script>
-// import FullCalendar from '@fullcalendar/vue3/dist/FullCalendar';
-
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -112,6 +132,8 @@ export default {
       role: "",
       isRondaAbierta: false, 
       isVotacionActiva: false,
+      puedeSubirCharla: false, 
+      puedeVotar: false, 
       rondas: [],
     };
   },
@@ -193,8 +215,8 @@ export default {
       });
     },
 
-
     evaluarRondas(){
+      // Obtener las rondas.
       serviceChar.getRondas()
       .then(response => {
         this.rondas = response;
@@ -204,53 +226,85 @@ export default {
         let isVotacionActiva = false;
         const events = []; // Para llenar el calendario
 
-        this.rondas.forEach(ronda => {
-          const fechaCierre = new Date(ronda.fechaCierre);
-          const fechaLimiteVotacion = new Date(ronda.fechaLimiteVotacion);
-          const fechaPresentacion = new Date(ronda.fechaPresentacion);
+        // Obtener las charlas del alumno
+        serviceChar.getCharlasAlumno()
+        .then(charlasAlumno => {
+          
+          // Obtener los votos del alumno
+          serviceChar.getVotosAlumno()
+          .then(votosAlumno => {
+            
+            this.rondas.forEach(ronda => {
+              const fechaCierre = new Date(ronda.fechaCierre + 'Z'); // Agregar "Z" al final para interpretar como UTC
+              const fechaLimiteVotacion = new Date(ronda.fechaLimiteVotacion + 'Z');
+              const fechaPresentacion = new Date(ronda.fechaPresentacion + 'Z');
 
-          // Comprobar si la ronda está abierta para solicitar charlas
-          if (ahora <= fechaCierre) {
-            isRondaAbierta = true;
+              // Comprobar si la ronda está abierta para solicitar charlas
+              if (ahora <= fechaCierre) {
+                isRondaAbierta = true;
 
-            events.push({
-              title: `${ronda.descripcionModulo}`,
-              start: ahora.toISOString().split('T')[0],
-              end: fechaCierre.toISOString().split('T')[0],
-              color: 'blue'
+                events.push({
+                  title: `${ronda.descripcionModulo}`,
+                  start: ahora.toISOString().split('T')[0],
+                  end: fechaCierre.toISOString().split('T')[0],
+                  color: 'blue'
+                });
+
+                // Verificar si el alumno ya tiene una charla asociada a esta ronda
+                const charlaEnRonda = charlasAlumno.some(charla => charla.charla.idRonda === ronda.idRonda);
+
+                // Si no tiene charla en esta ronda, puede subir una nueva
+                if (!charlaEnRonda) {
+                  this.puedeSubirCharla = true;
+                }
+              }
+
+              // Comprobar si hay una votación activa (entre la fecha de cierre y la fecha límite de votación)
+              if (ahora <= fechaLimiteVotacion) {
+                if (ahora > fechaCierre && ahora <= fechaLimiteVotacion){
+                  isVotacionActiva = true;
+
+                  // Verificar si el alumno ya votó en esta ronda
+                  const votoEnRonda = votosAlumno.some(voto => voto.idRonda === ronda.idRonda);
+  
+                  if (!votoEnRonda) {
+                    this.puedeVotar = true;
+                  }
+                }
+
+                events.push({
+                  title: `${ronda.descripcionModulo}`,
+                  start: fechaCierre.toISOString().split('T')[0],
+                  end: fechaLimiteVotacion.toISOString().split('T')[0],
+                  color: 'green'
+                });
+              }
+
+              // Evento de presentación de la charla
+              events.push({
+                title: `${ronda.descripcionModulo}`,
+                date: fechaPresentacion.toISOString().split('T')[0],
+                color: 'purple',
+              });
             });
-          }
 
-          // Comprobar si hay una votación activa (entre la fecha de cierre y la fecha límite de votación)
-          if (ahora > fechaCierre && ahora <= fechaLimiteVotacion) {
-            isVotacionActiva = true;
-            events.push({
-              title: `${ronda.descripcionModulo}`,
-              start: fechaCierre.toISOString().split('T')[0],
-              end: fechaLimiteVotacion.toISOString().split('T')[0],
-              color: 'green'
-            });
-          } else if (ahora < fechaCierre) {
-            events.push({
-              title: `${ronda.descripcionModulo}`,
-              start: fechaCierre.toISOString().split('T')[0], 
-              end: fechaLimiteVotacion.toISOString().split('T')[0], 
-              color: 'green',
-              textColor: 'white'
-            });
-          }
+            // Actualizar variables de estado
+            this.isRondaAbierta = isRondaAbierta;
+            this.isVotacionActiva = isVotacionActiva;
+            this.calendarOptions.events = events;
 
-          // Evento de presentación de la charla
-          events.push({
-            title: `${ronda.descripcionModulo}`,
-            date: fechaPresentacion.toISOString().split('T')[0],
-            color: 'purple',
+            // Si no hay rondas abiertas, no se puede subir charla
+            if (!isRondaAbierta) {
+              this.puedeSubirCharla = false;
+            }
+          })
+          .catch(error => {
+            console.error('Error al obtener los votos del alumno:', error);
           });
+        })
+        .catch(error => {
+          console.error('Error al obtener las charlas del alumno:', error);
         });
-
-        this.isRondaAbierta = isRondaAbierta;
-        this.isVotacionActiva = isVotacionActiva;
-        this.calendarOptions.events = events;
       })
       .catch(error => {
         console.error('Error al obtener las rondas de charlas:', error);
@@ -297,10 +351,15 @@ export default {
     font-size: 16px;
   }
 
+  .parent-container {
+    overflow-x: auto;
+    width: 100%;
+  }
+
   .calendar-wrapper {
     overflow-x: auto;
-    width: 100%; /* 100% del ancho disponible */
+    width: 100%;
     max-width: 100%;
-    min-width: 510px !important;
+    min-width: 510px;
   }
 </style>

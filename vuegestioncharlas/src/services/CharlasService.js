@@ -19,7 +19,51 @@ export default class CharlasService {
                 resolve(response.data);
             })
             .catch(error => {
-                console.error("Error al obtener las rondas de charlas:':", error.response ? error.response.data : error);
+                console.error("Error al obtener las rondas de charlas: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    getCharlasAlumno(){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/charlas/charlasalumno';
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener la charla de una ronda: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    getVotosAlumno(){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/votos/votosalumno';
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener la charla de una ronda: ", error.response ? error.response.data : error);
                 reject(error);
             });
         });
