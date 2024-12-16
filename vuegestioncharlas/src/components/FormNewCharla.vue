@@ -63,9 +63,9 @@
 <script>
 import Swal from 'sweetalert2';
 
-// import CharlasService from '@/services/CharlasService';
+import CharlasService from '@/services/CharlasService';
 
-// const serviceChar = new CharlasService();
+const serviceChar = new CharlasService();
 
 export default {
     data() {
@@ -87,7 +87,43 @@ export default {
             ],
         };
     },
+    mounted(){
+        serviceChar.getRondas()
+        .then(response => {
+            const rondas = response;
+            const fechaActual = new Date();
+
+            // Filtrar rondas abiertas antes de la fecha de cierre
+            this.rondasDisponibles = rondas
+            .filter(ronda => new Date(ronda.fechaCierre) > fechaActual)
+            .map(ronda => ({
+                id: ronda.idRonda,
+                descripcion: ronda.descripcionModulo
+            }));
+
+            // Obtener las charlas del alumno
+            serviceChar.getCharlasAlumno()
+            .then(charlasResponse => {
+                this.rondasDisponibles.forEach(ronda => {
+                    ronda.puedeSubirCharla = this.puedeSubirCharlaEnRonda(ronda, charlasResponse);
+                });
+
+                // Filtrar solo las rondas donde el alumno pueda subir una charla
+                this.rondasDisponibles = this.rondasDisponibles.filter(ronda => ronda.puedeSubirCharla);
+            })
+            .catch(error => {
+                console.error("Error al obtener las charlas del alumno en new charla:", error);
+            });
+        })
+        .catch(error => {
+            console.error('Error al obtener las rondas de charlas en new charla:', error);
+        });
+    },
     methods: {
+        puedeSubirCharlaEnRonda(ronda, charlas) {
+            const charlasEnRonda = charlas.filter(charla => charla.charla.idRonda === ronda.id);
+            return charlasEnRonda.length === 0 ? true : false;
+        },
         isValidForm() {
             return (
                 this.form.titulo.trim() &&
