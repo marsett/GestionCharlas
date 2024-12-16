@@ -69,27 +69,25 @@ export default class CharlasService {
         });
     }
 
-    async getTodasLasCharlas() {
-        const endpoint = 'api/charlas';
-        const token = Cookies.get('bearer_token');
-        try {
-          const response = await axios.get(Global.urlBase + endpoint, {
-            headers: { Authorization: token },
-          });
-          return response.data;
-        } catch (error) {
-          console.error('Error al obtener todas las charlas: ', error.response?.data || error);
-          throw error;
-        }
-      }
-    
-      async getCharlasPorRondasActivas(rondasActivas) {
-        try {
-          const charlas = await this.getTodasLasCharlas();
-          return charlas.filter(charla => rondasActivas.includes(charla.idRonda));
-        } catch (error) {
-          console.error('Error al filtrar las charlas por rondas activas: ', error);
-          throw error;
-        }
-      }
+    getCharlas() {
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/charlas';
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener las charlas: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
 }
