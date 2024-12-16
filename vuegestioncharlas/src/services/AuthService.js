@@ -19,7 +19,7 @@ export default class AuthService {
                 }
             )
             .then(response => {
-                resolve(response.data.response);
+                resolve(response.data);
             })
             .catch(error => {
                 console.error("Error al obtener el token:", error.response ? error.response.data : error);
@@ -107,4 +107,5 @@ export default class AuthService {
     //         });
     //     });
     // }
+    
 }

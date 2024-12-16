@@ -1,0 +1,76 @@
+import axios from "axios";
+import { Global } from "@/Global";
+import Cookies from "cookies-js";
+
+export default class AdminService {
+  getProfesores() {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .get(`${Global.urlBase}/api/Admin/Profesores`, {
+        headers: { Authorization: token },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al obtener profesores:", err);
+        throw err;
+      });
+  }
+
+  getUsuariosActivos() {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .get(`${Global.urlBase}/api/Admin/UsuariosActivos`, {
+        headers: { Authorization: token },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al obtener usuarios activos:", err);
+        throw err;
+      });
+  }
+
+  updateEstadoProfesor(idUsuario, estado) {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .put(
+        `${Global.urlBase}/api/Admin/UpdateEstadoProfesor/${idUsuario}/${estado}`,
+        {},
+        { headers: { Authorization: token } }
+      )
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al actualizar estado del profesor:", err);
+        throw err;
+      });
+  }
+
+  updateCursoUsuario(idUsuario, idCurso) {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .put(
+        `${Global.urlBase}/api/Admin/UpdateCursoUsuario/${idUsuario}/${idCurso}`,
+        {},
+        { headers: { Authorization: token } }
+      )
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al actualizar curso del usuario:", err);
+        throw err;
+      });
+  }
+
+  updateRolUsuario(idUsuario, idRol) {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .put(
+        `${Global.urlBase}/api/Admin/UpdateRoleUsuario/${idUsuario}/${idRol}`,
+        {},
+        { headers: { Authorization: token } }
+      )
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al actualizar rol del usuario:", err);
+        throw err;
+      });
+  }
+}

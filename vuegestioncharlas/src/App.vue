@@ -1,41 +1,50 @@
 <template>
-  <MenuComponent v-if="isLoggedIn"/>
+  <MenuComponentAlumno v-if="isLoggedIn && userRole === 'ALUMNO'" />
+  <MenuComponentProfesor v-if="isLoggedIn && userRole === 'PROFESOR'" />
+  <MenuComponentAdmin v-if="isLoggedIn && userRole === 'ADMINISTRADOR'" />
   <router-view></router-view>
 </template>
 
 <script>
-import Cookies from 'cookies-js';
-import MenuComponent from './components/MenuComponent.vue';
+import Cookies from "cookies-js";
+import MenuComponentAlumno from "./components/MenuAlumnoComponent.vue";
+import MenuComponentProfesor from "./components/MenuComponentProfesor.vue";
+import MenuComponentAdmin from "./components/MenuComponentAdmin.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    MenuComponent
+    MenuComponentAlumno,
+    MenuComponentProfesor,
+    MenuComponentAdmin,
+
   },
   data() {
     return {
       isLoggedIn: false,
+      userRole: null,
     };
   },
   watch: {
     // Observamos los cambios en la ruta para verificar login
-    '$route'() {
+    $route() {
       this.checkAuthentication();
     },
   },
   created() {
     // Llamamos al método para comprobar si el usuario está autenticado
-    this.checkAuthentication();  
+    this.checkAuthentication();
   },
   methods: {
     checkAuthentication() {
-      const token = Cookies.get('bearer_token');
+      const token = Cookies.get("bearer_token");
+      const role = Cookies.get("user_role");
       this.isLoggedIn = !!token; // Determina si el usuario está logueado
+      this.userRole = role;
     },
   },
-}
+};
 </script>
 
 <style>
-
 </style>
