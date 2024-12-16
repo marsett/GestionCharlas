@@ -103,9 +103,9 @@
         v-if="!editMode"
         class="d-flex gap-3 mt-4 justify-content-center justify-content-md-start"
       >
-        <button class="btn btn-primary" @click="activarEdicion">
+        <!-- <button class="btn btn-primary" @click="activarEdicion">
           Editar Perfil
-        </button>
+        </button> -->
         <router-link class="nav-link" to="/charlasalumno">
           <button class="btn btn-primary">Mis Charlas</button>
         </router-link>
@@ -125,10 +125,10 @@ export default {
   name: "PerfilAlumnoComponent",
   data() {
     return {
-      usuario: null, // Datos del usuario
+      usuario: null,
       perfilService: new PerfilService(),
-      editMode: false, // Estado de edición, inicialmente desactivado
-      editedUsuario: {} // Almacenará los datos editados temporalmente
+      // editMode: false,
+      // editedUsuario: {}
     };
   },
   methods: {
@@ -142,33 +142,33 @@ export default {
         alert("No se pudo cargar la información del perfil.");
       }
     },
-    activarEdicion() {
-      this.editMode = true; // Activar el modo de edición
-      this.editedUsuario = { ...this.usuario }; // Copiar los datos actuales al formulario
-    },
-    async guardarCambios() {
-      try {
-        // Llama al método editarPerfil con los datos del usuario actualizados
-        await this.perfilService.editarPerfil({
-          idUsuario: this.usuario.idUsuario,
-          nombre: this.editedUsuario.nombre,
-          apellidos: this.editedUsuario.apellidos,
-          email: this.editedUsuario.email,
-          estadoUsuario: this.usuario.estadoUsuario,
-          imagen: this.usuario.imagen,
-          password: this.usuario.password,
-          idRole: this.usuario.idRole,
-        });
+    // activarEdicion() {
+    //   this.editMode = true; // Activar el modo de edición
+    //   this.editedUsuario = { ...this.usuario }; // Copiar los datos actuales al formulario
+    // },
+    // async guardarCambios() {
+    //   try {
+    //     // Llama al método editarPerfil con los datos del usuario actualizados
+    //     await this.perfilService.editarPerfil({
+    //       idUsuario: this.usuario.idUsuario,
+    //       nombre: this.editedUsuario.nombre,
+    //       apellidos: this.editedUsuario.apellidos,
+    //       email: this.editedUsuario.email,
+    //       estadoUsuario: this.usuario.estadoUsuario,
+    //       imagen: this.usuario.imagen,
+    //       password: this.usuario.password,
+    //       idRole: this.usuario.idRole,
+    //     });
 
-        // Actualiza el estado del componente
-        this.usuario = { ...this.usuario, ...this.editedUsuario };
-        this.editMode = false; // Salir del modo de edición
-        alert("Perfil actualizado con éxito.");
-      } catch (error) {
-        console.error("Error al guardar los cambios:", error);
-        alert("No se pudo actualizar el perfil. Inténtalo de nuevo.");
-      }
-    },
+    //     // Actualiza el estado del componente
+    //     this.usuario = { ...this.usuario, ...this.editedUsuario };
+    //     this.editMode = false; // Salir del modo de edición
+    //     alert("Perfil actualizado con éxito.");
+    //   } catch (error) {
+    //     console.error("Error al guardar los cambios:", error);
+    //     alert("No se pudo actualizar el perfil. Inténtalo de nuevo.");
+    //   }
+    // },
     cancelarEdicion() {
       this.editMode = false; // Cancelar edición
       this.editedUsuario = { ...this.usuario }; // Revertir cambios no guardados

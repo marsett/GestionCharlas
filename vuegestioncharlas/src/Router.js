@@ -5,6 +5,8 @@ import LoginComponent from './components/LoginComponent.vue';
 import PerfilAlumnoComponent from './components/PerfilAlumnoComponent.vue';
 import CharlasComponent from './components/CharlasComponent.vue';
 import CharlasAlumnoComponent from './components/CharlasAlumnoComponent.vue';
+import AdminGestionUsuariosComponent from "@/components/AdminGestionUsuariosComponent";
+import AdminGestionProfesoresComponent from "@/components/AdminGestionProfesoresComponent";
 
 const routes = [
     {
@@ -67,6 +69,30 @@ const routes = [
             }
         }
     },
+    {
+    path: '/gestionusuarios',
+        component: AdminGestionUsuariosComponent,
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token');
+            if (token) {
+                next(); 
+            } else {
+                next('/login');
+            }
+        }
+    },
+    {
+        path: '/gestionprofesores',
+            component: AdminGestionProfesoresComponent,
+            beforeEnter: (to, from, next) => {
+                const token = Cookies.get('bearer_token');
+                if (token) {
+                    next(); 
+                } else {
+                    next('/login');
+                }
+            }
+        }
 ];
 
 const router = createRouter({
