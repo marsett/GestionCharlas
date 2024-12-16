@@ -160,7 +160,7 @@ export default {
         year: 'numeric'
       });
 
-      console.log('Eventos:', this.calendarOptions.events);  // Verifica los eventos disponibles
+      // console.log('Eventos:', this.calendarOptions.events);  // Verifica los eventos disponibles
 
       // Filtrar eventos que coinciden con la fecha seleccionada
       let eventList = "";
@@ -175,7 +175,7 @@ export default {
           const selectedDate = new Date(clickedDate.setHours(0, 0, 0, 0));  // Fecha seleccionada sin hora
 
           // Comprobar si la fecha seleccionada está dentro del rango de fechas del evento
-          return selectedDate >= startDate && selectedDate <= endDate;
+          return selectedDate >= startDate && selectedDate < endDate || startDate.toISOString().split('T')[0] === selectedDate.toISOString().split('T')[0];
         });
 
         if (eventsOnSelectedDate.length > 0) {

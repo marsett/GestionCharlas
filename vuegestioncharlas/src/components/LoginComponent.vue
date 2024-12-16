@@ -246,7 +246,8 @@
         service.getToken(this.userName, this.password)
         .then(response => {
           let fechaCaducidad = new Date();
-          fechaCaducidad.setTime(fechaCaducidad.getTime() + (2 * 60 * 60 * 1000)); // 2 horas en milisegundos
+          fechaCaducidad.setTime(fechaCaducidad.getTime() + (30 * 60 * 1000)); // 30 minutos en milisegundos
+
 
           let token = 'bearer ' + response;
           Cookies.set('bearer_token', token, { expires: fechaCaducidad });
