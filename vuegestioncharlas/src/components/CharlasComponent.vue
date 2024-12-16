@@ -1,16 +1,22 @@
 <template>
     <div class="container">
-        <h2 class="my-4">Todas las charlas</h2>
+        <h2>Todas las charlas</h2>
         <div class="row">
-            <div v-for="charla in charlas" :key="charla.id" class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">
-                        {{ charla.titulo }}
+            <div class="col-md-4" v-for="charla in charlas" :key="charla.id">
+                <div class="card">
+                    <div v-if="charla.estadoCharla" :class="estadoClass(charla.estadoCharla)" class="estado-btn">
+                        {{ charla.estadoCharla }}
                     </div>
+                    <img class="card-img-top" src="../assets/banner_default.jpg" alt="Card image cap">
                     <div class="card-body">
                         <h5 class="card-title">{{ charla.titulo }}</h5>
                         <p class="card-text">{{ charla.descripcion }}</p>
-                        <a href="#" class="btn btn-primary">Ver más</a>
+                        <button class="btn btn-primary" @click="mostrarDetalles(charla.idCharla)">Ver detalles</button>
+                        <div v-if="charla.mostrarDetalles" class="card-footer">
+                            <p><strong>Fecha Propuesta:</strong> {{ charla.fechaPropuesta }}</p>
+                            <p><strong>Usuario:</strong> {{ charla.usuario }}</p>
+                            <p><strong>Curso:</strong> {{ charla.nombreCurso }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -30,7 +36,7 @@ export default {
     },
     methods: {
         cargarCharlas() {
-            serviceCharlas.getCharlas()  
+            serviceCharlas.getCharlas()
                 .then(response => {
                     console.log('Charlas cargadas:', response);
                     this.charlas = response;
@@ -39,6 +45,24 @@ export default {
                     console.error('Error al cargar las charlas:', error);
                 });
         },
+        mostrarDetalles(idCharla) {
+            const charla = this.charlas.find(c => c.idCharla === idCharla);
+            if (charla) {
+                charla.mostrarDetalles = !charla.mostrarDetalles; // Alterna la visibilidad de los detalles
+            }
+        },
+        estadoClass(estado) {
+            switch (estado) {
+                case 'Propuesta':
+                    return 'btn btn-info';
+                case 'Aceptada':
+                    return 'btn btn-success';
+                case 'Rechazada':
+                    return 'btn btn-danger';
+                default:
+                    return 'btn btn-secondary';
+            }
+        }
     },
     mounted() {
         this.cargarCharlas();
@@ -47,6 +71,10 @@ export default {
 </script>
 
 <style scoped>
+.container {
+    margin-top: 20px;
+}
+
 .card-header {
     font-weight: bold;
     background-color: #f8f9fa;
@@ -55,9 +83,23 @@ export default {
 .card {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
+    margin-bottom: 20px;
+    margin-top: 10px;
 }
 
 .card:hover {
     transform: translateY(-5px);
+}
+
+.estado-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  z-index: 10;
+  pointer-events: none;
 }
 </style>

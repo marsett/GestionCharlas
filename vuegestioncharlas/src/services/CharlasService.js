@@ -71,7 +71,7 @@ export default class CharlasService {
 
     getCharlas() {
         return new Promise((resolve, reject) => {
-            const endpoint = 'api/charlas';
+            const endpoint = 'api/charlas/charlascurso';
             const token = Cookies.get('bearer_token');
             axios.get(
                 Global.urlBase + endpoint,
