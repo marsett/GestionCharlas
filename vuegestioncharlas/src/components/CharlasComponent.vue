@@ -20,6 +20,7 @@
 
 <script>
 import CharlasService from '@/services/CharlasService';
+const serviceCharlas = new CharlasService();
 export default {
     name: 'CharlasComponent',
     data() {
@@ -29,7 +30,7 @@ export default {
     },
     methods: {
         cargarCharlas() {
-            CharlasService.getCharlas()  
+            serviceCharlas.getCharlas()  
                 .then(response => {
                     console.log('Charlas cargadas:', response);
                     this.charlas = response;
