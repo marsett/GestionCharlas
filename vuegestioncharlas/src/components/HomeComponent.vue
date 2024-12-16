@@ -23,9 +23,11 @@
               :class="isRondaAbierta && puedeSubirCharla ? 'btn btn-primary' : 'btn btn-secondary'"
               :disabled="!isRondaAbierta || !puedeSubirCharla"
               @click="$router.push('/charlas')"
+              v-if="!isRondaAbierta || !puedeSubirCharla"
             >
               Subir charla
             </button>
+            <FormNewCharla v-else/>
           </div>
         </div>  
       </div>
@@ -110,6 +112,7 @@ import esLocale from '@fullcalendar/core/locales/es';
 import Swal from 'sweetalert2';
 import PerfilService from '@/services/PerfilService';
 import CharlasService from '@/services/CharlasService';
+import FormNewCharla from './FormNewCharla.vue';
 
 const servicePerf = new PerfilService();
 const serviceChar = new CharlasService();
@@ -118,6 +121,7 @@ export default {
   name: "HomeComponent",
   components: {
     FullCalendar,
+    FormNewCharla,
   },
   data() {
     return {
