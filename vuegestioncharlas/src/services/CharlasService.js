@@ -68,4 +68,26 @@ export default class CharlasService {
             });
         });
     }
+
+    getCharlas() {
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/charlas/charlascurso';
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener las charlas: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
 }
