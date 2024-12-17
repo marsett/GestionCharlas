@@ -94,16 +94,17 @@ export default class CharlasService {
     setCharla(form){
         return new Promise((resolve, reject) => {
             const endpoint = 'api/charlas';
+            const token = Cookies.get('bearer_token');
             const json = JSON.stringify({
                 idCharla: 0,
                 titulo: form.titulo,
-                descripcion: "string",
-                tiempo: 0,
-                fechaPropuesta: "2024-12-17T08:40:57.817Z",
+                descripcion: form.descripcion,
+                tiempo: form.tiempo,
+                fechaPropuesta: form.fechaPropuesta+'T00:00:00',
                 idUsuario: 0,
-                idEstadoCharla: 0,
-                idRonda: 0,
-                imagenCharla: "string"
+                idEstadoCharla: 1,
+                idRonda: form.idRonda,
+                imagenCharla: "https://static.vecteezy.com/system/resources/previews/022/555/586/non_2x/3d-abstract-red-and-black-background-by-ai-generated-can-be-use-as-facebook-cover-free-photo.jpg"
             });
             axios.post(
                 Global.urlBase + endpoint,
@@ -111,6 +112,7 @@ export default class CharlasService {
                 {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: token, 
                     }
                 }
             )

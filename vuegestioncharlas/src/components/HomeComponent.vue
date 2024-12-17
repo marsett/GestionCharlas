@@ -27,7 +27,7 @@
             >
               Subir charla
             </button>
-            <FormNewCharla v-else/>
+            <FormNewCharla @evaluarRondas="actualizarContenido" v-else/>
           </div>
         </div>  
       </div>
@@ -228,6 +228,7 @@ export default {
 
         let isRondaAbierta = false;
         let isVotacionActiva = false;
+        this.puedeSubirCharla = false;
         const events = []; // Para llenar el calendario
 
         // Obtener las charlas del alumno
@@ -313,7 +314,12 @@ export default {
       .catch(error => {
         console.error('Error al obtener las rondas de charlas:', error);
       });
-    }
+    },
+
+    actualizarContenido() {
+      this.evaluarRondas();
+    },
+
   },
 }
 </script>
