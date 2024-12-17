@@ -90,4 +90,37 @@ export default class CharlasService {
             });
         });
     }
+
+    setCharla(form){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/charlas';
+            const json = JSON.stringify({
+                idCharla: 0,
+                titulo: form.titulo,
+                descripcion: "string",
+                tiempo: 0,
+                fechaPropuesta: "2024-12-17T08:40:57.817Z",
+                idUsuario: 0,
+                idEstadoCharla: 0,
+                idRonda: 0,
+                imagenCharla: "string"
+            });
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al crear el usuario:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
 }

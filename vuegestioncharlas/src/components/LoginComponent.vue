@@ -306,7 +306,9 @@ export default {
       this.isLoading = true;
       service.getToken(this.userName, this.password).then((data) => {
         let fechaCaducidad = new Date();
-        fechaCaducidad.setTime(fechaCaducidad.getTime() + (30 * 60 * 1000)); // 30 min en milisegundos
+        // fechaCaducidad.setTime(fechaCaducidad.getTime() + (30 * 60 * 1000)); // 30 min en milisegundos
+        fechaCaducidad.setTime(fechaCaducidad.getTime() + (4 * 60 * 60 * 1000)); // 4 horas en milisegundos
+
 
         const token = "bearer " + data.response;
         Cookies.set("bearer_token", token, { expires: fechaCaducidad });

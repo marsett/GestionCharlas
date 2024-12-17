@@ -71,7 +71,6 @@ export default {
     data() {
         return {
             form: {
-                idCharla: 0,
                 titulo: "",
                 descripcion: "",
                 tiempo: 0,
@@ -144,7 +143,12 @@ export default {
             } 
 
             console.log("Formulario enviado:", this.form);
-                alert("Charla registrada con éxito.");
+
+            Swal.fire({
+                title: "Charla registrada con éxito!",
+                icon: "success",
+                draggable: true
+            });
         }
     }
 }
