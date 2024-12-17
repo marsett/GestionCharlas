@@ -35,23 +35,32 @@
                         <!-- Fecha Propuesta -->
                         <div class="col-md-6">
                             <label for="fechaPropuesta" class="form-label">Fecha propuesta: <span class="text-danger">*</span></label>
-                            <input type="datetime-local" class="form-control" id="fechaPropuesta" v-model="form.fechaPropuesta" required>
+                            <!-- <input type="datetime-local" class="form-control" id="fechaPropuesta" v-model="form.fechaPropuesta" required> -->
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="fechaPropuesta"
+                                v-model="form.fechaPropuesta"
+                                :min="fechaPropuesta"
+                                disabled
+                                required
+                            />
                         </div>
                         <!-- ID Ronda -->
                         <div class="col-md-12">
                             <label for="idRonda" class="form-label">Ronda disponible: <span class="text-danger">*</span></label>
                             <select class="form-select" id="idRonda" v-model="form.idRonda" required>
-                            <option value="" disabled selected>--- Seleccionar ---</option>
-                            <option v-for="ronda in rondasDisponibles" :key="ronda.id" :value="ronda.id">
-                                {{ ronda.descripcion }}
-                            </option>
+                                <option value="" disabled selected>--- Seleccionar ---</option>
+                                <option v-for="ronda in rondasDisponibles" :key="ronda.id" :value="ronda.id">
+                                    {{ ronda.descripcion }}
+                                </option>
                             </select>
                         </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearForm()" id="cancelarFormNew">Cancelar</button>
                     <button type="submit" class="btn btn-primary" form="formCharla" @click.prevent="submitCharla">Subir</button>
                 </div>
             </div>
@@ -74,16 +83,10 @@ export default {
                 titulo: "",
                 descripcion: "",
                 tiempo: 0,
-                fechaPropuesta: "",
-                idUsuario: 0,
-                idEstadoCharla: 1,
+                fechaPropuesta: this.getCurrentDate(),
                 idRonda: "",
-                imagenCharla: "https://static.vecteezy.com/system/resources/previews/022/555/586/non_2x/3d-abstract-red-and-black-background-by-ai-generated-can-be-use-as-facebook-cover-free-photo.jpg"
             },
-            rondasDisponibles: [
-                { id: 1, descripcion: "Ronda 1" },
-                { id: 2, descripcion: "Ronda 2" }
-            ],
+            rondasDisponibles: [],
         };
     },
     mounted(){
@@ -97,7 +100,8 @@ export default {
             .filter(ronda => new Date(ronda.fechaCierre) > fechaActual)
             .map(ronda => ({
                 id: ronda.idRonda,
-                descripcion: ronda.descripcionModulo
+                descripcion: ronda.descripcionModulo,
+                fechaPresentacion: ronda.fechaPresentacion	
             }));
 
             // Obtener las charlas del alumno
@@ -123,13 +127,20 @@ export default {
             const charlasEnRonda = charlas.filter(charla => charla.charla.idRonda === ronda.id);
             return charlasEnRonda.length === 0 ? true : false;
         },
+        getCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = ("0" + (today.getMonth() + 1)).slice(-2); 
+            const day = ("0" + today.getDate()).slice(-2);
+            return `${year}-${month}-${day}`;
+        },
         isValidForm() {
             return (
-                this.form.titulo.trim() &&
-                this.form.descripcion.trim() &&
+                this.form.titulo.trim() !== "" &&
+                this.form.descripcion.trim() !== "" &&
                 this.form.tiempo > 0 &&
-                this.form.fechaPropuesta &&
-                this.form.idRonda
+                this.form.fechaPropuesta !== "" &&
+                this.form.idRonda !== ""
             );
         },
         submitCharla() {
@@ -142,14 +153,37 @@ export default {
                 return;
             } 
 
-            console.log("Formulario enviado:", this.form);
-
-            Swal.fire({
-                title: "Charla registrada con éxito!",
-                icon: "success",
-                draggable: true
+            serviceChar.setCharla(this.form)
+            .then(response => {
+                console.log(response);
+                Swal.fire({
+                    title: "Charla registrada con éxito!",
+                    icon: "success",
+                    draggable: true
+                })
+                .then(() => {
+                    document.getElementById('cancelarFormNew').click();
+                    this.$emit('evaluarRondas');
+                });
+            })
+            .catch(error => {
+                console.error('Error al crear una charla:', error);
+                Swal.fire({
+                    icon: "error",
+                    title: "No se pudo crear la charla",
+                    text: "Hubo un problema al intentar crear la charla. Por favor, inténtalo de nuevo más tarde.",
+                });
             });
-        }
+        },
+        clearForm() {
+            this.form = {
+                titulo: "",
+                descripcion: "",
+                tiempo: 0,
+                fechaPropuesta: "",
+                idRonda: "",
+            };
+        },
     }
 }
 </script>
