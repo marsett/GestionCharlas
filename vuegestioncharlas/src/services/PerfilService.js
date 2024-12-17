@@ -73,7 +73,6 @@ export default class PerfilService {
             const endpoint = "api/Usuarios";
             const token = Cookies.get('bearer_token');
     
-            // Construimos el payload para la actualización
             const payload = {
                 idUsuario: usuario.idUsuario,
                 nombre: usuario.nombre,
@@ -92,11 +91,11 @@ export default class PerfilService {
                 },
             })
                 .then(response => {
-                    resolve(response.data); // Devuelve la respuesta del servidor
+                    resolve(response.data); 
                 })
                 .catch(error => {
                     console.error("Error al editar el perfil:", error.response ? error.response.data : error);
-                    reject(error); // Propaga el error para ser manejado por el llamado
+                    reject(error); 
                 });
         });
     }

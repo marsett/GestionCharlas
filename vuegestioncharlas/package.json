@@ -14,11 +14,13 @@
     "@fullcalendar/timegrid": "^6.1.15",
     "@fullcalendar/vue3": "^6.1.15",
     "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
     "cookies-js": "^1.2.3",
     "core-js": "^3.8.3",
     "jquery": "^3.7.1",
     "sweetalert2": "^11.14.5",
     "vue": "^3.2.13",
+    "vue-confetti": "^2.3.0",
     "vue-router": "^4.0.13"
   },
   "devDependencies": {

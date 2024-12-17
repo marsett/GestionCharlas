@@ -73,4 +73,18 @@ export default class AdminService {
         throw err;
       });
   }
+
+  getRoles() {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .get(`${Global.urlBase}/api/Roles`, {
+        headers: { Authorization: token },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al obtener roles:", err);
+        throw err;
+      });
+  }
+
 }
