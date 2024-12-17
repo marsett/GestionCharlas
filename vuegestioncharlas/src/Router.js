@@ -7,6 +7,7 @@ import CharlasComponent from './components/CharlasComponent.vue';
 import CharlasAlumnoComponent from './components/CharlasAlumnoComponent.vue';
 import AdminGestionUsuariosComponent from "@/components/AdminGestionUsuariosComponent";
 import AdminGestionProfesoresComponent from "@/components/AdminGestionProfesoresComponent";
+import NotFoundComponent from "./components/NotFoundComponent.vue";
 
 const routes = [
     {
@@ -83,16 +84,22 @@ const routes = [
     },
     {
         path: '/gestionprofesores',
-            component: AdminGestionProfesoresComponent,
-            beforeEnter: (to, from, next) => {
-                const token = Cookies.get('bearer_token');
-                if (token) {
-                    next(); 
-                } else {
-                    next('/login');
-                }
+        component: AdminGestionProfesoresComponent,
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token');
+            if (token) {
+                next(); 
+            } else {
+                next('/login');
             }
         }
+    },
+    // Ruta catch-all para manejar Not Found
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFoundComponent
+    }
 ];
 
 const router = createRouter({
