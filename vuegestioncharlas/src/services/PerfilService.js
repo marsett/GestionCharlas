@@ -104,9 +104,9 @@ export default class PerfilService {
         return axios.get(Global.urlBase + "api/Profesor/RondasProfesor", {
           headers: { Authorization: Cookies.get("bearer_token") },
         }).then(response => response.data);
-      }
+    }
       
-      getAlumnosCursoProfesor() {
+    getAlumnosCursoProfesor() {
         return new Promise((resolve, reject) => {
             const endpoint = "api/Profesor/AlumnosCursoProfesor";
             const token = Cookies.get('bearer_token'); 
@@ -116,13 +116,13 @@ export default class PerfilService {
                     Authorization: token, 
                 },
             })
-                .then(response => {
-                    resolve(response.data); 
-                })
-                .catch(error => {
-                    console.error("Error al obtener las charlas:", error.response ? error.response.data : error);
-                    reject(error);
-                });
+            .then(response => {
+                resolve(response.data); 
+            })
+            .catch(error => {
+                console.error("Error al obtener los alumnos de un profesor:", error.response ? error.response.data : error);
+                reject(error);
+            });
         });
     }
     
