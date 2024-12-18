@@ -3,6 +3,7 @@ import Cookies from 'cookies-js';
 import HomeComponent from './components/HomeComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
 import PerfilAlumnoComponent from './components/PerfilAlumnoComponent.vue';
+import PerfilProfesorComponent from './components/PerfilProfesorComponent.vue';
 import CharlasComponent from './components/CharlasComponent.vue';
 import CharlasAlumnoComponent from './components/CharlasAlumnoComponent.vue';
 import AdminGestionUsuariosComponent from "@/components/AdminGestionUsuariosComponent";
@@ -37,6 +38,18 @@ const routes = [
     {
         path: '/perfilalumno',
         component: PerfilAlumnoComponent,
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token');
+            if (token) {
+                next(); 
+            } else {
+                next('/login');
+            }
+        }
+    },
+    {
+        path: '/perfilprofesor',
+        component: PerfilProfesorComponent,
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {

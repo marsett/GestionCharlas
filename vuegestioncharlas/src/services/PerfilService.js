@@ -99,5 +99,31 @@ export default class PerfilService {
                 });
         });
     }
+
+    getRondasProfesor() {
+        return axios.get(Global.urlBase + "api/Profesor/RondasProfesor", {
+          headers: { Authorization: Cookies.get("bearer_token") },
+        }).then(response => response.data);
+      }
+      
+      getAlumnosCursoProfesor() {
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/Profesor/AlumnosCursoProfesor";
+            const token = Cookies.get('bearer_token'); 
+
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token, 
+                },
+            })
+                .then(response => {
+                    resolve(response.data); 
+                })
+                .catch(error => {
+                    console.error("Error al obtener las charlas:", error.response ? error.response.data : error);
+                    reject(error);
+                });
+        });
+    }
     
 }
