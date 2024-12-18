@@ -285,12 +285,15 @@ export default {
                 });
               }
 
-              // Evento de presentación de la charla
-              events.push({
-                title: `${ronda.descripcionModulo}`,
-                date: fechaPresentacion.toISOString().split('T')[0],
-                color: 'purple',
-              });
+              if (ahora <= fechaPresentacion) {
+                // Evento de presentación de la charla
+                events.push({
+                  title: `${ronda.descripcionModulo}`,
+                  date: fechaPresentacion.toISOString().split('T')[0],
+                  color: 'purple',
+                });
+              }
+
             });
 
             // Actualizar variables de estado
