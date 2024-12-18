@@ -395,7 +395,7 @@ export default {
     },
 
     evaluarAlumnos(){
-      servicePerf.getAlumnosProfesor()
+      servicePerf.getAlumnosCursoProfesor()
       .then(response => {
         this.curso = response[0].curso.nombre;
         const data = response[0].alumnos;
