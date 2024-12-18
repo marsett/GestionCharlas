@@ -37,9 +37,9 @@
           <li class="nav-item">
             <router-link 
               class="nav-link" 
-              to="/perfilalumno" 
-              :class="{ selected: isSelected('/perfilalumno') }" 
-              @click="setSelected('/perfilalumno')"
+              to="/perfilprofesor" 
+              :class="{ selected: isSelected('/perfilprofesor') }" 
+              @click="setSelected('/perfilprofesor')"
             >
               <i class="fas fa-user-circle"></i> Perfil
             </router-link>
