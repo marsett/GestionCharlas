@@ -1,107 +1,160 @@
 <template>
-  <div class="container my-3" v-if="role == 2">
-    <h1 class="fw-semibold mt-4 mt-md-5">Hola, {{ nombre }} !</h1>
-    <div class="row row-cols-1 row-cols-md-2 my-4 pt-2">
-      <!-- Card para ronda abierta (no activa) -->
-      <div class="col mb-3">
-        <div :class="{'card': true, 'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
-          <div class="card-body text-center">
-            <h5 class="card-title">📢 Ronda Abierta</h5>
-            <p class="card-text">
-              <!-- Mensaje para indicar si puede subir charla o no -->
-              <span v-if="isRondaAbierta">
-                {{ puedeSubirCharla 
-                  ? 'Actualmente hay una ronda abierta para subir charlas. ¡Aprovecha la oportunidad de compartir tus ideas!' 
-                  : 'Actualmente hay una ronda abierta, pero ya tienes una charla registrada para esta ronda.' }}
-              </span>
-              <span v-else>
-                No hay rondas abiertas para subir charlas.
-              </span>
-            </p>
-            <!-- Button en lugar de router link porque si pones 2 condiciones para que sea disabled, no tiene ningun efecto -->
-            <button 
-              :class="isRondaAbierta && puedeSubirCharla ? 'btn btn-primary' : 'btn btn-secondary'"
-              :disabled="!isRondaAbierta || !puedeSubirCharla"
-              @click="$router.push('/charlas')"
-              v-if="!isRondaAbierta || !puedeSubirCharla"
-            >
-              Subir charla
-            </button>
-            <FormNewCharla @evaluarRondas="actualizarContenido" v-else/>
+  <div>
+
+    <div class="container my-3" v-if="role == 2">
+      <h1 class="fw-semibold mt-4 mt-md-5">Hola, {{ nombre }} !</h1>
+      <div class="row row-cols-1 row-cols-md-2 my-4 pt-2">
+        <!-- Card para ronda abierta (no activa) -->
+        <div class="col mb-3">
+          <div :class="{'card': true, 'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
+            <div class="card-body text-center">
+              <h5 class="card-title">📢 Ronda Abierta</h5>
+              <p class="card-text">
+                <!-- Mensaje para indicar si puede subir charla o no -->
+                <span v-if="isRondaAbierta">
+                  {{ puedeSubirCharla 
+                    ? 'Actualmente hay una ronda abierta para subir charlas. ¡Aprovecha la oportunidad de compartir tus ideas!' 
+                    : 'Actualmente hay una ronda abierta, pero ya tienes una charla registrada para esta ronda.' }}
+                </span>
+                <span v-else>
+                  No hay rondas abiertas para subir charlas.
+                </span>
+              </p>
+              <!-- Button en lugar de router link porque si pones 2 condiciones para que sea disabled, no tiene ningun efecto -->
+              <button 
+                :class="isRondaAbierta && puedeSubirCharla ? 'btn btn-primary' : 'btn btn-secondary'"
+                :disabled="!isRondaAbierta || !puedeSubirCharla"
+                @click="$router.push('/charlas')"
+                v-if="!isRondaAbierta || !puedeSubirCharla"
+              >
+                Subir charla
+              </button>
+              <FormNewCharla @evaluarRondas="actualizarContenido" v-else/>
+            </div>
+          </div>  
+        </div>
+      
+        <!-- Card para votación activa (activa o no activa) -->
+        <div class="col mb-3">
+          <div :class="{'card': true, 'inactive-card': !isVotacionActiva, 'active-card': isVotacionActiva}">
+            <div class="card-body text-center">
+              <h5 class="card-title">🔔 Votación Activa</h5>
+              <p class="card-text">
+                <span v-if="isVotacionActiva">
+                  {{ !puedeVotar 
+                    ? 'La votación está activa, pero ya has emitido tu voto. ¡Gracias por participar!' 
+                    : 'Actualmente hay una votación activa para elegir las próximas charlas. ¡Haz que tu voz cuente!' 
+                  }}
+                </span>
+                <span v-else>
+                  No hay votaciones activas en este momento.
+                </span>
+              </p>
+              <button 
+                :class="isVotacionActiva && puedeVotar ? 'btn btn-primary' : 'btn btn-secondary'"
+                :disabled="!isVotacionActiva || !puedeVotar"
+                @click="$router.push('/charlas')"
+              >
+                Ir a Votar
+              </button>
+            </div>
           </div>
-        </div>  
+        </div>
       </div>
-    
-      <!-- Card para votación activa (activa o no activa) -->
-      <div class="col mb-3">
-        <div :class="{'card': true, 'inactive-card': !isVotacionActiva, 'active-card': isVotacionActiva}">
-          <div class="card-body text-center">
-            <h5 class="card-title">🔔 Votación Activa</h5>
-            <p class="card-text">
-              <span v-if="isVotacionActiva">
-                {{ !puedeVotar 
-                  ? 'La votación está activa, pero ya has emitido tu voto. ¡Gracias por participar!' 
-                  : 'Actualmente hay una votación activa para elegir las próximas charlas. ¡Haz que tu voz cuente!' 
-                }}
-              </span>
-              <span v-else>
-                No hay votaciones activas en este momento.
-              </span>
-            </p>
-            <button 
-              :class="isVotacionActiva && puedeVotar ? 'btn btn-primary' : 'btn btn-secondary'"
-              :disabled="!isVotacionActiva || !puedeVotar"
-              @click="$router.push('/charlas')"
-            >
-              Ir a Votar
-            </button>
+
+      <div class="mb-4">
+        <h1 class="mt-4 pt-0 mt-md-4 pt-md-3">Calendario</h1>
+        <hr class="  mb-4 pb-2">
+        <!-- Guía de colores -->
+        <div>
+          <div class="row">
+            <!-- Ronda Abierta -->
+            <div class="col-md-auto">
+              <div class="d-flex align-items-center">
+                <div class="color-box" style="background-color: blue;"></div>
+                <span class="ms-2">Ronda abierta</span>
+              </div>
+            </div>
+            <!-- Votación Activa -->
+            <div class="col-md-auto">
+              <div class="d-flex align-items-center">
+                <div class="color-box" style="background-color: green;"></div>
+                <span class="ms-2">Votación activa</span>
+              </div>
+            </div>
+            <!-- Votación Terminada -->
+            <div class="col-md-auto">
+              <div class="d-flex align-items-center">
+                <div class="color-box" style="background-color: purple;"></div>
+                <span class="ms-2">Presentación</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-secondary small mt-2"><b>Nota:</b> Lo que aparece en el calendario es el titulo de la ronda.</p>
+        </div>
+
+        <!-- Calendario -->
+        <div class="mt-3">
+          <!-- Contenedor con scroll horizontal -->
+          <div class="parent-container">
+            <div class="calendar-wrapper">
+              <FullCalendar :options="calendarOptions" />
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="mb-4">
-      <h1 class="mt-4 pt-0 mt-md-4 pt-md-3">Calendario</h1>
-      <hr class="  mb-4 pb-2">
-      <!-- Guía de colores -->
-      <div>
-        <div class="row">
-          <!-- Ronda Abierta -->
-          <div class="col-md-auto">
-            <div class="d-flex align-items-center">
-              <div class="color-box" style="background-color: blue;"></div>
-              <span class="ms-2">Ronda abierta</span>
-            </div>
-          </div>
-          <!-- Votación Activa -->
-          <div class="col-md-auto">
-            <div class="d-flex align-items-center">
-              <div class="color-box" style="background-color: green;"></div>
-              <span class="ms-2">Votación activa</span>
-            </div>
-          </div>
-          <!-- Votación Terminada -->
-          <div class="col-md-auto">
-            <div class="d-flex align-items-center">
-              <div class="color-box" style="background-color: purple;"></div>
-              <span class="ms-2">Presentación</span>
+    <div class="container my-5" v-if="role == 1">
+      <h2 class="text-center mb-4 fw-bold">{{ curso }}</h2>
+
+      <!-- Fila de métricas clave -->
+      <div class="row mt-5 mb-5">
+        <!-- Total de Charlas Propuestas -->
+        <div class="col-md-3 mb-3">
+          <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+              <h5>Charlas propuestas</h5>
+              <h3>{{ totalCharlasPropuestas }}</h3>
             </div>
           </div>
         </div>
-        <p class="text-secondary small mt-2"><b>Nota:</b> Lo que aparece en el calendario es el titulo de la ronda.</p>
+        <!-- Charlas Pendientes -->
+        <div class="col-md-3 mb-3">
+          <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+              <h5>Charlas pendientes</h5>
+              <h3>{{ charlasPendientes }}</h3>
+            </div>
+          </div>
+        </div>
+        <!-- Total de Charlas Aceptadas -->
+        <div class="col-md-3 mb-3">
+          <div class="card bg-success text-white">
+            <div class="card-body text-center">
+              <h5>Charlas aceptadas</h5>
+              <h3>{{ totalCharlasAceptadas }}</h3>
+            </div>
+          </div>
+        </div>
+        <!-- Usuarios Sin Subir Charla -->
+        <div class="col-md-3 mb-3">
+          <div class="card bg-danger text-white">
+            <div class="card-body text-center">
+              <h5>Alumnos sin charla</h5>
+              <h3>{{ usuariosSinCharla }}</h3>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Calendario -->
-      <div class="mt-3">
-        <!-- Contenedor con scroll horizontal -->
-        <div class="parent-container">
-          <div class="calendar-wrapper">
-            <FullCalendar :options="calendarOptions" />
-          </div>
-        </div>
+      <!-- Gráfico de barras -->
+      <div class="mt-5 mb-5">
+        <canvas id="barChart"></canvas>
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -113,6 +166,12 @@ import Swal from 'sweetalert2';
 import PerfilService from '@/services/PerfilService';
 import CharlasService from '@/services/CharlasService';
 import FormNewCharla from './FormNewCharla.vue';
+
+
+import { Chart, CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend } from 'chart.js';
+
+// Registrar las escalas, elementos, y otros componentes
+Chart.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend);
 
 const servicePerf = new PerfilService();
 const serviceChar = new CharlasService();
@@ -134,11 +193,17 @@ export default {
       },
       nombre: "",
       role: "",
+      curso:"",
       isRondaAbierta: false, 
       isVotacionActiva: false,
       puedeSubirCharla: false, 
       puedeVotar: false, 
       rondas: [],
+      totalCharlasPropuestas: 0,
+      totalCharlasAceptadas: 0, 
+      charlasPendientes: 0,
+      usuariosSinCharla: 0, 
+      progresoGeneral: 0, 
     };
   },
   mounted() {
@@ -146,12 +211,18 @@ export default {
     .then(response => {
       this.nombre = response.usuario.nombre;
       this.role = response.usuario.idRole;
+
+      if(this.role == 1){
+        this.evaluarAlumnos();
+      }
+
+      if(this.role == 2){
+        this.evaluarRondas();
+      } 
     })
     .catch(error => {
       console.error('Error al obtener los datos de usuario:', error);
     });
-
-    this.evaluarRondas();
   },
   methods: {
     handleDateClick(info) {
@@ -323,6 +394,128 @@ export default {
       this.evaluarRondas();
     },
 
+    evaluarAlumnos(){
+      servicePerf.getAlumnosProfesor()
+      .then(response => {
+        this.curso = response[0].curso.nombre;
+        const data = response[0].alumnos;
+
+        // Verifica si hay alumnos
+        if (!data || data.length === 0) {
+          console.error('No hay alumnos en la respuesta');
+          return;
+        }
+
+        // Filtrar solo alumnos y extraer los datos relevantes
+        const alumnos = data
+                        .filter(entry => entry.alumno.role === "ALUMNO")
+                        .map(entry => ({
+                          nombre: entry.alumno.usuario,
+                          charlasPropuestas: entry.charlasPropuestas || 0,
+                          charlasAceptadas: entry.charlasAceptadas || 0,
+                        }));
+
+        // Extraemos la información de los alumnos
+        const labels = alumnos.map(alumno => alumno.nombre);
+        const propuestas = alumnos.map(alumno => alumno.charlasPropuestas);
+        const aceptadas = alumnos.map(alumno => alumno.charlasAceptadas);
+
+        // Encontrar el valor máximo entre charlas propuestas y aceptadas.
+        const maxCharlasPropuestas = Math.max(...propuestas);
+        const maxCharlasAceptadas = Math.max(...aceptadas);
+
+        // El valor máximo para la escala Y será el máximo entre ambos más 1.
+        const maxCharlas = Math.max(maxCharlasPropuestas, maxCharlasAceptadas) + 1;
+
+        // Configurar los datos para el gráfico
+        const barData = {
+          labels: labels, // Las etiquetas del gráfico
+          datasets: [
+            {
+              label: 'Charlas Propuestas',
+              data: propuestas, // Los datos para las charlas propuestas
+              backgroundColor: 'rgba(102, 179, 255, 0.2)', // Color de fondo para las barras
+              borderColor: 'rgba(102, 179, 255, 1)', // Color del borde
+              borderWidth: 1, // Ancho del borde
+            },
+            {
+              label: 'Charlas Aceptadas',
+              data: aceptadas, // Los datos para las charlas aceptadas
+              backgroundColor: 'rgba(113, 214, 125, 0.2)', 
+              borderColor: 'rgba(113, 214, 125, 1)', 
+              borderWidth: 1, 
+            }
+          ]
+        };
+
+        this.mostrarDiagrama(barData, maxCharlas);
+
+        // Total de charlas propuestas y aceptadas
+        const totalCharlasPropuestas = propuestas.reduce((sum, propuestas) => sum + propuestas, 0);
+        const totalCharlasAceptadas = aceptadas.reduce((sum, aceptadas) => sum + aceptadas, 0);
+
+        // Charlas pendientes (propuestas - aceptadas)
+        const charlasPendientes = totalCharlasPropuestas - totalCharlasAceptadas;
+
+        // Usuarios que no han subido su charla
+        const usuariosSinCharla = alumnos.filter(alumno => alumno.charlasPropuestas === 0 && alumno.charlasAceptadas === 0).length;
+
+        // Asignamos los valores calculados a las variables de data()
+        this.totalCharlasPropuestas = totalCharlasPropuestas;
+        this.totalCharlasAceptadas = totalCharlasAceptadas;
+        this.charlasPendientes = charlasPendientes;
+        this.usuariosSinCharla = usuariosSinCharla;
+      })
+      .catch(error => {
+        console.error('Error al obtener los alumnos de un profesor:', error);
+      });
+    },
+
+    mostrarDiagrama(barData, maxCharlas){
+      const ctx = document.getElementById('barChart').getContext('2d');
+        if (ctx) {
+          const diagrama  = new Chart(ctx, {
+              type: 'bar', // Tipo de gráfico
+              data: barData, // Datos del gráfico
+              options: {
+                responsive: true,
+                maintainAspectRatio: false, // Para que el gráfico se adapte al tamaño del contenedor
+                plugins: {
+                  legend: {
+                      position: 'top', // Posición de la leyenda
+                  },
+                  tooltip: {
+                      enabled: true, // Habilitar tooltips
+                  }
+                },
+                scales: {
+                  x: {
+                    beginAtZero: true, // Asegurarse de que el eje X comience en cero
+                    tickRotation: 45, // Rotar las etiquetas para que se vean bien
+                    ticks: {
+                      maxRotation: 90,
+                      minRotation: 45
+                    },
+                    categoryPercentage: 0.8, // Controla el ancho de las barras en relación con el espacio disponible
+                    barPercentage: 0.9, // Ajusta el porcentaje de la barra
+                  },
+                  y: {
+                    beginAtZero: true, // Asegurarse de que el eje Y comience en cero
+                    max: maxCharlas,
+                    ticks: {
+                      stepSize: 1 // Ajusta el tamaño de cada paso en el eje Y
+                    }
+                  }
+                }
+              }
+          });
+
+          diagrama;
+        } else {
+          console.error("Error: No se pudo obtener el contexto del gráfico");
+        }
+    }
+
   },
 }
 </script>
@@ -374,5 +567,10 @@ export default {
     width: 100%;
     max-width: 100%;
     min-width: 510px;
+  }
+
+  #barChart{
+    height: 400px;
+    width: 400px;
   }
 </style>

@@ -99,5 +99,25 @@ export default class PerfilService {
                 });
         });
     }
+
+    getAlumnosProfesor(){
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/profesor/alumnoscursoprofesor";
+            const token = Cookies.get('bearer_token'); 
+
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token, 
+                },
+            })
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los alumnos de un profesor:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
     
 }
