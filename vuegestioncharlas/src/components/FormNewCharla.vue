@@ -27,11 +27,6 @@
                             <label for="descripcion" class="form-label">Descripción: <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="descripcion" v-model="form.descripcion" rows="4" placeholder="Explica brevemente el contenido y objetivos de la charla" required></textarea>
                         </div>
-                        <!-- Tiempo -->
-                        <div class="col-md-6">
-                            <label for="tiempo" class="form-label">Duración (en minutos): <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="tiempo" v-model="form.tiempo" placeholder="Ejemplo: 30" min="1" required>
-                        </div>
                         <!-- Fecha Propuesta -->
                         <div class="col-md-6">
                             <label for="fechaPropuesta" class="form-label">Fecha propuesta: <span class="text-danger">*</span></label>
@@ -47,14 +42,36 @@
                             />
                         </div>
                         <!-- ID Ronda -->
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label for="idRonda" class="form-label">Ronda disponible: <span class="text-danger">*</span></label>
-                            <select class="form-select" id="idRonda" v-model="form.idRonda" required>
+                            <select class="form-select" id="idRonda" v-model="form.idRonda" @change="changeRangeMax()" required>
                                 <option value="" disabled selected>--- Seleccionar ---</option>
                                 <option v-for="ronda in rondasDisponibles" :key="ronda.id" :value="ronda.id">
                                     {{ ronda.descripcion }}
                                 </option>
                             </select>
+                        </div>
+                        <!-- Tiempo -->
+                        <div class="col-md-12">
+                            <label for="tiempo" class="form-label">
+                                Duración (en minutos): <span class="text-danger">*</span>
+                            </label>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <!-- Input tipo range -->
+                                <input 
+                                    type="range" 
+                                    class="form-range" 
+                                    min="5" 
+                                    :max="maxTiempo" 
+                                    step="5" 
+                                    id="tiempo" 
+                                    v-model="form.tiempo" 
+                                    required 
+                                    :disabled="!form.idRonda" 
+                                />
+                                <!-- Mostrar el valor de tiempo -->
+                                <span style="font-weight: bold; font-size: 1em; width: 100px; padding-left: 20px;">{{ form.tiempo }} mins</span>
+                            </div>
                         </div>
                         </div>
                     </form>
@@ -87,6 +104,7 @@ export default {
                 idRonda: "",
             },
             rondasDisponibles: [],
+            maxTiempo: 30
         };
     },
     mounted(){
@@ -101,7 +119,8 @@ export default {
             .map(ronda => ({
                 id: ronda.idRonda,
                 descripcion: ronda.descripcionModulo,
-                fechaPresentacion: ronda.fechaPresentacion	
+                fechaPresentacion: ronda.fechaPresentacion,
+                tiempo: ronda.duracion
             }));
 
             // Obtener las charlas del alumno
@@ -184,6 +203,15 @@ export default {
                 idRonda: "",
             };
         },
+        changeRangeMax(){
+            // Encuentra el valor máximo de tiempo (duración) en las rondas filtradas.
+            const maxTiempo = this.rondasDisponibles.length > 0
+                ? Math.max(...this.rondasDisponibles.map(ronda => ronda.tiempo))
+                : 0; // Si no hay rondas disponibles, asigna 0 como maxTiempo.
+
+            // Aquí puedes asignar el valor de maxTiempo a tu variable correspondiente:
+            this.maxTiempo = maxTiempo;
+        }
     }
 }
 </script>
