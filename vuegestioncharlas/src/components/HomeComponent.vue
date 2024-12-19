@@ -315,8 +315,12 @@ export default {
               const fechaLimiteVotacion = new Date(ronda.fechaLimiteVotacion + 'Z');
               const fechaPresentacion = new Date(ronda.fechaPresentacion + 'Z');
 
+              const fechaCierreDia = new Date(fechaCierre.getFullYear(), fechaCierre.getMonth(), fechaCierre.getDate());
+              // const fechaLimiteVotacionDia = new Date(fechaLimiteVotacion.getFullYear(), fechaLimiteVotacion.getMonth(), fechaLimiteVotacion.getDate());
+              // const fechaPresentacionDia = new Date(fechaPresentacion.getFullYear(), fechaPresentacion.getMonth(), fechaPresentacion.getDate());
+
               // Comprobar si la ronda está abierta para solicitar charlas
-              if (ahora <= fechaCierre) {
+              if (ahora < fechaCierreDia) {
                 isRondaAbierta = true;
 
                 events.push({
@@ -337,7 +341,7 @@ export default {
 
               // Comprobar si hay una votación activa (entre la fecha de cierre y la fecha límite de votación)
               if (ahora <= fechaLimiteVotacion) {
-                if (ahora > fechaCierre && ahora <= fechaLimiteVotacion){
+                if (ahora > fechaCierreDia && ahora <= fechaLimiteVotacion){
                   isVotacionActiva = true;
 
                   // Verificar si el alumno ya votó en esta ronda
