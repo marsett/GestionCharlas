@@ -156,33 +156,40 @@
               <div class="row">
                 <!-- Rol -->
                 <div class="col-12 col-lg-6 mb-3">
-                  <label for="idRole" class="form-label"
-                    >Rol <span class="text-danger">*</span></label
-                  >
-                  <select
-                    class="form-select"
-                    id="idRole"
-                    v-model="form.idRole"
-                    :readonly="isLoading2"
-                    required
-                  >
-                    <option value="" disabled selected>
-                      --- Seleccionar ---
-                    </option>
-                    <option
-                      v-for="role in roles"
-                      :key="role.idRole"
-                      :value="role.idRole"
-                    >
-                      {{ role.roleName }}
-                    </option>
-                  </select>
+                  <label class="form-label">Rol <span class="text-danger">*</span></label>
+                  <div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        id="rolAlumno"
+                        value="Alumno"
+                        v-model="form.idRole"
+                        :disabled="isLoading2"
+                        required
+                      />
+                      <label class="form-check-label" for="rolAlumno">Alumno</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        id="rolProfesor"
+                        value="Profesor"
+                        v-model="form.idRole"
+                        :disabled="isLoading2"
+                        required
+                      />
+                      <label class="form-check-label" for="rolProfesor">Profesor</label>
+                    </div>
+                  </div>
                 </div>
-                <!-- Curso -->
-                <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 2">
-                  <label for="idCurso" class="form-label"
-                    >Curso <span class="text-danger">*</span></label
-                  >
+
+                <!-- Curso (solo para Alumno) -->
+                <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 'Alumno'">
+                  <label for="idCurso" class="form-label">
+                    Curso <span class="text-danger">*</span>
+                  </label>
                   <input
                     type="number"
                     id="idCurso"
@@ -193,11 +200,11 @@
                   />
                 </div>
 
-                <!-- Contraseña especial si seleccionan "Profesor" -->
-                <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 1">
-                  <label for="profesorPassword" class="form-label"
-                    >Clave de acceso <span class="text-danger">*</span></label
-                  >
+                <!-- Contraseña especial (solo para Profesor) -->
+                <div class="col-12 col-lg-6 mb-3" v-if="form.idRole === 'Profesor'">
+                  <label for="profesorPassword" class="form-label">
+                    Clave de acceso <span class="text-danger">*</span>
+                  </label>
                   <input
                     type="password"
                     id="profesorPassword"
@@ -277,16 +284,6 @@ export default {
         idRole: "",
         idCurso: "",
       },
-      roles: [
-        {
-          idRole: 1,
-          roleName: "PROFESOR",
-        },
-        {
-          idRole: 2,
-          roleName: "ALUMNO",
-        },
-      ],
       isLoading: false,
       isLoading2: false,
       profesorPassword: "",
@@ -323,6 +320,15 @@ export default {
         } else {
           this.$router.push("/");
         }
+      })
+      .catch((error) => {
+        this.isLoading = false;
+        console.error('Error during login:', error);
+        Swal.fire({
+          icon: "error",
+          title: "Error al iniciar sesión",
+          text: "Por favor, revisa tus credenciales",
+        });
       });
     },
     registerUser() {
@@ -341,8 +347,9 @@ export default {
         return;
       }
 
-      if (this.form.idRole === 2) {
+      if (this.form.idRole === 'Alumno') {
         this.isLoading2 = true;
+        this.form.idRole = 2;
         service
           .setAlumno(this.form)
           .then((response) => {
@@ -370,6 +377,7 @@ export default {
           })
           .catch((error) => {
             this.isLoading2 = false;
+            this.form.idRole = 'Alumno';
             console.error("Error al crear el usuario: ", error);
             Swal.fire({
               icon: "error",
@@ -379,6 +387,7 @@ export default {
           });
       } else {
         this.isLoading2 = true;
+        this.form.idRole = 1;
         service
           .setProfesor(this.form, this.profesorPassword)
           .then((response) => {
@@ -406,6 +415,7 @@ export default {
           })
           .catch((error) => {
             this.isLoading2 = false;
+            this.form.idRole = 'Profesor';
             console.error("Error al crear el usuario: ", error);
             Swal.fire({
               icon: "error",
