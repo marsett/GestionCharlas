@@ -53,14 +53,14 @@ export default {
         },
         estadoClass(estado) {
             switch (estado) {
-                case 'Propuesta':
-                    return 'btn btn-info';
-                case 'Aceptada':
+                case 'PROPUESTA':
+                    return 'btn btn-secondary';
+                case 'ACEPTADA':
                     return 'btn btn-success';
-                case 'Rechazada':
+                case 'RECHAZADA':
                     return 'btn btn-danger';
                 default:
-                    return 'btn btn-secondary';
+                    return 'btn btn-info';
             }
         }
     },
