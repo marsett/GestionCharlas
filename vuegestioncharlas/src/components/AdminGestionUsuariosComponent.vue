@@ -1,94 +1,82 @@
 <template>
   <div class="container mt-4">
-    <h2 class="mb-4 text-center">Usuarios Activos</h2>
+    <h2 class="mb-4 text-center">Gestión de Usuarios Activos</h2>
     <div class="row g-4">
       <div
         class="col-12 col-md-6 col-lg-4"
         v-for="usuario in usuariosActivos"
         :key="usuario.idUsuario"
       >
-        <div class="card shadow-sm h-100">
-          <div class="card-image-wrapper">
-            <img
-              :src="usuario.imagen"
-              class="card-img-top"
-              alt="Imagen de usuario"
-            />
+        <div class="card shadow h-100 border-0">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0 d-flex align-items-center">
+              <i class="bi bi-person-circle me-2"></i>
+              {{ usuario.usuario }}
+            </h5>
           </div>
           <div class="card-body">
-            <h5 class="card-title text-primary">{{ usuario.usuario }}</h5>
-            <p class="card-text mb-2">
-              <strong>Email:</strong> {{ usuario.email }}
-            </p>
-            <p class="card-text mb-2">
-              <strong>Curso:</strong> {{ usuario.curso }}
-            </p>
-            <p class="card-text mb-2">
-              <strong>Estado:</strong> {{ usuario.estadoUsuario }}
-            </p>
-            <div class="d-flex justify-content-between">
-              <button
-                class="btn btn-outline-primary btn-sm"
-                @click="openModal('curso', usuario.idUsuario)"
-              >
-                Cambiar Curso
-              </button>
-              <button
-                class="btn btn-outline-success btn-sm"
-                @click="openModal('rol', usuario.idUsuario)"
-              >
-                Cambiar Rol
-              </button>
-            </div>
+            <p class="card-text"><strong>Email:</strong> {{ usuario.email }}</p>
+            <p class="card-text"><strong>Curso:</strong> {{ usuario.curso }}</p>
+            <p class="card-text"><strong>Rol:</strong> {{ usuario.role }}</p>
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <button
+              class="btn btn-outline-primary btn-sm"
+              @click="abrirModalCambio('curso', usuario)"
+            >
+              Cambiar Curso
+            </button>
+            <button
+              class="btn btn-outline-success btn-sm"
+              @click="abrirModalCambio('rol', usuario)"
+            >
+              Cambiar Rol
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Modal para cambiar Curso o Rol -->
-  <div
-    class="modal fade show"
-    id="cambioModal"
-    tabindex="-1"
-    aria-labelledby="cambioModalLabel"
-    aria-hidden="true"
-    v-if="isModalOpen"
-    @click.self="closeModal"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="cambioModalLabel">
-            Cambiar {{ modalTipo }}
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            @click="closeModal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <form @submit.prevent="guardarCambio">
-            <div class="mb-3" v-if="modalTipo === 'curso'">
-              <label for="nuevoValor" class="form-label">Nuevo Curso</label>
-              <input
-                type="text"
-                id="nuevoValor"
-                v-model="nuevoValor"
-                class="form-control"
-                required
-              />
-            </div>
-
-            <div class="mb-3" v-if="modalTipo === 'rol'">
-              <label for="nuevoRol" class="form-label">Seleccionar Rol</label>
+    <!-- Modal General -->
+    <div
+      v-if="modalAbierto"
+      class="modal fade show"
+      tabindex="-1"
+      style="display: block; background: rgba(0, 0, 0, 0.5)"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Cambiar {{ tipoCambio }}</h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="cerrarModal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="tipoCambio === 'curso'">
+              <label for="nuevoCurso" class="form-label">Nuevo Curso</label>
               <select
-                id="nuevoRol"
-                v-model="nuevoRol"
+                v-model="datosCambio.curso"
+                id="nuevoCurso"
                 class="form-select"
-                required
+              >
+                <option
+                  v-for="curso in cursos"
+                  :key="curso.idCurso"
+                  :value="curso.idCurso"
+                >
+                  {{ curso.nombre }}
+                </option>
+              </select>
+            </div>
+            <div v-if="tipoCambio === 'rol'">
+              <label for="nuevoRol" class="form-label">Nuevo Rol</label>
+              <select
+                v-model="datosCambio.rol"
+                id="nuevoRol"
+                class="form-select"
               >
                 <option
                   v-for="role in roles"
@@ -99,9 +87,23 @@
                 </option>
               </select>
             </div>
-
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="cerrarModal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="guardarCambio"
+            >
+              Guardar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -118,81 +120,101 @@ export default {
     return {
       usuariosActivos: [],
       roles: [],
+      cursos: [],
+      modalAbierto: false,
+      tipoCambio: "",
+      datosCambio: {
+        usuarioId: null,
+        curso: "",
+        rol: null,
+      },
       adminService: new AdminService(),
-      modalTipo: "",
-      usuarioId: null,
-      nuevoValor: "",
-      nuevoRol: null,
-      isModalOpen: false, // Controlar la visibilidad del modal
     };
   },
   methods: {
     async cargarDatos() {
       try {
-        this.usuariosActivos = await this.adminService.getUsuariosActivos();
+        const usuarios = await this.adminService.getUsuariosActivos();
+        this.usuariosActivos = usuarios
+          .map((usuario) => ({
+            ...usuario,
+            rol:
+              this.roles.find((role) => role.idRole === usuario.idRol)
+                ?.roleName || "Desconocido",
+          }))
+          .filter((usuario) => usuario.role === "ALUMNO"); // Filtra solo los alumnos
+
+        this.cursos = await this.adminService.getCursos();
+        console.log("Cursos cargados:", this.cursos);
       } catch (error) {
-        console.error("Error al cargar usuarios activos:", error);
-        alert("No se pudieron cargar los datos.");
+        console.error("Error al cargar datos:", error);
       }
     },
 
     async cargarRoles() {
       try {
-        const data = await this.adminService.getRoles();
-        this.roles = data;
+        this.roles = await this.adminService.getRoles();
       } catch (error) {
-        console.error("Error al cargar los roles:", error);
-        alert("No se pudieron cargar los roles.");
+        console.error("Error al cargar roles:", error);
       }
     },
-
-    openModal(tipo, idUsuario) {
-      this.modalTipo = tipo;
-      this.usuarioId = idUsuario;
-      this.nuevoValor = "";
-      this.nuevoRol = null;
-      if (this.modalTipo === "rol") {
+    abrirModalCambio(tipo, usuario) {
+      this.tipoCambio = tipo;
+      this.datosCambio.usuarioId = usuario.idUsuario;
+      if (tipo === "curso") {
+        this.datosCambio.curso = usuario.curso;
+      } else if (tipo === "rol") {
+        this.datosCambio.rol = usuario.rol;
         this.cargarRoles();
       }
-      this.isModalOpen = true;
+      this.modalAbierto = true;
     },
-
-    closeModal() {
-      this.isModalOpen = false;
+    cerrarModal() {
+      this.modalAbierto = false;
+      this.tipoCambio = "";
+      this.datosCambio = { usuarioId: null, curso: "", rol: null };
     },
-
     async guardarCambio() {
       try {
-        if (this.modalTipo === "curso") {
+        if (this.tipoCambio === "curso") {
           await this.adminService.updateCursoUsuario(
-            this.usuarioId,
-            this.nuevoValor
+            this.datosCambio.usuarioId,
+            this.datosCambio.curso
           );
-          Swal.fire("¡Éxito!", "Curso actualizado correctamente.", "success").then(
-            () => {
-              this.cargarDatos();
-              this.closeModal(); // Cierra el modal
-            }
-          );
-        } else if (this.modalTipo === "rol") {
+        } else if (this.tipoCambio === "rol") {
           await this.adminService.updateRolUsuario(
-            this.usuarioId,
-            this.nuevoRol
+            this.datosCambio.usuarioId,
+            this.datosCambio.rol
           );
-          Swal.fire("¡Éxito!", "Rol actualizado correctamente.", "success").then(
-            () => {
-              this.cargarDatos();
-              this.closeModal();
-            }
+          // Elimina al usuario si deja de ser alumno
+          const usuarioIndex = this.usuariosActivos.findIndex(
+            (u) => u.idUsuario === this.datosCambio.usuarioId
           );
+          if (
+            usuarioIndex !== -1 &&
+            this.roles.find((role) => role.idRole === this.datosCambio.rol)
+              ?.roleName !== "ALUMNO"
+          ) {
+            this.usuariosActivos.splice(usuarioIndex, 1);
+          }
         }
+
+        Swal.fire(
+          "¡Éxito!",
+          `El ${this.tipoCambio} fue actualizado.`,
+          "success"
+        );
+        this.cerrarModal();
       } catch (error) {
-        console.error("Error al cambiar valor:", error);
-        Swal.fire("¡Error!", "No se pudo actualizar el valor.", "error");
+        Swal.fire(
+          "¡Error!",
+          `No se pudo actualizar el ${this.tipoCambio}.`,
+          "error"
+        );
+        console.error("Error al guardar cambio:", error);
       }
     },
   },
-
   created() {
     this.cargarDatos();
   },
@@ -200,54 +222,22 @@ export default {
 </script>
 
 <style scoped>
-.container {
+.card-header {
+  font-size: 1.1rem;
+  font-weight: bold;
+  background-color: #007bff;
+  color: white;
+}
+.card-footer {
   background-color: #f9f9f9;
-  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+.modal-content {
   border-radius: 10px;
 }
-
-.card {
-  border: none;
-  border-radius: 10px;
-}
-
-.card-image-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 100%;
-  overflow: hidden;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.card-img-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.card-body {
-  padding: 15px;
-}
-
-.card-title {
-  font-size: 1.25rem;
-}
-
-.card-text {
-  font-size: 0.9rem;
-}
-
-.btn {
-  font-size: 0.8rem;
-}
-
-.modal.show {
-  display: block;
+.modal-header {
+  background-color: #007bff;
+  color: white;
 }
 </style>

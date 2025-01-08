@@ -91,21 +91,5 @@ export default class AuthService {
             });
         });
     }
-
-    // getRoles(){
-    //     return new Promise((resolve, reject) => {
-    //         const endpoint = 'api/roles';
-    //         axios.get(
-    //             Global.urlBase + endpoint
-    //         )
-    //         .then(response => {
-    //             resolve(response.data);
-    //         })
-    //         .catch(error => {
-    //             console.error("Error al obtener los roles: ", error.response ? error.response.data : error);
-    //             reject(error);
-    //         });
-    //     });
-    // }
     
 }

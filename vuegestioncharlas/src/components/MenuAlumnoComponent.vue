@@ -63,7 +63,7 @@ export default {
   name: "MenuComponent",
   data() {
     return {
-      selectedRoute: '/',
+      selectedRoute: this.$route.path, // Inicializa con la ruta activa
     };
   },
   methods: {
@@ -91,6 +91,12 @@ export default {
       });
     },
   },
+  watch: {
+    // Detecta cambios en la ruta activa y actualiza la selección
+    '$route.path'(newPath) {
+      this.selectedRoute = newPath;
+    }
+  }
 };
 </script>
 

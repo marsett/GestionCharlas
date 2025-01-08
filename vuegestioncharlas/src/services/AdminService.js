@@ -87,4 +87,17 @@ export default class AdminService {
       });
   }
 
+  getCursos() {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .get(`${Global.urlBase}/api/Cursos`, {
+        headers: { Authorization: token },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al obtener cursos:", err);
+        throw err;
+      });
+  }
+  
 }
