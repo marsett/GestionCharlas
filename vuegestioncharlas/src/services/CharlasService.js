@@ -125,4 +125,37 @@ export default class CharlasService {
             });
         });
     }
+
+    setRonda(form){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/profesor/createronda';
+            const token = Cookies.get('bearer_token');
+            const json = JSON.stringify({
+                idRonda: 0, // Generado automáticamente en la API
+                idCursoUsuario: 0,
+                fechaPresentacion: form.fechaPresentacion,
+                fechaCierre: form.fechaCierre,
+                duracion: form.duracion,
+                descripcionModulo: form.descripcion,
+                fechaLimiteVotacion: form.fechaLimiteVotacion
+            });
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al crear ronda profesor:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
 }
