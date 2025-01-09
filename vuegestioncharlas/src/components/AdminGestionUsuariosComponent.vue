@@ -134,18 +134,37 @@ export default {
   methods: {
     async cargarDatos() {
       try {
-        const usuarios = await this.adminService.getUsuariosActivos();
-        this.usuariosActivos = usuarios
-          .map((usuario) => ({
-            ...usuario,
-            rol:
-              this.roles.find((role) => role.idRole === usuario.idRol)
-                ?.roleName || "Desconocido",
-          }))
-          .filter((usuario) => usuario.role === "ALUMNO"); // Filtra solo los alumnos
+        // Obtén los datos de usuarios, cursos y relaciones curso-usuario
+        const [usuarios, cursos, cursosUsuarios] = await Promise.all([
+          this.adminService.getUsuariosActivos(),
+          this.adminService.getCursos(),
+          this.adminService.getCursosUsuarios(),
+        ]);
 
-        this.cursos = await this.adminService.getCursos();
-        console.log("Cursos cargados:", this.cursos);
+        // Asigna los cursos a los usuarios mediante las relaciones
+        const usuariosConCursos = usuarios.map((usuario) => {
+          const relacion = cursosUsuarios.find(
+            (cu) => cu.idUsuario === usuario.idUsuario
+          );
+          const curso = relacion
+            ? cursos.find((c) => c.idCurso === relacion.idCurso)
+            : null;
+
+          return {
+            ...usuario,
+            cursoNombre: curso ? curso.nombre : "Sin curso",
+            idCurso: curso ? curso.idCurso : null, // Incluye el idCurso
+          };
+        });
+
+        this.usuariosActivos = usuariosConCursos.filter(
+          (usuario) => usuario.role === "ALUMNO"
+        );
+        this.cursos = cursos;
+        console.log(
+          "Datos de usuarios activos cargados:",
+          this.usuariosActivos
+        );
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
@@ -159,33 +178,60 @@ export default {
       }
     },
     abrirModalCambio(tipo, usuario) {
+      console.log("Modal abierto para:", tipo, usuario);
       this.tipoCambio = tipo;
       this.datosCambio.usuarioId = usuario.idUsuario;
+
       if (tipo === "curso") {
-        this.datosCambio.curso = usuario.curso;
+        console.log("Id curso: " + usuario.idCurso);
+        this.datosCambio.curso = usuario.idCurso;
       } else if (tipo === "rol") {
-        this.datosCambio.rol = usuario.rol;
+        this.datosCambio.rol = usuario.idRole;
         this.cargarRoles();
       }
       this.modalAbierto = true;
     },
+
     cerrarModal() {
       this.modalAbierto = false;
       this.tipoCambio = "";
-      this.datosCambio = { usuarioId: null, curso: "", rol: null };
+      this.datosCambio = { usuarioId: null, curso: null, rol: null };
     },
     async guardarCambio() {
+      console.log("Metodo guardarCambio ejecutado");
       try {
         if (this.tipoCambio === "curso") {
+          console.log("Datos enviados al servicio:");
+          console.log("Usuario ID:", this.datosCambio.usuarioId);
+          console.log("Curso ID:", this.datosCambio.curso);
+
           await this.adminService.updateCursoUsuario(
             this.datosCambio.usuarioId,
             this.datosCambio.curso
           );
+
+          // Actualiza la lista de usuarios activos
+          const usuarioIndex = this.usuariosActivos.findIndex(
+            (u) => u.idUsuario === this.datosCambio.usuarioId
+          );
+          if (usuarioIndex !== -1) {
+            const nuevoCurso = this.cursos.find(
+              (curso) => curso.idCurso === this.datosCambio.curso
+            );
+            if (nuevoCurso) {
+              this.usuariosActivos[usuarioIndex].cursoNombre =
+                nuevoCurso.nombre;
+              this.usuariosActivos[usuarioIndex].idCurso = nuevoCurso.idCurso;
+            }
+          }
+
+          console.log("Curso seleccionado:", this.datosCambio.curso);
         } else if (this.tipoCambio === "rol") {
           await this.adminService.updateRolUsuario(
             this.datosCambio.usuarioId,
             this.datosCambio.rol
           );
+
           // Elimina al usuario si deja de ser alumno
           const usuarioIndex = this.usuariosActivos.findIndex(
             (u) => u.idUsuario === this.datosCambio.usuarioId
@@ -203,8 +249,9 @@ export default {
           "¡Éxito!",
           `El ${this.tipoCambio} fue actualizado.`,
           "success"
-        );
-        this.cerrarModal();
+        ).then(() => {
+          this.cerrarModal(); // Cierra el modal tras confirmar el éxito
+        });
       } catch (error) {
         Swal.fire(
           "¡Error!",

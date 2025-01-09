@@ -99,5 +99,18 @@ export default class AdminService {
         throw err;
       });
   }
+
+  getCursosUsuarios() {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .get(`${Global.urlBase}/api/CursosUsuarios`, {
+        headers: { Authorization: token },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al obtener cursos/usuarios:", err);
+        throw err;
+      });
+  }
   
 }
