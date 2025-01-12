@@ -90,7 +90,9 @@
               </div>
             </div>
           </div>
-          <p class="text-secondary small mt-2"><b>Nota:</b> Lo que aparece en el calendario es el titulo de la ronda.</p>
+          <p class="text-secondary small mt-2">
+            <b>Nota:</b> En el calendario se muestra el título de la ronda. Para ver los detalles de un día específico, haz clic en cualquier parte de la casilla correspondiente a ese día.
+          </p>
         </div>
 
         <!-- Calendario -->
@@ -98,7 +100,7 @@
           <!-- Contenedor con scroll horizontal -->
           <div class="parent-container">
             <div class="calendar-wrapper">
-              <FullCalendar :options="calendarOptions" />
+              <FullCalendar :options="calendarOptions" @mouseover="cambiarCursor"/>
             </div>
           </div>
         </div>
@@ -518,8 +520,11 @@ export default {
         } else {
           console.error("Error: No se pudo obtener el contexto del gráfico");
         }
-    }
+    },
 
+    cambiarCursor(event) {
+      event.target.style.cursor = 'pointer';
+    },
   },
 }
 </script>
