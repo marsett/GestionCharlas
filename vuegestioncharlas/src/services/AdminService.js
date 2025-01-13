@@ -44,6 +44,21 @@ export default class AdminService {
       });
   }
 
+  updateEstadoUsuario(idUsuario, estado){
+    const token = Cookies.get("bearer_token");
+    return axios
+      .put(
+        `${Global.urlBase}/api/Usuarios/UpdateEstadoUsuario/${idUsuario}/${estado}`,
+        {},
+        { headers: { Authorization: token } }
+      )
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al actualizar estado del usuario:", err);
+        throw err;
+      });
+  }
+
   updateCursoUsuario(idUsuario, idCurso) {
     const token = Cookies.get("bearer_token");
     return axios
@@ -112,5 +127,7 @@ export default class AdminService {
         throw err;
       });
   }
+
+
   
 }
