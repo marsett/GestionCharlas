@@ -81,10 +81,11 @@
                     <div class="col">
                         <label for="fechaPresentacion" class="form-label fw-semibold h5 mb-3">Fecha de Presentación:</label>
                         <input
-                        type="datetime-local"
+                        type="date"
                         id="fechaPresentacion"
                         v-model="form.fechaPresentacion"
                         class="form-control mb-1"
+                        :min="fechaActual"
                         required
                         />
                         <small class="text-danger"><b>Nota:</b> Es la fecha en la que debe realizarse la charla.</small>
@@ -93,10 +94,11 @@
                     <div class="col">
                         <label for="fechaCierre" class="form-label fw-semibold h5 mb-3">Fecha de Cierre:</label>
                         <input
-                        type="datetime-local"
+                        type="date"
                         id="fechaCierre"
                         v-model="form.fechaCierre"
                         class="form-control mb-1"
+                        :min="fechaActual"
                         required
                         />
                         <small class="text-danger"><b>Nota:</b> Es la última fecha para proponer charlas.</small>
@@ -105,10 +107,11 @@
                     <div class="col">
                         <label for="fechaLimiteVotacion" class="form-label fw-semibold h5 mb-3">Fecha Límite de Votación:</label>
                         <input
-                        type="datetime-local"
+                        type="date"
                         id="fechaLimiteVotacion"
                         v-model="form.fechaLimiteVotacion"
                         class="form-control mb-1"
+                        :min="fechaActual"
                         required
                         />
                         <small class="text-danger"><b>Nota:</b> Es el período para votar, entre la fecha de cierre y esta fecha.</small>
@@ -117,12 +120,13 @@
                     <div class="col">
                         <label for="duracion" class="form-label fw-semibold h5 mb-3">Duración (minutos):</label>
                         <input
-                        type="number"
-                        id="duracion"
-                        v-model="form.duracion"
-                        class="form-control"
-                        required
-                        min="1"
+                            type="number"
+                            id="duracion"
+                            v-model="form.duracion"
+                            class="form-control"
+                            required
+                            min="1"
+                            max="300"
                         />
                     </div>
                     <!-- Descripción del Módulo -->
@@ -157,6 +161,7 @@
   
 <script>
 import Cookies from "cookies-js";
+import Swal from "sweetalert2";
 import CharlasService from '@/services/CharlasService';
 const serviceCharlas = new CharlasService();
 export default {
@@ -177,6 +182,7 @@ export default {
                 descripcionModulo: '',
                 fechaLimiteVotacion: ''
             },
+            fechaActual: '',
             isLoading: false
         };
     },
@@ -236,35 +242,100 @@ export default {
         },
         crearRonda() {
             this.isLoading = true;
-            // Simulación de envío del formulario
-            setTimeout(() => {
-                alert("Ronda creada exitosamente!");
+
+            // Validar que las fechas están correctamente ordenadas
+            const { fechaPresentacion, fechaCierre, fechaLimiteVotacion } = this.form;
+
+            if (!fechaPresentacion || !fechaCierre || !fechaLimiteVotacion) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error de validación",
+                    text: "Por favor, complete todas las fechas",
+                });
                 this.isLoading = false;
-            }, 1000);
+                return;
+            }
+
+            if (fechaCierre > fechaLimiteVotacion || fechaCierre > fechaPresentacion) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error de validación",
+                    text: "La fecha de cierre debe ser la más cercana",
+                });
+                this.isLoading = false;
+                return;
+            }
+
+            if (fechaLimiteVotacion > fechaPresentacion) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error de validación",
+                    text: "La fecha límite de votación debe ser intermedia entre la fecha de cierre y la fecha de presentación",
+                });
+                this.isLoading = false;
+                return;
+            }
+
+            if (fechaPresentacion <= fechaLimiteVotacion || fechaPresentacion <= fechaCierre) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error de validación",
+                    text: "La fecha de presentación debe ser la más lejana",
+                });
+                this.isLoading = false;
+                return;
+            }
+
+            // Formatear las fechas al formato ISO 8601
+            const formatearFecha = (fecha) => {
+                const date = new Date(fecha);
+                return date.toISOString();
+            };
+
+            // Crear el objeto con las fechas formateadas
+            const rondaFormateada = {
+                fechaPresentacion: formatearFecha(this.form.fechaPresentacion),
+                fechaCierre: formatearFecha(this.form.fechaCierre),
+                duracion: this.form.duracion,
+                descripcionModulo: this.form.descripcionModulo,
+                fechaLimiteVotacion: formatearFecha(this.form.fechaLimiteVotacion),
+            };
             
-            // serviceCharlas.setRonda(this.form)
-            // .then(response => {
-            //     console.log('Charlas cargadas:', response);
-            //     alert('Ronda creada exitosamente!');
-            //     this.form = {
-            //         fechaPresentacion: '',
-            //         fechaCierre: '',
-            //         duracion: 0,
-            //         descripcionModulo: '',
-            //         fechaLimiteVotacion: ''
-            //     };
-            //     this.isLoading = false;
-            // })
-            // .catch(error => {
-            //     this.isLoading = false;
-            //     console.error('Error al crear la ronda profesor:', error);
-            // });
+            serviceCharlas.setRonda(rondaFormateada)
+            .then(response => {
+                console.log('Charlas cargadas:', response);
+                Swal.fire({
+                    icon: "success",
+                    title: "Ronda creada exitosamente!"
+                });
+                this.form = {
+                    fechaPresentacion: '',
+                    fechaCierre: '',
+                    duracion: 0,
+                    descripcionModulo: '',
+                    fechaLimiteVotacion: ''
+                };
+                this.isLoading = false;
+            })
+            .catch(error => {
+                this.isLoading = false;
+                Swal.fire({
+                    icon: "error",
+                    title: "Error en la creación",
+                    text: "No se ha podido crear la ronda, revise los datos enviados",
+                });
+                console.error('Error al crear la ronda profesor:', error);
+            });
         }
     },
     mounted() {
         this.cargarRondas();
         this.rolActual = Cookies.get('user_role');
-    },
+
+        // Establecer la fecha actual en formato ISO para los inputs de fecha
+        const hoy = new Date();
+        this.fechaActual = hoy.toISOString().split('T')[0];
+     },
     watch: {
         filtroRonda: "filtrarCharlas",
         filtroEstado: "filtrarCharlas",

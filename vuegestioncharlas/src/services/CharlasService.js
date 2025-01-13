@@ -128,32 +128,49 @@ export default class CharlasService {
 
     setRonda(form){
         return new Promise((resolve, reject) => {
-            const endpoint = 'api/profesor/createronda';
             const token = Cookies.get('bearer_token');
-            const json = JSON.stringify({
-                idRonda: 0, // Generado automáticamente en la API
-                idCursoUsuario: 0,
-                fechaPresentacion: form.fechaPresentacion,
-                fechaCierre: form.fechaCierre,
-                duracion: form.duracion,
-                descripcionModulo: form.descripcion,
-                fechaLimiteVotacion: form.fechaLimiteVotacion
-            });
-            axios.post(
-                Global.urlBase + endpoint,
-                json,
+            const endpoint1 = 'api/profesor/cursosprofesor';
+            const endpoint2 = 'api/profesor/createronda';
+
+            axios.get(
+                Global.urlBase + endpoint1,
                 {
                     headers: {
-                        'Content-Type': 'application/json',
                         Authorization: token, 
                     }
                 }
             )
             .then(response => {
-                resolve(response.data);
+                const json = JSON.stringify({
+                    idRonda: 0, // Generado automáticamente en la API
+                    idCursoUsuario: response.data[0],
+                    fechaPresentacion: form.fechaPresentacion,
+                    fechaCierre: form.fechaCierre,
+                    duracion: form.duracion,
+                    descripcionModulo: form.descripcionModulo,
+                    fechaLimiteVotacion: form.fechaLimiteVotacion
+                });
+
+                axios.post(
+                    Global.urlBase + endpoint2,
+                    json,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: token, 
+                        }
+                    }
+                )
+                .then(response => {
+                    resolve(response.data);
+                })
+                .catch(error => {
+                    console.error("Error al crear ronda profesor:", error.response ? error.response.data : error);
+                    reject(error);
+                });
             })
             .catch(error => {
-                console.error("Error al crear ronda profesor:", error.response ? error.response.data : error);
+                console.error("Error al obtener el curso del profesor en la creacion de ronda: ", error.response ? error.response.data : error);
                 reject(error);
             });
         });

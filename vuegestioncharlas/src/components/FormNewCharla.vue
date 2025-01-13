@@ -174,7 +174,7 @@ export default {
 
             serviceChar.setCharla(this.form)
             .then(response => {
-                console.log(response);
+                response
                 Swal.fire({
                     title: "Charla registrada con éxito!",
                     icon: "success",
@@ -204,13 +204,23 @@ export default {
             };
         },
         changeRangeMax(){
-            // Encuentra el valor máximo de tiempo (duración) en las rondas filtradas.
-            const maxTiempo = this.rondasDisponibles.length > 0
-                ? Math.max(...this.rondasDisponibles.map(ronda => ronda.tiempo))
-                : 0; // Si no hay rondas disponibles, asigna 0 como maxTiempo.
+            if (this.form.idRonda) {
+                // Encuentra la ronda seleccionada
+                const rondaSeleccionada = this.rondasDisponibles.find(ronda => ronda.id === this.form.idRonda);
 
-            // Aquí puedes asignar el valor de maxTiempo a tu variable correspondiente:
-            this.maxTiempo = maxTiempo;
+                // Actualiza maxTiempo basado en la ronda seleccionada
+                if (rondaSeleccionada) {
+                    console.log(rondaSeleccionada);
+                    this.maxTiempo = rondaSeleccionada.tiempo;
+                    this.form.tiempo = 0;
+                } else {
+                    this.form.tiempo = 0;
+                    this.maxTiempo = 0; // Valor predeterminado si no encuentra la ronda
+                }
+            } else {
+                this.form.tiempo = 0;
+                this.maxTiempo = 0;
+            }
         }
     }
 }
