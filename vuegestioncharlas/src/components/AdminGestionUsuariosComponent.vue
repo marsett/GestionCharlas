@@ -32,6 +32,12 @@
             >
               Cambiar Rol
             </button>
+            <button
+              class="btn btn-outline-warning btn-sm"
+              @click="abrirModalCambio('estado', usuario)"
+            >
+              Cambiar Estado
+            </button>
           </div>
         </div>
       </div>
@@ -85,6 +91,17 @@
                 >
                   {{ role.roleName }}
                 </option>
+              </select>
+            </div>
+            <div v-if="tipoCambio === 'estado'">
+              <label for="nuevoEstado" class="form-label">Nuevo Estado</label>
+              <select
+                v-model="datosCambio.estado"
+                id="nuevoEstado"
+                class="form-select"
+              >
+                <option :value="true">Activo</option>
+                <option :value="false">Inactivo</option>
               </select>
             </div>
           </div>
@@ -188,6 +205,8 @@ export default {
       } else if (tipo === "rol") {
         this.datosCambio.rol = usuario.idRole;
         this.cargarRoles();
+      } else if (tipo === "estado") {
+        this.datosCambio.estado = usuario.activo; // Asumimos que tienes el campo `activo`
       }
       this.modalAbierto = true;
     },
@@ -209,6 +228,9 @@ export default {
             this.datosCambio.usuarioId,
             this.datosCambio.curso
           );
+
+          // Actualiza directamente la lista de usuarios activos
+          await this.cargarDatos(); // Recarga los datos actualizados
 
           // Actualiza la lista de usuarios activos
           const usuarioIndex = this.usuariosActivos.findIndex(
@@ -232,6 +254,8 @@ export default {
             this.datosCambio.rol
           );
 
+          await this.cargarDatos();
+
           // Elimina al usuario si deja de ser alumno
           const usuarioIndex = this.usuariosActivos.findIndex(
             (u) => u.idUsuario === this.datosCambio.usuarioId
@@ -243,7 +267,21 @@ export default {
           ) {
             this.usuariosActivos.splice(usuarioIndex, 1);
           }
+        } else if (this.tipoCambio === "estado") {
+          console.log("Cambiando estado:", {
+            UsuarioID: this.datosCambio.usuarioId,
+            Estado: this.datosCambio.estado,
+          });
+
+          await this.adminService.updateEstadoUsuario(
+            this.datosCambio.usuarioId,
+            this.datosCambio.estado
+          );
+
+          await this.cargarDatos();
         }
+
+        this.cerrarModal(); // Cierra el modal inmediatamente
 
         Swal.fire(
           "¡Éxito!",
