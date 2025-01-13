@@ -326,7 +326,7 @@ export default {
                 });
                 console.error('Error al crear la ronda profesor:', error);
             });
-        }
+        },
     },
     mounted() {
         this.cargarRondas();

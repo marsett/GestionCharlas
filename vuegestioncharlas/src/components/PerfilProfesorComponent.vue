@@ -65,18 +65,18 @@
         <table class="table table-bordered table-hover">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Descripción</th>
               <th>Duración</th>
-              <th>Fecha Presentación</th>
+              <th>Fecha Cierre</th>
               <th>Fecha Límite Votación</th>
+              <th>Fecha Presentación</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="ronda in rondas" :key="ronda.idRonda">
-              <td>{{ ronda.idRonda }}</td>
               <td>{{ ronda.descripcionModulo }}</td>
               <td>{{ ronda.duracion }} minutos</td>
+              <td>{{  new Date(ronda.fechaCierre).toLocaleDateString()  }}</td>
               <td>
                 {{ new Date(ronda.fechaPresentacion).toLocaleDateString() }}
               </td>
@@ -90,24 +90,46 @@
 
       <!-- Lista de Alumnos -->
       <div v-if="seccionActiva === 'alumnos'" class="mt-4">
-        <h5>Alumnos del Curso</h5>
-        <ul class="list-group">
+        <h5 v-if="!cargando">Alumnos del Curso</h5>
+
+        <!-- Mostrar spinner mientras se cargan los alumnos -->
+        <div v-if="cargando" class="d-flex justify-content-center my-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+
+        <!-- Mostrar mensaje si no hay alumnos -->
+        <div v-else-if="!alumnos.length && !cargando" class="alert alert-warning text-center my-4">
+          No hay alumnos en el curso.
+        </div>
+
+        <!-- Mostrar lista de alumnos -->
+        <ul v-else class="list-group">
           <li
             class="list-group-item"
             v-for="alumno in alumnos"
             :key="alumno.alumno.idUsuario"
           >
-            <div class="d-flex align-items-center">
-              <img
-                :src="alumno.alumno.imagen"
-                alt="Foto de Alumno"
-                class="rounded-circle border-primary me-3"
-                style="width: 50px; height: 50px; object-fit: cover"
-              />
-              <div>
-                <strong>{{ alumno.alumno.usuario }}</strong>
-                <p class="text-muted">{{ alumno.alumno.email }}</p>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center">
+                <img
+                  :src="alumno.alumno.imagen"
+                  alt="Foto de Alumno"
+                  class="rounded-circle border-primary me-3"
+                  style="width: 50px; height: 50px; object-fit: cover"
+                />
+                <div>
+                  <strong>{{ alumno.alumno.usuario }}</strong>
+                  <p class="text-muted">{{ alumno.alumno.email }}</p>
+                </div>
               </div>
+              <button
+                class="btn btn-outline-danger btn-sm ms-auto"
+                @click="abrirAlerta(alumno.alumno)"
+              >
+                Cambiar Estado
+              </button>
             </div>
           </li>
         </ul>
@@ -121,6 +143,7 @@
 
 <script>
 import PerfilService from "@/services/PerfilService";
+import Swal from "sweetalert2";
 
 export default {
   name: "PerfilProfesorComponent",
@@ -131,6 +154,7 @@ export default {
       alumnos: [],
       seccionActiva: null, // 'rondas' o 'alumnos'
       perfilService: new PerfilService(),
+      cargando: false,
     };
   },
   methods: {
@@ -188,12 +212,47 @@ export default {
     async mostrarAlumnos() {
       try {
         this.seccionActiva = "alumnos";
+        this.cargando = true; 
         const data = await this.perfilService.getAlumnosCursoProfesor();
         // Si 'data' es un array de cursos con sus alumnos
-        this.alumnos = data.length > 0 ? data[0].alumnos : [];
+        // Filtrar solo alumnos con estadoUsuario activo
+        this.alumnos = data.length > 0 
+          ? data[0].alumnos.filter(alumno => alumno.alumno.estadoUsuario == true) 
+          : [];
       } catch (error) {
         console.error("Error al cargar los alumnos:", error);
         alert("No se pudieron cargar los alumnos.");
+      }
+      finally {
+        this.cargando = false; // Ocultar spinner
+      }
+    },
+    abrirAlerta(alumno) {
+      if(alumno.estadoUsuario == true){
+        Swal.fire({
+          title: "¿Estás seguro?",
+          text: `Estás a punto de cambiar el estado de ${alumno.usuario} a inactivo.`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Sí, cambiar",
+          cancelButtonText: "Cancelar",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.cambiarEstadoAlumno(alumno);
+          }
+        });
+      }
+    },
+    cambiarEstadoAlumno(alumno) {
+      if(alumno.estadoUsuario == true){
+        this.perfilService.updateEstadoUsuario(alumno.idUsuario, !alumno.estadoUsuario)
+        .then(response => {
+          console.log('Estado alumno actualizado: ', response);
+          this.mostrarAlumnos();
+        })
+        .catch(error => {
+          console.error('Error al actualizar el estado alumno:', error);
+        });
       }
     },
   },

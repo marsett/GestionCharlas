@@ -125,5 +125,25 @@ export default class PerfilService {
             });
         });
     }
+
+    updateEstadoUsuario(idUsuario, estado) {
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/profesor/updateestadoalumno/"+idUsuario+"/"+estado;
+            const token = Cookies.get('bearer_token'); 
+
+            axios.put(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token, 
+                },
+            })
+            .then(response => {
+                resolve(response.data); 
+            })
+            .catch(error => {
+                console.error("Error al actualizar el estado del usuario:", error);
+                reject(error);
+            });
+        });
+    }
     
 }
