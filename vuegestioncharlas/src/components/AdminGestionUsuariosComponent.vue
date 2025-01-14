@@ -1,23 +1,84 @@
 <template>
   <div class="container mt-4">
-    <h2 class="mb-4 text-center">Gestión de Usuarios Activos</h2>
+    <h2 class="mb-4 text-center">Gestión de Usuarios</h2>
+
+    <!-- Filtro por Rol -->
+    <div class="mb-3">
+      <label for="filtroRol" class="form-label">Filtrar por Rol</label>
+      <select
+        id="filtroRol"
+        class="form-select"
+        v-model="rolSeleccionado"
+        @change="filtrarUsuarios"
+      >
+        <option value="">Todos</option>
+        <option v-for="role in roles" :key="role.idRole" :value="role.idRole">
+          {{ role.roleName }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Filtro por Curso -->
+    <div class="mb-3">
+      <label for="filtroCurso" class="form-label">Filtrar por Curso</label>
+      <select
+        id="filtroCurso"
+        class="form-select"
+        v-model="cursoSeleccionado"
+        @change="filtrarUsuarios"
+      >
+        <option value="">Todos</option>
+        <option
+          v-for="curso in cursos"
+          :key="curso.idCurso"
+          :value="curso.idCurso"
+        >
+          {{ curso.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Filtro por Estado -->
+    <div class="mb-3">
+      <label for="filtroEstado" class="form-label">Filtrar por Estado</label>
+      <select
+        id="filtroEstado"
+        class="form-select"
+        v-model="estadoSeleccionado"
+        @change="filtrarUsuarios"
+      >
+        <option value="">Todos</option>
+        <option value="true">Activo</option>
+        <option value="false">Inactivo</option>
+      </select>
+    </div>
+
+    <!-- Mensaje cuando no hay usuarios filtrados -->
+    <div v-if="noUsuariosMensaje" class="alert alert-warning text-center">
+      {{ noUsuariosMensaje }}
+    </div>
+
     <div class="row g-4">
       <div
         class="col-12 col-md-6 col-lg-4"
-        v-for="usuario in usuariosActivos"
+        v-for="usuario in usuariosFiltrados"
         :key="usuario.idUsuario"
       >
         <div class="card shadow h-100 border-0">
           <div class="card-header bg-primary text-white">
             <h5 class="mb-0 d-flex align-items-center">
               <i class="bi bi-person-circle me-2"></i>
-              {{ usuario.usuario }}
+              {{ usuario.nombre }} {{ usuario.apellidos }}
             </h5>
           </div>
           <div class="card-body">
             <p class="card-text"><strong>Email:</strong> {{ usuario.email }}</p>
-            <p class="card-text"><strong>Curso:</strong> {{ usuario.curso }}</p>
-            <p class="card-text"><strong>Rol:</strong> {{ usuario.role }}</p>
+            <p class="card-text">
+              <strong>Curso:</strong> {{ usuario.cursoNombre }}
+            </p>
+            <p class="card-text">
+              <strong>Rol:</strong> {{ usuario.rolNombre }}
+            </p>
           </div>
           <div class="card-footer d-flex justify-content-between">
             <button
@@ -136,29 +197,37 @@ export default {
   data() {
     return {
       usuariosActivos: [],
+      usuariosFiltrados: [], 
       roles: [],
       cursos: [],
+      cursosUsuarios: [],
+      rolSeleccionado: "",
+      cursoSeleccionado: "", 
+      estadoSeleccionado: "", 
       modalAbierto: false,
       tipoCambio: "",
       datosCambio: {
         usuarioId: null,
         curso: "",
         rol: null,
+        estado: null,
       },
       adminService: new AdminService(),
+      noUsuariosMensaje: "", 
     };
   },
   methods: {
     async cargarDatos() {
       try {
-        // Obtén los datos de usuarios, cursos y relaciones curso-usuario
-        const [usuarios, cursos, cursosUsuarios] = await Promise.all([
-          this.adminService.getUsuariosActivos(),
+        const [usuarios, cursos, cursosUsuarios] = await Promise.all([ 
+          this.adminService.getUsuarios(), 
           this.adminService.getCursos(),
           this.adminService.getCursosUsuarios(),
+          this.adminService.getRoles(),
         ]);
 
-        // Asigna los cursos a los usuarios mediante las relaciones
+        this.cursosUsuarios = cursosUsuarios;
+
         const usuariosConCursos = usuarios.map((usuario) => {
           const relacion = cursosUsuarios.find(
             (cu) => cu.idUsuario === usuario.idUsuario
@@ -167,16 +236,18 @@ export default {
             ? cursos.find((c) => c.idCurso === relacion.idCurso)
             : null;
 
+          const rol = this.roles.find((r) => r.idRole === usuario.idRole);
+
           return {
             ...usuario,
             cursoNombre: curso ? curso.nombre : "Sin curso",
-            idCurso: curso ? curso.idCurso : null, // Incluye el idCurso
+            idCurso: curso ? curso.idCurso : null,
+            rolNombre: rol ? rol.roleName : "Sin rol",
           };
         });
 
-        this.usuariosActivos = usuariosConCursos.filter(
-          (usuario) => usuario.role === "ALUMNO"
-        );
+        this.usuariosActivos = usuariosConCursos;
+        this.usuariosFiltrados = usuariosConCursos; 
         this.cursos = cursos;
         console.log(
           "Datos de usuarios activos cargados:",
@@ -186,27 +257,59 @@ export default {
         console.error("Error al cargar datos:", error);
       }
     },
-
     async cargarRoles() {
       try {
         this.roles = await this.adminService.getRoles();
+        console.log("Roles cargados:", this.roles);
       } catch (error) {
         console.error("Error al cargar roles:", error);
       }
     },
+
+    filtrarUsuarios() {
+      let usuariosFiltrados = this.usuariosActivos;
+
+      if (this.rolSeleccionado !== undefined && this.rolSeleccionado !== "") {
+        usuariosFiltrados = usuariosFiltrados.filter(
+          (usuario) => usuario.idRole === this.rolSeleccionado
+        );
+      }
+
+      if (
+        this.cursoSeleccionado !== undefined &&
+        this.cursoSeleccionado !== ""
+      ) {
+        usuariosFiltrados = usuariosFiltrados.filter(
+          (usuario) => usuario.idCurso === this.cursoSeleccionado
+        );
+      }
+
+      if (this.estadoSeleccionado !== "") {
+        usuariosFiltrados = usuariosFiltrados.filter(
+          (usuario) =>
+            usuario.estadoUsuario === (this.estadoSeleccionado === "true")
+        );
+      }
+
+      this.usuariosFiltrados = usuariosFiltrados;
+
+      if (this.usuariosFiltrados.length === 0) {
+        this.noUsuariosMensaje = "No se encontraron usuarios con los filtros seleccionados.";
+      } else {
+        this.noUsuariosMensaje = "";
+      }
+    },
     abrirModalCambio(tipo, usuario) {
-      console.log("Modal abierto para:", tipo, usuario);
       this.tipoCambio = tipo;
       this.datosCambio.usuarioId = usuario.idUsuario;
 
       if (tipo === "curso") {
-        console.log("Id curso: " + usuario.idCurso);
         this.datosCambio.curso = usuario.idCurso;
       } else if (tipo === "rol") {
         this.datosCambio.rol = usuario.idRole;
         this.cargarRoles();
       } else if (tipo === "estado") {
-        this.datosCambio.estado = usuario.activo; // Asumimos que tienes el campo `activo`
+        this.datosCambio.estado = usuario.activo;
       }
       this.modalAbierto = true;
     },
@@ -216,92 +319,53 @@ export default {
       this.tipoCambio = "";
       this.datosCambio = { usuarioId: null, curso: null, rol: null };
     },
+
     async guardarCambio() {
-      console.log("Metodo guardarCambio ejecutado");
       try {
         if (this.tipoCambio === "curso") {
-          console.log("Datos enviados al servicio:");
-          console.log("Usuario ID:", this.datosCambio.usuarioId);
-          console.log("Curso ID:", this.datosCambio.curso);
-
           await this.adminService.updateCursoUsuario(
             this.datosCambio.usuarioId,
             this.datosCambio.curso
           );
-
-          // Actualiza directamente la lista de usuarios activos
-          await this.cargarDatos(); // Recarga los datos actualizados
-
-          // Actualiza la lista de usuarios activos
-          const usuarioIndex = this.usuariosActivos.findIndex(
-            (u) => u.idUsuario === this.datosCambio.usuarioId
-          );
-          if (usuarioIndex !== -1) {
-            const nuevoCurso = this.cursos.find(
-              (curso) => curso.idCurso === this.datosCambio.curso
-            );
-            if (nuevoCurso) {
-              this.usuariosActivos[usuarioIndex].cursoNombre =
-                nuevoCurso.nombre;
-              this.usuariosActivos[usuarioIndex].idCurso = nuevoCurso.idCurso;
-            }
-          }
-
-          console.log("Curso seleccionado:", this.datosCambio.curso);
+          await this.cargarDatos();
         } else if (this.tipoCambio === "rol") {
           await this.adminService.updateRolUsuario(
             this.datosCambio.usuarioId,
             this.datosCambio.rol
           );
-
           await this.cargarDatos();
-
-          // Elimina al usuario si deja de ser alumno
-          const usuarioIndex = this.usuariosActivos.findIndex(
-            (u) => u.idUsuario === this.datosCambio.usuarioId
-          );
-          if (
-            usuarioIndex !== -1 &&
-            this.roles.find((role) => role.idRole === this.datosCambio.rol)
-              ?.roleName !== "ALUMNO"
-          ) {
-            this.usuariosActivos.splice(usuarioIndex, 1);
-          }
         } else if (this.tipoCambio === "estado") {
-          console.log("Cambiando estado:", {
-            UsuarioID: this.datosCambio.usuarioId,
-            Estado: this.datosCambio.estado,
-          });
-
           await this.adminService.updateEstadoUsuario(
             this.datosCambio.usuarioId,
             this.datosCambio.estado
           );
-
           await this.cargarDatos();
         }
+        this.cerrarModal();
 
-        this.cerrarModal(); // Cierra el modal inmediatamente
+        // resetear filtros
+        this.rolSeleccionado = "";
+        this.cursoSeleccionado = "";
+        this.estadoSeleccionado = "";
 
         Swal.fire(
           "¡Éxito!",
           `El ${this.tipoCambio} fue actualizado.`,
           "success"
-        ).then(() => {
-          this.cerrarModal(); // Cierra el modal tras confirmar el éxito
-        });
+        );
       } catch (error) {
         Swal.fire(
           "¡Error!",
           `No se pudo actualizar el ${this.tipoCambio}.`,
           "error"
         );
-        console.error("Error al guardar cambio:", error);
       }
     },
   },
   created() {
-    this.cargarDatos();
+    this.cargarRoles().then(() => {
+      this.cargarDatos();
+    });
   },
 };
 </script>

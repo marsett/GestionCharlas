@@ -16,6 +16,19 @@ export default class AdminService {
       });
   }
 
+  getUsuarios() {
+    const token = Cookies.get("bearer_token");
+    return axios
+      .get(`${Global.urlBase}/api/Usuarios`, {
+        headers: { Authorization: token },
+      })
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Error al obtener profesores:", err);
+        throw err;
+      });
+  }
+
   getUsuariosActivos() {
     const token = Cookies.get("bearer_token");
     return axios
@@ -44,7 +57,7 @@ export default class AdminService {
       });
   }
 
-  updateEstadoUsuario(idUsuario, estado){
+  updateEstadoUsuario(idUsuario, estado) {
     const token = Cookies.get("bearer_token");
     return axios
       .put(
@@ -129,5 +142,5 @@ export default class AdminService {
   }
 
 
-  
+
 }
