@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5" v-if="usuario">
     <div
-      class="card shadow-lg p-4 rounded"
+      class="card shadow-lg p-4 rounded mx-auto"
       style="width: 100%; max-width: 1100px"
     >
       <div class="row text-center text-md-start">
@@ -48,21 +48,40 @@
         </div>
       </div>
 
-      <div
-        class="d-flex gap-3 mt-4 justify-content-center justify-content-md-start"
-      >
-        <button class="btn btn-primary" @click="mostrarRondas">
+      <div class="d-flex gap-3 mt-4 justify-content-center justify-content-md-start">
+        <button
+          class="btn"
+          :class="{ 'btn-primary': seccionActiva === 'rondas', 'btn-outline-primary': seccionActiva !== 'rondas' }"
+          @click="mostrarRondas"
+        >
           Ver Rondas
         </button>
-        <button class="btn btn-secondary" @click="mostrarAlumnos">
-          Ver Alumnos del Curso
+        <button
+          class="btn"
+          :class="{ 'btn-secondary': seccionActiva === 'alumnos', 'btn-outline-secondary': seccionActiva !== 'alumnos' }"
+          @click="mostrarAlumnos"
+        >
+          Ver Alumnos
         </button>
       </div>
 
       <!-- Tabla de Rondas -->
       <div v-if="seccionActiva === 'rondas'" class="mt-4">
-        <h5>Rondas</h5>
-        <table class="table table-bordered table-hover">
+
+        <!-- Mostrar spinner mientras se cargan las rondas -->
+        <div v-if="cargando" class="d-flex justify-content-center my-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+
+        <!-- Mostrar mensaje si no hay alumnos -->
+        <div v-else-if="!rondas.length && !cargando" class="alert alert-warning text-center my-4">
+          No hay rondas creadas.
+        </div>
+
+        <h5 v-if="!cargando">Rondas</h5>
+        <table class="table table-bordered table-hover" v-if="!cargando">
           <thead>
             <tr>
               <th>Descripción</th>
@@ -125,10 +144,10 @@
                 </div>
               </div>
               <button
-                class="btn btn-outline-danger btn-sm ms-auto"
+                class="btn btn-danger btn-sm ms-auto"
                 @click="abrirAlerta(alumno.alumno)"
               >
-                Cambiar Estado
+                Desactivar
               </button>
             </div>
           </li>
@@ -202,11 +221,15 @@ export default {
     async mostrarRondas() {
       try {
         this.seccionActiva = "rondas";
+        this.cargando = true; 
         const data = await this.perfilService.getRondasProfesor();
         this.rondas = data;
       } catch (error) {
         console.error("Error al cargar las rondas:", error);
         alert("No se pudieron cargar las rondas.");
+      }
+      finally {
+        this.cargando = false; // Ocultar spinner
       }
     },
     async mostrarAlumnos() {
@@ -231,7 +254,7 @@ export default {
       if(alumno.estadoUsuario == true){
         Swal.fire({
           title: "¿Estás seguro?",
-          text: `Estás a punto de cambiar el estado de ${alumno.usuario} a inactivo.`,
+          text: `Estás a punto de desactivar al usuario "${alumno.usuario}"`,
           icon: "warning",
           showCancelButton: true,
           confirmButtonText: "Sí, cambiar",
@@ -243,16 +266,17 @@ export default {
         });
       }
     },
-    cambiarEstadoAlumno(alumno) {
+    async cambiarEstadoAlumno(alumno) {
       if(alumno.estadoUsuario == true){
-        this.perfilService.updateEstadoUsuario(alumno.idUsuario, !alumno.estadoUsuario)
-        .then(response => {
-          console.log('Estado alumno actualizado: ', response);
-          this.mostrarAlumnos();
-        })
-        .catch(error => {
-          console.error('Error al actualizar el estado alumno:', error);
-        });
+        try {
+          // Realizar la eliminación en el servidor
+          await this.perfilService.updateEstadoUsuario(alumno.idUsuario, !alumno.estadoUsuario);
+          Swal.fire("Estado cambiado", `El usuario "${alumno.usuario}" ha sido desactivado correctamente. Ahora no podrá acceder al sistema.`, "success");
+          await this.mostrarAlumnos();
+        } catch (error) {
+          console.error("Error al eliminar el alumno:", error);
+          Swal.fire("Error en la Operación", "No se pudo desactivar al usuario. Por favor, inténtalo más tarde.", "error");
+        }
       }
     },
   },
@@ -288,16 +312,6 @@ export default {
   color: #007bff;
 }
 
-.btn-primary {
-  font-size: 1.1em;
-  padding: 12px 24px;
-  border-radius: 5px;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
 @media (min-width: 768px) {
   .card {
     padding: 30px;
@@ -306,10 +320,6 @@ export default {
   .profile-image {
     width: 150px;
     height: 150px;
-  }
-
-  .btn-primary {
-    font-size: 1.2em;
   }
 }
 

@@ -1,7 +1,10 @@
 <template>
   <div>
     <!-- Mostrar spinner mientras se cargan los alumnos -->
-    <div v-if="cargando" class="d-flex justify-content-center my-4">
+    <div
+      v-if="cargando"
+      class="d-flex justify-content-center align-items-center vh-100"
+    >
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
