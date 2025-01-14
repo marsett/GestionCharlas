@@ -1,5 +1,11 @@
 <template>
   <div>
+    <!-- Mostrar spinner mientras se cargan los alumnos -->
+    <div v-if="cargando" class="d-flex justify-content-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
 
     <div class="container my-3" v-if="role == 2">
       <h1 class="fw-semibold mt-4 mt-md-5">Hola, {{ nombre }} !</h1>
@@ -107,7 +113,7 @@
       </div>
     </div>
 
-    <div class="container my-5" v-if="role == 1">
+    <div class="container my-5" v-if="role == 1 && !cargando">
       <h2 class="text-center mb-4 fw-bold">{{ curso }}</h2>
 
       <!-- Fila de métricas clave -->
@@ -151,7 +157,7 @@
       </div>
 
       <!-- Gráfico de barras -->
-      <div class="mt-5 mb-5">
+      <div class="mt-5 mb-5" >
         <canvas id="barChart"></canvas>
       </div>
     </div>
@@ -206,6 +212,7 @@ export default {
       charlasPendientes: 0,
       usuariosSinCharla: 0, 
       progresoGeneral: 0, 
+      cargando: false,
     };
   },
   mounted() {
@@ -219,11 +226,12 @@ export default {
       }
 
       if(this.role == 2){
-        this.evaluarRondas();
+        this.evaluarRondas(); 
       } 
     })
     .catch(error => {
       console.error('Error al obtener los datos de usuario:', error);
+      this.cargando = false; 
     });
   },
   methods: {
@@ -293,6 +301,7 @@ export default {
     },
 
     evaluarRondas(){
+      this.cargando = true;
       // Obtener las rondas.
       serviceChar.getRondas()
       .then(response => {
@@ -382,17 +391,22 @@ export default {
             if (!isRondaAbierta) {
               this.puedeSubirCharla = false;
             }
+
+            this.cargando = false;
           })
           .catch(error => {
             console.error('Error al obtener los votos del alumno:', error);
+            this.cargando = false;
           });
         })
         .catch(error => {
           console.error('Error al obtener las charlas del alumno:', error);
+          this.cargando = false;
         });
       })
       .catch(error => {
         console.error('Error al obtener las rondas de charlas:', error);
+        this.cargando = false;
       });
     },
 
@@ -401,6 +415,7 @@ export default {
     },
 
     evaluarAlumnos(){
+      this.cargando = true;
       servicePerf.getAlumnosCursoProfesor()
       .then(response => {
         this.curso = response[0].curso.nombre;
@@ -414,7 +429,7 @@ export default {
 
         // Filtrar solo alumnos y extraer los datos relevantes
         const alumnos = data
-                        .filter(entry => entry.alumno.role === "ALUMNO")
+                        .filter(entry => entry.alumno.role === "ALUMNO" && entry.alumno.estadoUsuario == true)
                         .map(entry => ({
                           nombre: entry.alumno.usuario,
                           charlasPropuestas: entry.charlasPropuestas || 0,
@@ -454,8 +469,6 @@ export default {
           ]
         };
 
-        this.mostrarDiagrama(barData, maxCharlas);
-
         // Total de charlas propuestas y aceptadas
         const totalCharlasPropuestas = propuestas.reduce((sum, propuestas) => sum + propuestas, 0);
         const totalCharlasAceptadas = aceptadas.reduce((sum, aceptadas) => sum + aceptadas, 0);
@@ -471,55 +484,63 @@ export default {
         this.totalCharlasAceptadas = totalCharlasAceptadas;
         this.charlasPendientes = charlasPendientes;
         this.usuariosSinCharla = usuariosSinCharla;
+
+        this.cargando = false; 
+
+        this.mostrarDiagrama(barData, maxCharlas);
       })
       .catch(error => {
         console.error('Error al obtener los alumnos de un profesor:', error);
+        this.cargando = false;
       });
     },
 
     mostrarDiagrama(barData, maxCharlas){
-      const ctx = document.getElementById('barChart').getContext('2d');
-        if (ctx) {
-          const diagrama  = new Chart(ctx, {
-              type: 'bar', // Tipo de gráfico
-              data: barData, // Datos del gráfico
-              options: {
-                responsive: true,
-                maintainAspectRatio: false, // Para que el gráfico se adapte al tamaño del contenedor
-                plugins: {
-                  legend: {
-                      position: 'top', // Posición de la leyenda
-                  },
-                  tooltip: {
-                      enabled: true, // Habilitar tooltips
-                  }
-                },
-                scales: {
-                  x: {
-                    beginAtZero: true, // Asegurarse de que el eje X comience en cero
-                    tickRotation: 45, // Rotar las etiquetas para que se vean bien
-                    ticks: {
-                      maxRotation: 90,
-                      minRotation: 45
+      // Espera a que el DOM se actualice antes de intentar obtener el canvas
+      this.$nextTick(() => {
+        const ctx = document.getElementById('barChart').getContext('2d');
+          if (ctx) {
+            const diagrama  = new Chart(ctx, {
+                type: 'bar', // Tipo de gráfico
+                data: barData, // Datos del gráfico
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false, // Para que el gráfico se adapte al tamaño del contenedor
+                  plugins: {
+                    legend: {
+                        position: 'top', // Posición de la leyenda
                     },
-                    categoryPercentage: 0.8, // Controla el ancho de las barras en relación con el espacio disponible
-                    barPercentage: 0.9, // Ajusta el porcentaje de la barra
+                    tooltip: {
+                        enabled: true, // Habilitar tooltips
+                    }
                   },
-                  y: {
-                    beginAtZero: true, // Asegurarse de que el eje Y comience en cero
-                    max: maxCharlas,
-                    ticks: {
-                      stepSize: 1 // Ajusta el tamaño de cada paso en el eje Y
+                  scales: {
+                    x: {
+                      beginAtZero: true, // Asegurarse de que el eje X comience en cero
+                      tickRotation: 45, // Rotar las etiquetas para que se vean bien
+                      ticks: {
+                        maxRotation: 90,
+                        minRotation: 45
+                      },
+                      categoryPercentage: 0.8, // Controla el ancho de las barras en relación con el espacio disponible
+                      barPercentage: 0.9, // Ajusta el porcentaje de la barra
+                    },
+                    y: {
+                      beginAtZero: true, // Asegurarse de que el eje Y comience en cero
+                      max: maxCharlas,
+                      ticks: {
+                        stepSize: 1 // Ajusta el tamaño de cada paso en el eje Y
+                      }
                     }
                   }
                 }
-              }
-          });
+            });
 
-          diagrama;
-        } else {
-          console.error("Error: No se pudo obtener el contexto del gráfico");
-        }
+            diagrama;
+          } else {
+            console.error("Error: No se pudo obtener el contexto del gráfico");
+          }
+      });
     },
 
     cambiarCursor(event) {
