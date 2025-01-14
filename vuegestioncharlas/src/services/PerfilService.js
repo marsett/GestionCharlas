@@ -102,10 +102,10 @@ export default class PerfilService {
 
     getRondasProfesor() {
         return axios.get(Global.urlBase + "api/Profesor/RondasProfesor", {
-          headers: { Authorization: Cookies.get("bearer_token") },
+            headers: { Authorization: Cookies.get("bearer_token") },
         }).then(response => response.data);
     }
-      
+
     getAlumnosCursoProfesor() {
         return new Promise((resolve, reject) => {
             const endpoint = "api/Profesor/AlumnosCursoProfesor";
@@ -128,10 +128,10 @@ export default class PerfilService {
 
     updateEstadoUsuario(idUsuario, estado) {
         return new Promise((resolve, reject) => {
-            const endpoint = "api/profesor/updateestadoalumno/"+idUsuario+"/"+estado;
+            const endpoint = `/api/profesor/updateestadoalumno/${idUsuario}/${estado}`;
             const token = Cookies.get('bearer_token'); 
 
-            axios.put(Global.urlBase + endpoint, {
+            axios.put(Global.urlBase + endpoint, {}, {
                 headers: {
                     Authorization: token, 
                 },
