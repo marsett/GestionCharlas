@@ -19,8 +19,8 @@ export default {
             hoveredIndex: null, // Indice del enlace con hover
             navItems: [
                 { name: 'Home', link: '/' },
-                { name: 'Charlas', link: '/link' },
-                { name: 'Perfil', link: '/about' },
+                { name: 'Charlas', link: '/charlasalumno' },
+                { name: 'Perfil', link: '/perfilalumno' },
                 { name: 'Cerrar Sesión', link: '/contact' }
             ] // Elementos del menú con enlaces
         };
@@ -38,7 +38,7 @@ export default {
 
 <style scoped>
 li{
-    margin: 5px;
+    margin: 0 8px 0px 0;
 }
 .nav{
     margin-top: 20px;
