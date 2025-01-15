@@ -6,7 +6,7 @@ export default class AuthService {
         return new Promise((resolve, reject) => {
             const endpoint = 'api/auth/login';
             const json = JSON.stringify({
-                userName,
+                userName: userName+'@tajamar365.com',
                 password
             });
             axios.post(
