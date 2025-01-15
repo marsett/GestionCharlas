@@ -3,7 +3,7 @@
 
 
     <!-- Contenedor principal -->
-    <div class="row shadow-lg mx-2 mx-md-0 rounded-3 overflow-hidden login-container" style="max-width: 1200px;">
+    <div class="row shadow-lg mx-2 mx-md-0 rounded-3 overflow-hidden login-container" style="max-width: 900px;">
       <!-- Columna de Ilustración -->
       <div class="col-md-4 p-5 m-3 bg-white d-flex align-items-center justify-content-center rounded-3">
         <img
@@ -21,7 +21,7 @@
         <!-- Formulario -->
         <form @submit.prevent="loginUser">
           <div class="mb-3">
-                <label for="userName" class="form-label">Correo educativo:</label>
+                <label for="email" class="form-label">Correo educativo <span class="text-danger">*</span></label>
                 <div class="input-group">
                     <input 
                         type="text" 
@@ -38,7 +38,7 @@
             </div>
 
           <div class="mb-3">
-            <label for="password" class="form-label">Contraseña:</label>
+            <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
             <div class="input-group flex-nowrap">
                 <input 
                     :type="!passwordVisible ? 'Password' : 'Text'" 
@@ -94,10 +94,10 @@
         <p class="text-center mt-2">
             ¿No tienes cuenta?
             <router-link
-            to="/signup"
+            to="/register"
             class="border-bottom fw-bold text-black"
             >
-            Regístrate aquí
+            Regístrate
             </router-link>
         </p>
       </div>
