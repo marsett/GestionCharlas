@@ -554,6 +554,9 @@ export default {
 </script>
 
 <style scoped>
+.container{
+  background-color: #F5ECD5!important;
+}
   /* Estilo para la card activa (cuando está disponible) */
   .active-card {
     transition: box-shadow 0.3s ease-in-out;
