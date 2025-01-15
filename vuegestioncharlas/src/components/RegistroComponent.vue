@@ -14,7 +14,7 @@
                     <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
                     <input
                     type="text"
-                    class="form-control"
+                    class="form-control shadow-input"
                     id="nombre"
                     v-model="form.nombre"
                     :readonly="isLoading"
@@ -26,7 +26,7 @@
                     <label for="apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
                     <input
                     type="text"
-                    class="form-control"
+                    class="form-control shadow-input"
                     id="apellidos"
                     v-model="form.apellidos"
                     :readonly="isLoading"
@@ -40,7 +40,7 @@
             <div class="input-group">
               <input
                 type="text"
-                class="form-control"
+                class="form-control shadow-input"
                 id="email"
                 v-model="form.email"
                 :readonly="isLoading"
@@ -57,8 +57,8 @@
                 <input 
                     :type="!passwordVisible ? 'Password' : 'Text'" 
                     id="password"
-                    class="form-control" 
-                    placeholder="••••••••" 
+                    class="form-control shadow-input" 
+                    :placeholder="passwordVisible ? 'Ejemplo123' : '••••••••••'" 
                     aria-label="password" 
                     aria-describedby="addon-wrapping passwordHelpBlock"
                     v-model="form.password"
@@ -66,12 +66,11 @@
                     required
                 >
                 <span 
-                    class="input-group-text" 
-                    id="addon-wrapping"
-                    @click="togglePasswordVisibility"
-                >
-                    {{ passwordVisible ? 'Ocultar' : 'Ver' }}
-                </span>
+                  class="input-group-text" 
+                  id="addon-wrapping"
+                  @click="togglePasswordVisibility"
+                  v-html="!passwordVisible ? '<i class=\'fa-solid fa-eye-slash\'></i>' : '<i class=\'fa-solid fa-eye\'></i>'"
+                ></span>
             </div>
             <div id="passwordHelpBlock" class="form-text">
                 Tu contraseña debe tener entre 8 y 20 caracteres, incluir letras y números, y no contener espacios ni caracteres especiales.
@@ -117,7 +116,7 @@
                     type="number"
                     id="idCurso"
                     v-model="form.idCurso"
-                    :readonly="isLoading2"
+                    :readonly="isLoading"
                     class="form-control"
                     placeholder="XXXX"
                   />
@@ -132,7 +131,7 @@
                     type="password"
                     id="profesorPassword"
                     v-model="profesorPassword"
-                    :readonly="isLoading2"
+                    :readonly="isLoading"
                     class="form-control"
                     placeholder="Introduce tu clave de profesor"
                   />
@@ -229,7 +228,7 @@ export default {
         }
 
         // Validar que el username no contenga el símbolo '@'
-        const usernameRegex = /^[a-zA-Z0-9._-]+$/; // Permitir solo letras, números, puntos, guiones bajos y guiones
+        const usernameRegex = /^[a-zA-ZÑñ0-9._-]+$/; // Permitir solo letras, números, puntos, guiones bajos y guiones
         if (!usernameRegex.test(this.form.email)) {
             Swal.fire({
                 icon: "error",
@@ -345,30 +344,30 @@ export default {
 </script>
 
 <style>
-.login-background {
+  .login-background {
     background-color: #FDFAFA;
-}
+  }
 
-.login-container {
+  .login-container {
     background-color: #F5ECD5;
-}
+  }
 
-.btn-success {
+  .btn-success {
     background-color: #578E7E;
     border-color: #578E7E;
-}
+  }
 
-.btn-success:active, .btn-success:hover {
+  .btn-success:active, .btn-success:hover {
     border-color: #436c60;
     background-color: #436c60;
-}
+  }
 
-.btn-success:disabled {
+  .btn-success:disabled {
     border-color: #40685C;
     background-color: #40685C;
-}
+  }
 
-.overlay {
+  .overlay {
     position: fixed; /* Fijo para cubrir toda la pantalla */
     top: 0;
     left: 0;
@@ -379,5 +378,20 @@ export default {
     display: flex; /* Para centrar el spinner */
     align-items: center; /* Centrado vertical */
     justify-content: center; /* Centrado horizontal */
-}
+  }
+
+  /* Sombreado interno para las cajas de entrada */
+  .shadow-input {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra interna ligera */
+    border-radius: 0.375rem; 
+    border: 1px solid #ccc; 
+    padding: 0.5rem; 
+  }
+
+  /* Cambiar color de sombreado al enfocar */
+  .shadow-input:focus {
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 4px rgba(0, 123, 255, 0.5);
+    border-color: #007bff;
+    outline: none;
+  }
 </style>
