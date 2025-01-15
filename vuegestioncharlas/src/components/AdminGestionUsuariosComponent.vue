@@ -1,64 +1,64 @@
 <template>
   <div class="container mt-4">
     <h2 class="mb-4 text-center">Gestión de Usuarios</h2>
-
-    <!-- Filtro por Rol -->
-    <div class="mb-3">
-      <label for="filtroRol" class="form-label">Filtrar por Rol</label>
-      <select
-        id="filtroRol"
-        class="form-select"
-        v-model="rolSeleccionado"
-        @change="filtrarUsuarios"
-      >
-        <option value="">Todos</option>
-        <option v-for="role in roles" :key="role.idRole" :value="role.idRole">
-          {{ role.roleName }}
-        </option>
-      </select>
-    </div>
-
-    <!-- Filtro por Curso -->
-    <div class="mb-3">
-      <label for="filtroCurso" class="form-label">Filtrar por Curso</label>
-      <select
-        id="filtroCurso"
-        class="form-select"
-        v-model="cursoSeleccionado"
-        @change="filtrarUsuarios"
-      >
-        <option value="">Todos</option>
-        <option
-          v-for="curso in cursos"
-          :key="curso.idCurso"
-          :value="curso.idCurso"
+    <div class="row">
+      <!-- Filtro por Rol -->
+      <div class="col-md-4 mb-3">
+        <label for="filtroRol" class="form-label">Filtrar por Rol</label>
+        <select
+          id="filtroRol"
+          class="form-select"
+          v-model="rolSeleccionado"
+          @change="filtrarUsuarios"
         >
-          {{ curso.nombre }}
-        </option>
-      </select>
-    </div>
+          <option value="">Todos</option>
+          <option v-for="role in roles" :key="role.idRole" :value="role.idRole">
+            {{ role.roleName }}
+          </option>
+        </select>
+      </div>
 
-    <!-- Filtro por Estado -->
-    <div class="mb-3">
-      <label for="filtroEstado" class="form-label">Filtrar por Estado</label>
-      <select
-        id="filtroEstado"
-        class="form-select"
-        v-model="estadoSeleccionado"
-        @change="filtrarUsuarios"
-      >
-        <option value="">Todos</option>
-        <option value="true">Activo</option>
-        <option value="false">Inactivo</option>
-      </select>
-    </div>
+      <!-- Filtro por Curso -->
+      <div class="col-md-4 mb-3">
+        <label for="filtroCurso" class="form-label">Filtrar por Curso</label>
+        <select
+          id="filtroCurso"
+          class="form-select"
+          v-model="cursoSeleccionado"
+          @change="filtrarUsuarios"
+        >
+          <option value="">Todos</option>
+          <option
+            v-for="curso in cursos"
+            :key="curso.idCurso"
+            :value="curso.idCurso"
+          >
+            {{ curso.nombre }}
+          </option>
+        </select>
+      </div>
 
+      <!-- Filtro por Estado -->
+      <div class="col-md-4 mb-3">
+        <label for="filtroEstado" class="form-label">Filtrar por Estado</label>
+        <select
+          id="filtroEstado"
+          class="form-select"
+          v-model="estadoSeleccionado"
+          @change="filtrarUsuarios"
+        >
+          <option value="">Todos</option>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+    </div>
     <!-- Mensaje cuando no hay usuarios filtrados -->
     <div v-if="noUsuariosMensaje" class="alert alert-warning text-center">
       {{ noUsuariosMensaje }}
     </div>
 
-    <div class="row g-4">
+    <!-- <div class="row g-4">
       <div
         class="col-12 col-md-6 col-lg-4"
         v-for="usuario in usuariosFiltrados"
@@ -67,7 +67,6 @@
         <div class="card shadow h-100 border-0">
           <div class="card-header bg-primary text-white">
             <h5 class="mb-0 d-flex align-items-center">
-              <i class="bi bi-person-circle me-2"></i>
               {{ usuario.nombre }} {{ usuario.apellidos }}
             </h5>
           </div>
@@ -97,6 +96,41 @@
               class="btn btn-outline-warning btn-sm"
               @click="abrirModalCambio('estado', usuario)"
             >
+              Cambiar Estado
+            </button>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <div class="card-container">
+      <div
+        class="card-usuario"
+        v-for="usuario in usuariosFiltrados"
+        :key="usuario.idUsuario"
+      >
+        <div class="card-encabezado">
+          <!-- Icono de información en la parte superior derecha -->
+          <i class="fas fa-info-circle info-icon"></i>
+        </div>
+        <div class="card-cuerpo">
+          <div class="profile-info">
+            <img :src="usuario.imagen" />
+            <div class="user-details">
+              <div class="user-name">
+                {{ usuario.nombre }} {{ usuario.apellidos }}
+              </div>
+              <div class="user-curso">{{ usuario.cursoNombre }}</div>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button @click="abrirModalCambio('curso', usuario)">
+              Cambiar Curso
+            </button>
+            <button @click="abrirModalCambio('rol', usuario)">
+              Cambiar Rol
+            </button>
+            <button @click="abrirModalCambio('estado', usuario)">
               Cambiar Estado
             </button>
           </div>
@@ -197,13 +231,13 @@ export default {
   data() {
     return {
       usuariosActivos: [],
-      usuariosFiltrados: [], 
+      usuariosFiltrados: [],
       roles: [],
       cursos: [],
       cursosUsuarios: [],
       rolSeleccionado: "",
-      cursoSeleccionado: "", 
-      estadoSeleccionado: "", 
+      cursoSeleccionado: "",
+      estadoSeleccionado: "",
       modalAbierto: false,
       tipoCambio: "",
       datosCambio: {
@@ -213,14 +247,14 @@ export default {
         estado: null,
       },
       adminService: new AdminService(),
-      noUsuariosMensaje: "", 
+      noUsuariosMensaje: "",
     };
   },
   methods: {
     async cargarDatos() {
       try {
-        const [usuarios, cursos, cursosUsuarios] = await Promise.all([ 
-          this.adminService.getUsuarios(), 
+        const [usuarios, cursos, cursosUsuarios] = await Promise.all([
+          this.adminService.getUsuarios(),
           this.adminService.getCursos(),
           this.adminService.getCursosUsuarios(),
           this.adminService.getRoles(),
@@ -247,7 +281,7 @@ export default {
         });
 
         this.usuariosActivos = usuariosConCursos;
-        this.usuariosFiltrados = usuariosConCursos; 
+        this.usuariosFiltrados = usuariosConCursos;
         this.cursos = cursos;
         console.log(
           "Datos de usuarios activos cargados:",
@@ -294,7 +328,8 @@ export default {
       this.usuariosFiltrados = usuariosFiltrados;
 
       if (this.usuariosFiltrados.length === 0) {
-        this.noUsuariosMensaje = "No se encontraron usuarios con los filtros seleccionados.";
+        this.noUsuariosMensaje =
+          "No se encontraron usuarios con los filtros seleccionados.";
       } else {
         this.noUsuariosMensaje = "";
       }
@@ -370,23 +405,110 @@ export default {
 };
 </script>
 
-<style scoped>
-.card-header {
-  font-size: 1.1rem;
-  font-weight: bold;
-  background-color: #007bff;
-  color: white;
+<style>
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Espacio entre las tarjetas */
+  justify-content: space-between; /* Asegura que las tarjetas ocupen todo el espacio disponible */
 }
-.card-footer {
-  background-color: #f9f9f9;
+.card-usuario {
+  flex: 1 1 calc(33.33% - 10px);
+  width: 480px; /* Tarjetas ocuparán un 30% del contenedor */
+  min-width: 400px;
+  margin-bottom: 20px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+  display: inline-block;
+  text-align: center;
+}
+
+.card-usuario:last-child {
+  margin-right: 0; /* Elimina el margen derecho de la última tarjeta */
+}
+
+.card-encabezado {
+  background-color: #ff7a00;
+  height: 100px; /* Parte del header más alta */
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  position: relative; /* Para posicionar el icono dentro de este contenedor */
+}
+
+.info-icon {
+  position: absolute;
+  top: 10px; /* Distancia desde la parte superior */
+  right: 10px; /* Distancia desde la parte derecha */
+  font-size: 24px; /* Tamaño del icono */
+  color: white; /* Color del icono */
+  cursor: pointer;
+}
+
+.card-cuerpo {
+  background-color: #A3A3A3;
+  padding: 20px;
+  text-align: center;
+  border-top-left-radius: 15px; /* Esquina superior izquierda redondeada */
+  border-top-right-radius: 15px; /* Esquina superior derecha redondeada */
+  position: relative;
+  margin-top: -30px; /* Superpone el card-body sobre el card-header */
+  z-index: 1;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Alinea a la izquierda */
+  margin-top: -60px; /* Subir más la imagen */
+}
+
+.profile-info img {
+  width: 120px; /* Imagen más grande */
+  height: 120px;
+  border-radius: 10%;
+  margin-right: 20px;
+}
+
+.user-details {
+  text-align: left;
+  margin-top: 20px; /* Baja más el nombre y el curso */
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.user-curso {
+  font-size: 14px;
+}
+
+.btn-group {
   display: flex;
   justify-content: space-between;
+  margin-top: 20px;
 }
-.modal-content {
-  border-radius: 10px;
+
+.btn-group button {
+  background-color: #CBCBCB;
+  border: none;
+  padding: 8px 15px;
+  margin: 5px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  flex: 1;
 }
-.modal-header {
-  background-color: #007bff;
-  color: white;
+
+.btn-group button:hover {
+  background-color: #c0c0c0;
+}
+
+.container {
+  background-color: #D9D9D9;
+  border-radius: 16px;
 }
 </style>
