@@ -1,9 +1,9 @@
 <template>
-  <div class="container mt-4">
+  <div class="container my-4 p-4">
     <h2 class="mb-4 text-center">Gestión de Usuarios</h2>
-    <div class="row">
+    <div class="row row-cols-md-3 row-cols-1">
       <!-- Filtro por Rol -->
-      <div class="col-md-4 mb-3">
+      <div class="col mb-3">
         <label for="filtroRol" class="form-label">Filtrar por Rol</label>
         <select
           id="filtroRol"
@@ -19,7 +19,7 @@
       </div>
 
       <!-- Filtro por Curso -->
-      <div class="col-md-4 mb-3">
+      <div class="col mb-3">
         <label for="filtroCurso" class="form-label">Filtrar por Curso</label>
         <select
           id="filtroCurso"
@@ -39,7 +39,7 @@
       </div>
 
       <!-- Filtro por Estado -->
-      <div class="col-md-4 mb-3">
+      <div class="col mb-3">
         <label for="filtroEstado" class="form-label">Filtrar por Estado</label>
         <select
           id="filtroEstado"
@@ -103,36 +103,38 @@
       </div>
     </div> -->
 
-    <div class="card-container">
+    <!-- Tarjetas de Usuarios -->
+    <div class="row row-cols-lg-3 row-cols-1 g-3">
       <div
-        class="card-usuario"
+        class="col"
         v-for="usuario in usuariosFiltrados"
         :key="usuario.idUsuario"
       >
-        <div class="card-encabezado">
-          <!-- Icono de información en la parte superior derecha -->
-          <i class="fas fa-info-circle info-icon"></i>
-        </div>
-        <div class="card-cuerpo">
-          <div class="profile-info">
-            <img :src="usuario.imagen" />
-            <div class="user-details">
-              <div class="user-name">
-                {{ usuario.nombre }} {{ usuario.apellidos }}
-              </div>
-              <div class="user-curso">{{ usuario.cursoNombre }}</div>
-            </div>
+        <div class="card-usuario">
+          <div class="card-encabezado">
+            <i class="fas fa-info-circle info-icon"></i>
           </div>
-          <div class="btn-group">
-            <button @click="abrirModalCambio('curso', usuario)">
-              Cambiar Curso
-            </button>
-            <button @click="abrirModalCambio('rol', usuario)">
-              Cambiar Rol
-            </button>
-            <button @click="abrirModalCambio('estado', usuario)">
-              Cambiar Estado
-            </button>
+          <div class="card-cuerpo">
+            <div class="profile-info">
+              <img :src="usuario.imagen" />
+              <div class="user-details">
+                <div class="user-name">
+                  {{ usuario.nombre }} {{ usuario.apellidos }}
+                </div>
+                <div class="user-curso">{{ usuario.cursoNombre }}</div>
+              </div>
+            </div>
+            <div class="btn-group">
+              <button @click="abrirModalCambio('curso', usuario)">
+                Cambiar Curso
+              </button>
+              <button @click="abrirModalCambio('rol', usuario)">
+                Cambiar Rol
+              </button>
+              <button @click="abrirModalCambio('estado', usuario)">
+                Cambiar Estado
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -406,90 +408,12 @@ export default {
 </script>
 
 <style>
-.card-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px; /* Espacio entre las tarjetas */
-  justify-content: space-between; /* Asegura que las tarjetas ocupen todo el espacio disponible */
-}
-.card-usuario {
-  flex: 1 1 calc(33.33% - 10px);
-  width: 480px; /* Tarjetas ocuparán un 30% del contenedor */
-  min-width: 400px;
-  margin-bottom: 20px;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  font-family: Arial, sans-serif;
-  display: inline-block;
-  text-align: center;
-}
-
 .card-usuario:last-child {
   margin-right: 0; /* Elimina el margen derecho de la última tarjeta */
 }
 
-.card-encabezado {
-  background-color: #ff7a00;
-  height: 100px; /* Parte del header más alta */
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-  position: relative; /* Para posicionar el icono dentro de este contenedor */
-}
-
-.info-icon {
-  position: absolute;
-  top: 10px; /* Distancia desde la parte superior */
-  right: 10px; /* Distancia desde la parte derecha */
-  font-size: 24px; /* Tamaño del icono */
-  color: white; /* Color del icono */
-  cursor: pointer;
-}
-
-.card-cuerpo {
-  background-color: #A3A3A3;
-  padding: 20px;
-  text-align: center;
-  border-top-left-radius: 15px; /* Esquina superior izquierda redondeada */
-  border-top-right-radius: 15px; /* Esquina superior derecha redondeada */
-  position: relative;
-  margin-top: -30px; /* Superpone el card-body sobre el card-header */
-  z-index: 1;
-}
-
-.profile-info {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* Alinea a la izquierda */
-  margin-top: -60px; /* Subir más la imagen */
-}
-
-.profile-info img {
-  width: 120px; /* Imagen más grande */
-  height: 120px;
-  border-radius: 10%;
-  margin-right: 20px;
-}
-
-.user-details {
-  text-align: left;
-  margin-top: 20px; /* Baja más el nombre y el curso */
-}
-
-.user-name {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 5px 0;
-}
-
 .user-curso {
   font-size: 14px;
-}
-
-.btn-group {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
 }
 
 .btn-group button {
@@ -511,4 +435,74 @@ export default {
   background-color: #D9D9D9;
   border-radius: 16px;
 }
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center; /* Cambiar a 'center' para centrar tarjetas */
+}
+
+.card-usuario {
+  width: 100%; /* Full width dentro de su columna de Bootstrap */
+  max-width: 480px; /* Limitar ancho máximo */
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.card-encabezado {
+  background-color: #ff7a00;
+  height: 100px;
+  position: relative;
+}
+
+.info-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+.card-cuerpo {
+  background-color: #a3a3a3;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  margin-top: -30px;
+  z-index: 1;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -60px;
+}
+
+.profile-info img {
+  width: 100px;
+  height: 100px;
+  border-radius: 10%;
+  margin-right: 20px;
+}
+
+.user-details {
+  text-align: left;
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
 </style>
