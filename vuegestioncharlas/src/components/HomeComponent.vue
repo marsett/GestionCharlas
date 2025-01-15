@@ -11,7 +11,7 @@
     </div>
 
     <div class="container my-3" v-if="role == 2">
-      <h1 class="fw-semibold mt-4 mt-md-5">Hola, {{ nombre }} !</h1>
+      <h1 class="fw-semibold ">Hola, {{ nombre }} !</h1>
       <div class="row row-cols-1 row-cols-md-2 my-4 pt-2">
         <!-- Card para ronda abierta (no activa) -->
         <div class="col mb-3">
@@ -554,6 +554,13 @@ export default {
 </script>
 
 <style scoped>
+
+.container{
+  background-color: #F5ECD5!important;
+  padding:55px 20px 0px 20px;
+  margin-top: 0px!important;
+  
+}
   /* Estilo para la card activa (cuando está disponible) */
   .active-card {
     transition: box-shadow 0.3s ease-in-out;

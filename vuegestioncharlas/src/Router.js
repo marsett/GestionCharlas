@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Cookies from 'cookies-js';
 import HomeComponent from './components/HomeComponent.vue';
-import LoginComponent from './components/LoginComponent.vue';
+// import LoginComponent from './components/LoginComponent.vue';
+import InicioSesionComponent from './components/InicioSesionComponent.vue';
+import RegistroComponent from './components/RegistroComponent.vue';
 import PerfilAlumnoComponent from './components/PerfilAlumnoComponent.vue';
 import PerfilProfesorComponent from './components/PerfilProfesorComponent.vue';
 import CharlasComponent from './components/CharlasComponent.vue';
@@ -13,7 +15,19 @@ import NotFoundComponent from "./components/NotFoundComponent.vue";
 const routes = [
     {
         path: '/login',
-        component: LoginComponent,
+        component: InicioSesionComponent,
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token'); // Verifica si la cookie 'bearer_token' existe
+            if (!token) {
+                next(); // Si no tiene token, accede a la página de login
+            } else {
+                next('/'); // Si tiene token, redirige al Home
+            }
+        }
+    },
+    {
+        path: '/register',
+        component: RegistroComponent,
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token'); // Verifica si la cookie 'bearer_token' existe
             if (!token) {
