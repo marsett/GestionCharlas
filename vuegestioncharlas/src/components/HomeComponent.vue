@@ -15,11 +15,18 @@
       <div class="row row-cols-1 row-cols-md-2 my-4 pt-2">
         <!-- Card para ronda abierta (no activa) -->
         <div class="col mb-3">
-          <div :class="{'card': true, 'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
-            <div class="card-body text-center">
-              <h5 class="card-title">📢 Ronda Abierta</h5>
-              <p class="card-text">
-                <!-- Mensaje para indicar si puede subir charla o no -->
+          <div class="custom-card" :class="{'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
+
+            <!-- Sección superior con forma de pestaña -->
+            <div class="card-header">
+              <div class="tab-header" :class="{'active-tab': isRondaAbierta, 'inactive-tab': !isRondaAbierta}">
+                📢 {{ isRondaAbierta ? 'Rondas abiertas' : 'Sin rondas abiertas' }}
+              </div>
+            </div>
+
+            <!-- Contenido principal de la tarjeta -->
+            <div class="card-body p-4">
+              <p class="card-text px-5">
                 <span v-if="isRondaAbierta">
                   {{ puedeSubirCharla 
                     ? 'Actualmente hay una ronda abierta para subir charlas. ¡Aprovecha la oportunidad de compartir tus ideas!' 
@@ -29,19 +36,21 @@
                   No hay rondas abiertas para subir charlas.
                 </span>
               </p>
-              <!-- Button en lugar de router link porque si pones 2 condiciones para que sea disabled, no tiene ningun efecto -->
+
+              <!-- Botón o formulario -->
               <button 
-                :class="isRondaAbierta && puedeSubirCharla ? 'btn btn-primary' : 'btn btn-secondary'"
+                :class="isRondaAbierta && puedeSubirCharla ? 'btn btn-primary' : 'btn btn-secondary text-black'"
                 :disabled="!isRondaAbierta || !puedeSubirCharla"
                 @click="$router.push('/charlas')"
                 v-if="!isRondaAbierta || !puedeSubirCharla"
               >
                 Subir charla
               </button>
-              <FormNewCharla @evaluarRondas="actualizarContenido" v-else/>
+              <FormNewCharla @evaluarRondas="actualizarContenido" v-else />
             </div>
-          </div>  
+          </div>
         </div>
+
       
         <!-- Card para votación activa (activa o no activa) -->
         <div class="col mb-3">
@@ -556,7 +565,7 @@ export default {
 <style scoped>
 
 .container{
-  background-color: #F5ECD5!important;
+  background-color: #FDFAFA!important;
   padding:55px 20px 0px 20px;
   margin-top: 0px!important;
   
@@ -567,8 +576,9 @@ export default {
   }
 
   .active-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 15px 30px -15px rgba(213, 206, 188, 0.55);
   }
+
 
   /* Estilo para la card inactiva (cuando no está disponible) */
   .inactive-card {
@@ -613,4 +623,107 @@ export default {
     height: 400px;
     width: 400px;
   }
+
+
+
+
+
+
+
+
+.custom-card {
+  background-color: #f9f5ec; /* Fondo beige claro */
+  border-radius: 15px; /* Bordes redondeados */
+  position: relative; /* Necesario para la pestaña */
+  overflow: hidden; /* Oculta contenido que salga del borde */
+  padding-top: 44px; /* Espacio para la pestaña superior */
+  transition: all 0.3s ease; /* Animaciones suaves */
+}
+
+.card-header{
+  width: 100%;
+  background-color: #FDFAFA;
+  height: 43px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Pestaña superior */
+.tab-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #F5ECD5; /* Fondo beige */
+  padding: 8px 24px;
+  border-radius: 16px 16px 0 0; /* Bordes redondeados superiores */
+  font-size: 18px; /* Tamaño del texto */
+  font-weight: bold; /* Negrita */
+  color: #333; /* Color del texto */
+  text-align: center;
+  box-shadow: 2px 2px 4px #e2dbc787; /* Sombra para destacarla */
+  transition: background-color 0.3s ease; /* Transición suave de color */
+}
+
+/* Pestaña activa */
+.active-tab {
+  background-color: #F5ECD5; /* Verde claro */
+  color: #333; /* Texto verde oscuro */
+}
+
+/* Pestaña inactiva */
+.inactive-tab {
+  background-color: #F5ECD5; /* Rojo claro */
+  color: #721c24; /* Texto rojo oscuro */
+}
+
+/* Contenido principal de la tarjeta */
+.card-body {
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  border: 2px solid #e2dbc787; /* Borde tenue */
+}
+
+/* Título */
+.card-title {
+  font-size: 18px; /* Tamaño mediano */
+  color: #333; /* Gris oscuro */
+  margin-bottom: 12px; /* Separación inferior */
+  font-weight: bold;
+}
+
+/* Texto descriptivo */
+.card-text {
+  font-size: 17px; /* Tamaño mediano */
+  color: #555; /* Gris medio */
+  margin-bottom: 16px; /* Separación inferior */
+}
+
+/* Pie de la tarjeta */
+.card-footer {
+  font-size: 14px; /* Tamaño más pequeño */
+  color: #777; /* Gris tenue */
+  margin-top: 10px; /* Separación superior */
+}
+
+/* Botones */
+.btn-primary {
+  background-color: #4caf50; /* Verde */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background-color: #cccccc; /* Gris */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: not-allowed;
+}
+
 </style>
