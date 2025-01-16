@@ -104,7 +104,9 @@
     </div> -->
 
     <!-- Tarjetas de Usuarios -->
-    <div class="row row-cols-lg-3 row-cols-1 g-3">
+    <div
+      class="row row-cols-xl-3 row-cols-lg-2 row-cols-1 d-flex"
+    >
       <div
         class="col"
         v-for="usuario in usuariosFiltrados"
@@ -417,7 +419,7 @@ export default {
 }
 
 .btn-group button {
-  background-color: #CBCBCB;
+  background-color: #cbcbcb;
   border: none;
   padding: 8px 15px;
   margin: 5px;
@@ -432,7 +434,7 @@ export default {
 }
 
 .container {
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   border-radius: 16px;
 }
 
@@ -450,6 +452,7 @@ export default {
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-align: center;
+  margin-bottom: 20px;
 }
 
 .card-encabezado {
@@ -505,4 +508,10 @@ export default {
   margin-top: 20px;
 }
 
+@media (max-width: 991px) {
+  .d-flex {
+    display: grid !important;
+    justify-content: center !important;
+  }
+}
 </style>
