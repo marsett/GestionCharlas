@@ -41,7 +41,6 @@
   </div>
 </template>
 
-
 <script>
 import PerfilService from "@/services/PerfilService";
 
@@ -93,7 +92,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 20px;
   margin-top: 20px;
 }
 
@@ -102,7 +101,8 @@ export default {
   flex-direction: column;
   background-color: #a7a2a2;
   padding: 20px;
-  width: 320px;
+  width: 100%;
+  max-width: 320px;
   min-height: 320px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -139,7 +139,7 @@ export default {
 }
 
 .chat-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   color: white;
   margin-bottom: 10px;
@@ -158,7 +158,7 @@ export default {
 }
 
 .chat-description {
-  font-size: 16px;
+  font-size: 14px;
   color: white;
   white-space: normal;
   word-wrap: break-word;
@@ -193,4 +193,37 @@ export default {
   border-radius: 8px;
 }
 
+/* Responsividad */
+@media (max-width: 768px) {
+  .chat-card {
+    width: 100%;
+  }
+
+  .chat-title {
+    font-size: 16px;
+  }
+
+  .chat-description {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .chat-card {
+    padding: 15px;
+    min-height: 280px;
+  }
+
+  .chat-title {
+    font-size: 14px;
+  }
+
+  .chat-description {
+    font-size: 12px;
+  }
+
+  .btn-round {
+    font-size: 16px;
+  }
+}
 </style>

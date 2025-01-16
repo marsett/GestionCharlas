@@ -1,30 +1,31 @@
 <template>
-  <div class="profile-container" v-if="usuario">
-    <!-- Sección de perfil -->
-    <div class="profile-header">
-      <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image" />
-    </div>
-
-    <div class="profile-back">
-      <div class="profile-details">
-        <h1 class="name">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
-        <p class="bio">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
-      </div>
-
-      <!-- Contenedor para los botones -->
-      <div class="profile-buttons">
-        <button class="btn-password" @click="activarEdicion">Editar Contraseña</button>
-        <button class="btn-activo" :class="{'active': usuario.estadoUsuario === 'Activo'}">Activo</button>
+  <div class="container mt-5">
+    <div v-if="usuario">
+      <div class="card shadow-sm text-center text-md-start profile-container">
+        <div class="profile-header"></div>
+        <div class="profile-back">
+          <div class="row align-items-center position-relative">
+            <div class="col-12 col-md-4 position-absolute start-50 translate-middle">
+              <img :src="usuario.imagen" alt="Foto de perfil" class="img-fluid rounded-circle profile-image mb-3" />
+            </div>
+            <div class="col-12 col-md-8 offset-md-4 mt-3 pt-3">
+              <h1 class="name">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
+              <p class="bio">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
+              <div class="profile-buttons mt-3">
+                <button class="btn btn-secondary btn-password me-2" @click="activarEdicion">Editar Contraseña</button>
+                <button class="btn btn-success btn-activo" :class="{'active': usuario.estadoUsuario === 'Activo'}">Activo</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <hr>
-
-      <!-- Componente para mostrar las charlas dinámicamente -->
       <CharlasAlumnoComponent :usuario="usuario" />
+      </div>
+    <div v-else>
+      <p>Cargando perfil...</p>
     </div>
-  </div>
-  <div v-else>
-    <p>Cargando perfil...</p>
   </div>
 </template>
 
@@ -63,50 +64,44 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .profile-container {
-  max-width: 80%;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 60px;
-  border-radius: 20px;
 }
 
 .profile-header {
   position: relative;
-  border-radius: 10px 10px 0px 0px;
   width: 100%;
-  height: 150px;
-  background-color: rgb(236, 132, 94);
+  height: 200px;
+  background-color: rgb(230, 159, 133);
 }
 
 .profile-back {
-  background-color: #cccbcb; /* Gris más suave */
-  padding-top: 40px;
-  border-radius: 0 0 20px 20px;
+  background-color: #98cce4;
+  padding-top: 60px;
   width: 100%;
   padding-bottom: 20px;
 }
 
 .profile-image {
   position: absolute;
-  bottom: -80px;
-  left: 25px;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 150px;
   height: 150px;
-  border-radius: 15px;
+  border-radius: 50%;
   border: 3px solid #fff;
-}
-
-.profile-details {
-  text-align: center;
-  margin-top: 60px;
-
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .name {
   font-size: 24px;
   font-weight: bold;
   color: #333;
+  margin-top: 60px;
 }
 
 .bio {
@@ -118,18 +113,16 @@ export default {
 .profile-buttons {
   margin-top: 20px;
   display: flex;
-  justify-content: flex-end;
-  margin-inline-end: 20px;
-  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btn-password,
 .btn-activo {
-  border: 2px solid #888;
-  height: 30px;
+  height: 40px;
   width: 150px;
   border-radius: 20px;
-  background-color: #9c9b9b;
+  background-color: #6c757d;
   font-size: 14px;
   color: white;
   cursor: pointer;
@@ -137,7 +130,29 @@ export default {
 
 .btn-password:hover,
 .btn-activo:hover {
-  background-color: #808080;
+  background-color: #5a6268;
 }
 
+@media (min-width: 768px) {
+  .profile-container {
+    padding: 30px;
+    border-radius: 10px;
+  }
+
+  .profile-header {
+    height: 200px;
+  }
+
+  .profile-image {
+    width: 150px;
+    height: 150px;
+    bottom: 60px;
+    left: -40%;
+    transform: translateX(-50%);
+  }
+
+  .profile-back {
+    padding-top: 40px;
+  }
+}
 </style>
