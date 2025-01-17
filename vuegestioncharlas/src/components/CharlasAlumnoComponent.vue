@@ -16,7 +16,7 @@
       <div class="chats">
         <div v-for="charla in charlas" :key="charla.charla.idCharla" class="chat-card">
           <div class="chat-image">
-            <img :src="charla.charla.imagen" alt="Imagen charla" />
+            <img src="https://www.esdesignbarcelona.com/sites/default/files/2023-07/funciones-de-la-imagen-1_0.png" alt="Imagen charla" />
           </div>
           <div class="chat-info">
             <div class="chat-details">
@@ -28,7 +28,6 @@
                 +
               </button>
             </div>
-            <!-- Detalles adicionales debajo de la charla -->
             <div v-if="charla.showDetails" class="additional-details">
               <p><strong>Fecha Propuesta:</strong> {{ charla.charla.fechaPropuesta }}</p>
               <p><strong>Usuario:</strong> {{ charla.charla.usuario }}</p>
@@ -83,9 +82,11 @@ export default {
 };
 </script>
 
+
+
 <style scoped>
 .container {
-  padding: 20px;
+  padding: 30px;
 }
 
 .chats {
@@ -93,42 +94,44 @@ export default {
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 20px;
-  margin-top: 20px;
+  margin-top: -50px;
 }
 
 .chat-card {
   display: flex;
   flex-direction: column;
-  background-color: #a7a2a2;
+  background-color: #c8bfe0;
   padding: 20px;
   width: 100%;
   max-width: 320px;
-  min-height: 320px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
+  min-height: 350px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   overflow: hidden;
 }
 
 .chat-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-8px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 .chat-image {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #c0c0c0;
+  background-color: #f5f5f5;
   padding: 10px;
   border-radius: 8px;
-  margin-bottom: 10px;
-  max-height: 150px;
+  margin-bottom: 15px;
+  max-height: 160px;
   overflow: hidden;
 }
 
 .chat-image img {
   max-width: 100%;
   height: auto;
+  border-radius: 8px;
 }
 
 .chat-info {
@@ -136,86 +139,88 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   flex-grow: 1;
+  
 }
 
 .chat-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  color: white;
+  color: #333;
   margin-bottom: 10px;
+  text-align: center;
 }
 
 .chat-details {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background-color: #757272;
-  padding: 10px;
+  background-color: #b0afdb;
+  padding: 15px;
   border-radius: 8px;
-  margin-top: 10px;
+  margin-top: 15px;
   width: 100%;
-  flex-grow: 1;
 }
 
 .chat-description {
   font-size: 14px;
-  color: white;
+  color: #555;
   white-space: normal;
   word-wrap: break-word;
+  margin-bottom: 15px;
 }
 
 .btn-round {
   align-self: flex-end;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
-  background-color: #83a2c4;
+  background-color: #1AAB8A;
   color: white;
-  font-size: 20px;
+  font-size: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s ease-in-out;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .btn-round:hover {
-  background-color: #0056b3;
+  background-color: #147d5c;
+  transform: scale(1.1);
 }
 
-/* Estilos para los detalles adicionales */
 .additional-details {
-  background-color: #e0e0e0;
-  padding: 10px;
-  margin-top: 10px;
+  background-color: #ab9cbd;
+  padding: 12px;
+  margin-top: 15px;
   border-radius: 8px;
+  font-size: 14px;
+  color: #e3e3ec;
 }
 
-/* Responsividad */
 @media (max-width: 768px) {
   .chat-card {
     width: 100%;
   }
 
   .chat-title {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .chat-description {
-    font-size: 14px;
+    font-size: 13px;
   }
 }
 
 @media (max-width: 576px) {
   .chat-card {
     padding: 15px;
-    min-height: 280px;
+    min-height: 300px;
   }
 
   .chat-title {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .chat-description {
@@ -223,7 +228,7 @@ export default {
   }
 
   .btn-round {
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 </style>
