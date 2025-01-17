@@ -1,276 +1,159 @@
 <template>
-  <div class="container mt-5" v-if="usuario">
-    <div
-      class="card shadow-lg p-4 rounded"
-      style="width: 100%; max-width: 1100px"
-    >
-      <div class="row text-center text-md-start">
-        <div class="col-12 col-md-3 mb-4 mb-md-0">
-          <img
-            :src="usuario.imagen"
-            alt="Foto de perfil"
-            @click="triggerFileInput"
-            class="profile-image img-fluid rounded-circle border-primary mb-3"
-            style="width: 150px; height: 150px; object-fit: cover"
-          />
-          <input
-            type="file"
-            ref="fileInput"
-            accept="image/*"
-            style="display: none"
-            @change="handleFileChange"
-          />
-        </div>
-        <div class="col-12 col-md-9">
-          <h4 class="font-weight-bold">
-            {{ usuario.nombre }} {{ usuario.apellidos }}
-          </h4>
-          <p class="text-muted">
-            {{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}
-          </p>
-
-          <div v-if="!editMode">
-            <div class="list-group">
-              <div class="list-group-item">
-                <strong>Nombre:</strong> {{ usuario.nombre }}
-              </div>
-              <div class="list-group-item">
-                <strong>Apellidos:</strong> {{ usuario.apellidos }}
-              </div>
-              <div class="list-group-item">
-                <strong>Email:</strong> {{ usuario.email }}
-              </div>
-              <div class="list-group-item">
-                <strong>Curso:</strong> {{ usuario.curso }}
+  <div class="container mt-5">
+    <div v-if="usuario">
+      <div class="card shadow-sm text-center text-md-start profile-container">
+        <div class="profile-header"></div>
+        <div class="profile-back">
+          <div class="row align-items-center position-relative">
+            <div class="col-12 col-md-4 position-absolute start-50 translate-middle">
+              <img :src="usuario.imagen" alt="Foto de perfil" class="img-fluid rounded-circle profile-image mb-3" />
+            </div>
+            <div class="col-12 col-md-8 offset-md-4 mt-3 pt-3">
+              <h1 class="name">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
+              <p class="bio">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
+              <div class="profile-buttons mt-3">
+                <button class="btn btn-secondary btn-password me-2" @click="activarEdicion">Editar Contraseña</button>
+                <button class="btn btn-success btn-activo" :class="{'active': usuario.estadoUsuario === 'Activo'}">Activo</button>
               </div>
             </div>
           </div>
-
-          <form v-else @submit.prevent="guardarCambios">
-            <div class="mb-3">
-              <label for="nombre" class="form-label"
-                ><strong>Nombre:</strong></label
-              >
-              <input
-                type="text"
-                id="nombre"
-                v-model="editedUsuario.nombre"
-                class="form-control"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label for="apellidos" class="form-label"
-                ><strong>Apellidos:</strong></label
-              >
-              <input
-                type="text"
-                id="apellidos"
-                v-model="editedUsuario.apellidos"
-                class="form-control"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label for="email" class="form-label"
-                ><strong>Email:</strong></label
-              >
-              <input
-                type="email"
-                id="email"
-                v-model="editedUsuario.email"
-                class="form-control"
-                required
-              />
-            </div>
-            <div class="d-flex gap-3 mt-3">
-              <button type="submit" class="btn btn-success">
-                Guardar Cambios
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                @click="cancelarEdicion"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
         </div>
       </div>
 
-      <div
-        v-if="!editMode"
-        class="d-flex gap-3 mt-4 justify-content-center justify-content-md-start"
-      >
-        <!-- <button class="btn btn-primary" @click="activarEdicion">
-          Editar Perfil
-        </button> -->
-        <router-link class="nav-link" to="/charlasalumno">
-          <button class="btn btn-primary">Mis Charlas</button>
-        </router-link>
+      <hr>
+      <CharlasAlumnoComponent :usuario="usuario" />
       </div>
+    <div v-else>
+      <p>Cargando perfil...</p>
     </div>
-  </div>
-  <div v-else>
-    <p>Cargando perfil...</p>
   </div>
 </template>
 
-
-
 <script>
 import PerfilService from "@/services/PerfilService";
+import CharlasAlumnoComponent from "@/components/CharlasAlumnoComponent";
+
 export default {
   name: "PerfilAlumnoComponent",
+  components: {
+    CharlasAlumnoComponent
+  },
   data() {
     return {
       usuario: null,
       perfilService: new PerfilService(),
-      // editMode: false,
-      // editedUsuario: {}
     };
   },
   methods: {
     async cargarPerfil() {
       try {
         const data = await this.perfilService.getUsuarioPerfil();
-        this.usuario = data.usuario; // Guardamos los datos del usuario en el estado
-        this.editedUsuario = { ...this.usuario }; // Inicializamos editedUsuario
+        this.usuario = data.usuario; // Los datos de usuario incluyen la información de charlas
       } catch (error) {
         console.error("Error al cargar el perfil:", error);
         alert("No se pudo cargar la información del perfil.");
       }
     },
-    // activarEdicion() {
-    //   this.editMode = true; // Activar el modo de edición
-    //   this.editedUsuario = { ...this.usuario }; // Copiar los datos actuales al formulario
-    // },
-    // async guardarCambios() {
-    //   try {
-    //     // Llama al método editarPerfil con los datos del usuario actualizados
-    //     await this.perfilService.editarPerfil({
-    //       idUsuario: this.usuario.idUsuario,
-    //       nombre: this.editedUsuario.nombre,
-    //       apellidos: this.editedUsuario.apellidos,
-    //       email: this.editedUsuario.email,
-    //       estadoUsuario: this.usuario.estadoUsuario,
-    //       imagen: this.usuario.imagen,
-    //       password: this.usuario.password,
-    //       idRole: this.usuario.idRole,
-    //     });
-
-    //     // Actualiza el estado del componente
-    //     this.usuario = { ...this.usuario, ...this.editedUsuario };
-    //     this.editMode = false; // Salir del modo de edición
-    //     alert("Perfil actualizado con éxito.");
-    //   } catch (error) {
-    //     console.error("Error al guardar los cambios:", error);
-    //     alert("No se pudo actualizar el perfil. Inténtalo de nuevo.");
-    //   }
-    // },
-    cancelarEdicion() {
-      this.editMode = false; // Cancelar edición
-      this.editedUsuario = { ...this.usuario }; // Revertir cambios no guardados
-    },
-    // Dispara el input de archivo
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
-    // Maneja el cambio de archivo y sube automáticamente
-    async handleFileChange(event) {
-      const file = event.target.files[0];
-      if (!file) return; // Si no se seleccionó archivo, salir
-      try {
-        const base64Content = await this.convertFileToBase64(file);
-        await this.perfilService.uploadUserImage(
-          this.usuario.idUsuario,
-          file.name,
-          base64Content
-        );
-        this.usuario.imagen = URL.createObjectURL(file); // Actualiza la imagen mostrada
-      } catch (error) {
-        console.error("Error al subir la imagen:", error);
-        alert("No se pudo subir la imagen. Inténtalo de nuevo.");
-      }
-    },
-    // Convierte el archivo a Base64
-    convertFileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(",")[1]); // Solo el contenido base64
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file);
-      });
+    activarEdicion() {
+      this.$router.push("/editar-perfil"); // Redirige a la página de edición del perfil
     },
   },
   created() {
-    this.cargarPerfil(); // Cargamos los datos al montar el componente
+    this.cargarPerfil(); // Cargar perfil al crear el componente
   },
 };
 </script>
 
+
 <style scoped>
+.profile-container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.profile-header {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background-color: rgb(230, 159, 133);
+}
+
+.profile-back {
+  background-color: #98cce4;
+  padding-top: 60px;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
 .profile-image {
-  border: 4px solid #007bff;
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3px solid #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.card {
-  background-color: #f8f9fa;
-}
-
-.card h4 {
+.name {
+  font-size: 24px;
+  font-weight: bold;
   color: #333;
+  margin-top: 60px;
 }
 
-.list-group-item {
-  font-size: 1.1em;
-  padding: 15px;
-  border: 1px solid #ddd;
-  background-color: #ffffff;
-  margin-bottom: 10px;
+.bio {
+  font-size: 14px;
+  color: #777;
+  margin: 10px 0;
 }
 
-.list-group-item strong {
-  color: #007bff;
+.profile-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.btn-primary {
-  font-size: 1.1em;
-  padding: 12px 24px;
-  border-radius: 5px;
+.btn-password,
+.btn-activo {
+  height: 40px;
+  width: 150px;
+  border-radius: 20px;
+  background-color: #6c757d;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.btn-password:hover,
+.btn-activo:hover {
+  background-color: #5a6268;
 }
 
 @media (min-width: 768px) {
-  .card {
+  .profile-container {
     padding: 30px;
+    border-radius: 10px;
+  }
+
+  .profile-header {
+    height: 200px;
   }
 
   .profile-image {
     width: 150px;
     height: 150px;
+    bottom: -30px;
+    left: -40%;
+    transform: translateX(-50%);
   }
 
-  .btn-primary {
-    font-size: 1.2em;
-  }
-}
-
-@media (min-width: 1200px) {
-  .container {
-    max-width: 1200px;
-  }
-  .card {
-    padding: 40px;
-  }
-  .profile-image {
-    width: 180px;
-    height: 180px;
+  .profile-back {
+    padding-top: 40px;
+    margin-top: -40px
   }
 }
 </style>
