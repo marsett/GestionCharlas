@@ -16,7 +16,7 @@
       <div class="chats">
         <div v-for="charla in charlas" :key="charla.charla.idCharla" class="chat-card">
           <div class="chat-image">
-            <img src="https://www.esdesignbarcelona.com/sites/default/files/2023-07/funciones-de-la-imagen-1_0.png" alt="Imagen charla" />
+            <img :src="charla.charla.imagen" alt="Imagen charla" />
           </div>
           <div class="chat-info">
             <div class="chat-details">
