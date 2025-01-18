@@ -1,276 +1,302 @@
 <template>
-  <div class="container mt-5" v-if="usuario">
-    <div
-      class="card shadow-lg p-4 rounded"
-      style="width: 100%; max-width: 1100px"
-    >
-      <div class="row text-center text-md-start">
-        <div class="col-12 col-md-3 mb-4 mb-md-0">
-          <img
-            :src="usuario.imagen"
-            alt="Foto de perfil"
-            @click="triggerFileInput"
-            class="profile-image img-fluid rounded-circle border-primary mb-3"
-            style="width: 150px; height: 150px; object-fit: cover"
-          />
-          <input
-            type="file"
-            ref="fileInput"
-            accept="image/*"
-            style="display: none"
-            @change="handleFileChange"
-          />
-        </div>
-        <div class="col-12 col-md-9">
-          <h4 class="font-weight-bold">
-            {{ usuario.nombre }} {{ usuario.apellidos }}
-          </h4>
-          <p class="text-muted">
-            {{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}
-          </p>
-
-          <div v-if="!editMode">
-            <div class="list-group">
-              <div class="list-group-item">
-                <strong>Nombre:</strong> {{ usuario.nombre }}
-              </div>
-              <div class="list-group-item">
-                <strong>Apellidos:</strong> {{ usuario.apellidos }}
-              </div>
-              <div class="list-group-item">
-                <strong>Email:</strong> {{ usuario.email }}
-              </div>
-              <div class="list-group-item">
-                <strong>Curso:</strong> {{ usuario.curso }}
+  <div class="container mt-5">
+    <div v-if="usuario">
+      <div class="card shadow-sm text-center text-md-start profile-container">
+        <div class="profile-header"></div>
+        <div class="profile-back">
+          <div class="row align-items-center position-relative">
+            <div class="col-12 col-md-4 position-absolute start-50 translate-middle">
+              <img :src="usuario.imagen" alt="Foto de perfil" class="img-fluid rounded-circle profile-image mb-3" />
+            </div>
+            <div class="col-12 col-md-8 offset-md-4 mt-3 pt-3">
+              <h1 class="name">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
+              <p class="bio">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
+              <div class="profile-buttons mt-3">
+                <button id="first" class="btn-password me-2" @click="mostrarFormularioContrasena()">Editar Contraseña</button>
+                <button 
+                  id="first" 
+                  class="btn-activo" 
+                  :class="{'active': usuario.estadoUsuario === 'Activo'}"
+                  @click="mostrarEstadoActivo"
+                >
+                  Activo
+                </button>
               </div>
             </div>
           </div>
-
-          <form v-else @submit.prevent="guardarCambios">
-            <div class="mb-3">
-              <label for="nombre" class="form-label"
-                ><strong>Nombre:</strong></label
-              >
-              <input
-                type="text"
-                id="nombre"
-                v-model="editedUsuario.nombre"
-                class="form-control"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label for="apellidos" class="form-label"
-                ><strong>Apellidos:</strong></label
-              >
-              <input
-                type="text"
-                id="apellidos"
-                v-model="editedUsuario.apellidos"
-                class="form-control"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label for="email" class="form-label"
-                ><strong>Email:</strong></label
-              >
-              <input
-                type="email"
-                id="email"
-                v-model="editedUsuario.email"
-                class="form-control"
-                required
-              />
-            </div>
-            <div class="d-flex gap-3 mt-3">
-              <button type="submit" class="btn btn-success">
-                Guardar Cambios
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                @click="cancelarEdicion"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
         </div>
       </div>
 
-      <div
-        v-if="!editMode"
-        class="d-flex gap-3 mt-4 justify-content-center justify-content-md-start"
-      >
-        <!-- <button class="btn btn-primary" @click="activarEdicion">
-          Editar Perfil
-        </button> -->
-        <router-link class="nav-link" to="/charlasalumno">
-          <button class="btn btn-primary">Mis Charlas</button>
-        </router-link>
-      </div>
+      <hr>
+      <CharlasAlumnoComponent :usuario="usuario" />
     </div>
-  </div>
-  <div v-else>
-    <p>Cargando perfil...</p>
+    <div v-else>
+      <p>Cargando perfil...</p>
+    </div>
   </div>
 </template>
 
-
-
 <script>
+import Swal from 'sweetalert2';
 import PerfilService from "@/services/PerfilService";
+import CharlasAlumnoComponent from "@/components/CharlasAlumnoComponent";
+
 export default {
   name: "PerfilAlumnoComponent",
+  components: {
+    CharlasAlumnoComponent
+  },
   data() {
     return {
       usuario: null,
       perfilService: new PerfilService(),
-      // editMode: false,
-      // editedUsuario: {}
     };
   },
   methods: {
     async cargarPerfil() {
       try {
         const data = await this.perfilService.getUsuarioPerfil();
-        this.usuario = data.usuario; // Guardamos los datos del usuario en el estado
-        this.editedUsuario = { ...this.usuario }; // Inicializamos editedUsuario
+        this.usuario = data.usuario;
       } catch (error) {
         console.error("Error al cargar el perfil:", error);
-        alert("No se pudo cargar la información del perfil.");
+        Swal.fire('Error', 'No se pudo cargar la información del perfil.', 'error');
       }
     },
-    // activarEdicion() {
-    //   this.editMode = true; // Activar el modo de edición
-    //   this.editedUsuario = { ...this.usuario }; // Copiar los datos actuales al formulario
-    // },
-    // async guardarCambios() {
-    //   try {
-    //     // Llama al método editarPerfil con los datos del usuario actualizados
-    //     await this.perfilService.editarPerfil({
-    //       idUsuario: this.usuario.idUsuario,
-    //       nombre: this.editedUsuario.nombre,
-    //       apellidos: this.editedUsuario.apellidos,
-    //       email: this.editedUsuario.email,
-    //       estadoUsuario: this.usuario.estadoUsuario,
-    //       imagen: this.usuario.imagen,
-    //       password: this.usuario.password,
-    //       idRole: this.usuario.idRole,
-    //     });
 
-    //     // Actualiza el estado del componente
-    //     this.usuario = { ...this.usuario, ...this.editedUsuario };
-    //     this.editMode = false; // Salir del modo de edición
-    //     alert("Perfil actualizado con éxito.");
-    //   } catch (error) {
-    //     console.error("Error al guardar los cambios:", error);
-    //     alert("No se pudo actualizar el perfil. Inténtalo de nuevo.");
-    //   }
-    // },
-    cancelarEdicion() {
-      this.editMode = false; // Cancelar edición
-      this.editedUsuario = { ...this.usuario }; // Revertir cambios no guardados
-    },
-    // Dispara el input de archivo
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
-    // Maneja el cambio de archivo y sube automáticamente
-    async handleFileChange(event) {
-      const file = event.target.files[0];
-      if (!file) return; // Si no se seleccionó archivo, salir
-      try {
-        const base64Content = await this.convertFileToBase64(file);
-        await this.perfilService.uploadUserImage(
-          this.usuario.idUsuario,
-          file.name,
-          base64Content
-        );
-        this.usuario.imagen = URL.createObjectURL(file); // Actualiza la imagen mostrada
-      } catch (error) {
-        console.error("Error al subir la imagen:", error);
-        alert("No se pudo subir la imagen. Inténtalo de nuevo.");
-      }
-    },
-    // Convierte el archivo a Base64
-    convertFileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(",")[1]); // Solo el contenido base64
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file);
+    mostrarFormularioContrasena() {
+      Swal.fire({
+        title: "Editar Contraseña",
+        html: `
+          <div class="form-group">
+            <input type="password" id="contraseniaNueva" class="form-control" placeholder="Contraseña Nueva">
+          </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        customClass: {
+          popup: 'swal-popup-bootstrap',
+          title: 'swal-title-bootstrap',
+          input: 'swal-input-bootstrap',
+          confirmButton: 'swal-confirm-btn',
+          cancelButton: 'swal-cancel-btn'
+        },
+        preConfirm: async () => {
+          const contraseniaNueva = Swal.getPopup().querySelector('#contraseniaNueva').value;
+          if (!contraseniaNueva) {
+            Swal.showValidationMessage(`Por favor, llena el campo de la nueva contraseña`);
+            return false;
+          }
+
+          try {
+            await this.perfilService.updateContrasenia(contraseniaNueva);
+            Swal.fire('Éxito', 'Contraseña actualizada con éxito', 'success');
+          } catch (error) {
+            console.error("Error al actualizar la contraseña:", error);
+            Swal.fire('Error', 'No se pudo actualizar la contraseña.', 'error');
+          }
+        }
       });
     },
+
+    mostrarEstadoActivo() {
+      Swal.fire({
+        title: "Estado del Usuario",
+        text: "Este usuario está activo",
+        icon: "info",
+        confirmButtonText: "Aceptar"
+      });
+    }
   },
   created() {
-    this.cargarPerfil(); // Cargamos los datos al montar el componente
-  },
+    this.cargarPerfil();
+  }
 };
 </script>
 
 <style scoped>
+.profile-container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.profile-header {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background-color: rgb(230, 159, 133);
+}
+
+.profile-back {
+  background-color: #98cce4;
+  padding-top: 60px;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
 .profile-image {
-  border: 4px solid #007bff;
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3px solid #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.card {
-  background-color: #f8f9fa;
-}
-
-.card h4 {
+.name {
+  font-size: 24px;
+  font-weight: bold;
   color: #333;
+  margin-top: 60px;
 }
 
-.list-group-item {
-  font-size: 1.1em;
-  padding: 15px;
-  border: 1px solid #ddd;
-  background-color: #ffffff;
-  margin-bottom: 10px;
+.bio {
+  font-size: 14px;
+  color: #777;
+  margin: 10px 0;
 }
 
-.list-group-item strong {
-  color: #007bff;
-}
-
-.btn-primary {
-  font-size: 1.1em;
-  padding: 12px 24px;
-  border-radius: 5px;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
+.profile-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 @media (min-width: 768px) {
-  .card {
+  .profile-container {
     padding: 30px;
+    border-radius: 10px;
+  }
+
+  .profile-header {
+    height: 200px;
   }
 
   .profile-image {
     width: 150px;
     height: 150px;
+    bottom: 60px;
+    left: -40%;
+    transform: translateX(-50%);
   }
 
-  .btn-primary {
-    font-size: 1.2em;
+  .profile-back {
+    padding-top: 40px;
   }
 }
 
-@media (min-width: 1200px) {
-  .container {
-    max-width: 1200px;
+.swal-popup-bootstrap {
+  border-radius: 0px !important;
+  width: 100% !important;
+  max-width: 500px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.swal-title-bootstrap {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+.swal-input-bootstrap {
+  width: 100%;
+  border-radius: 0px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.swal-confirm-btn,
+.swal-cancel-btn {
+  width: 48%;
+  font-size: 16px;
+  padding: 12px 0;
+  border-radius: 0px;
+}
+
+.swal-confirm-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+}
+
+.swal-cancel-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+@media (max-width: 600px) {
+  .swal-popup-bootstrap {
+    width: 90%;
   }
-  .card {
-    padding: 40px;
+
+  .swal-title-bootstrap {
+    font-size: 18px;
   }
-  .profile-image {
-    width: 180px;
-    height: 180px;
+
+  .swal-input-bootstrap {
+    font-size: 16px;
+  }
+}
+
+button {
+  background: #7787bd;
+  color: #fff;
+  border: none;
+  position: relative;
+  height: 50px;
+  font-size: 1.2em;
+  padding: 0 2em;
+  cursor: pointer;
+  transition: 800ms ease all;
+  outline: none;
+}
+
+button:hover {
+  background: #fff;
+  color: #512399;
+}
+
+button:before,
+button:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2px;
+  width: 0;
+  background: #512399;
+  transition: 400ms ease all;
+}
+
+button:after {
+  right: inherit;
+  top: inherit;
+  left: 0;
+  bottom: 0;
+}
+
+button:hover:before,
+button:hover:after {
+  width: 100%;
+  transition: 800ms ease all;
+}
+
+@media (max-width: 768px) {
+  button {
+    height: 45px;
+    font-size: 1em;
+  }
+
+  button:hover {
+    background: #fff;
+    color: #512399;
   }
 }
 </style>
