@@ -556,10 +556,7 @@ export default {
 <style scoped>
 
 .container{
-  background-color: #F5ECD5!important;
   padding:55px 20px 0px 20px;
-  margin-top: 0px!important;
-  
 }
   /* Estilo para la card activa (cuando está disponible) */
   .active-card {
