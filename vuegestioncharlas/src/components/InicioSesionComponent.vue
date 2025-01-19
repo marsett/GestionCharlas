@@ -1,7 +1,5 @@
 <template>
   <div class="login-background position-relative vh-100 d-flex align-items-center justify-content-center">
-
-
     <!-- Contenedor principal -->
     <div class="row shadow-lg mx-2 mx-md-0 rounded-3 overflow-hidden login-container" style="max-width: 900px;">
       <!-- Columna de Ilustración -->

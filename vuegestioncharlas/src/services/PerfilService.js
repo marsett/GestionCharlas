@@ -144,5 +144,26 @@ export default class PerfilService {
             });
         });
     }
-    
+    updateContrasenia(nuevacontrasenia) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `/api/usuarios/updatepasswordusuario`;
+            const token = Cookies.get('bearer_token'); 
+
+            const passwordnew = {
+                newPassword: nuevacontrasenia
+            };
+            axios.put(Global.urlBase + endpoint, passwordnew, {
+                headers: {
+                    Authorization: token, 
+                },
+            })
+            .then(response => {
+                resolve(response.data); 
+            })
+            .catch(error => {
+                console.error("Error al actualizar el estado del usuario:", error);
+                reject(error);
+            });
+        });
+    }  
 }
