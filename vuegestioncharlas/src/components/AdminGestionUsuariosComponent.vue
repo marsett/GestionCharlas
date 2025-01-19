@@ -1,10 +1,18 @@
 <template>
   <div class="container my-4 p-4">
-    <h2 class="mb-4 text-center">Gestión de Usuarios</h2>
+    <h2 class="mb-4 text-center" style="font-size: 42px; font-weight: 400px">
+      Gestión de Usuarios
+    </h2>
+    <hr
+      class="linea-separadora"
+      style="width: 160px; margin: 10px auto 20px auto"
+    />
     <div class="row row-cols-md-3 row-cols-1">
       <!-- Filtro por Rol -->
       <div class="col mb-3">
-        <label for="filtroRol" class="form-label">Filtrar por Rol</label>
+        <label for="filtroRol" class="form-label subtitulo"
+          >Filtrar por Rol</label
+        >
         <select
           id="filtroRol"
           class="form-select"
@@ -20,7 +28,9 @@
 
       <!-- Filtro por Curso -->
       <div class="col mb-3">
-        <label for="filtroCurso" class="form-label">Filtrar por Curso</label>
+        <label for="filtroCurso" class="form-label subtitulo"
+          >Filtrar por Curso</label
+        >
         <select
           id="filtroCurso"
           class="form-select"
@@ -40,7 +50,9 @@
 
       <!-- Filtro por Estado -->
       <div class="col mb-3">
-        <label for="filtroEstado" class="form-label">Filtrar por Estado</label>
+        <label for="filtroEstado" class="form-label subtitulo"
+          >Filtrar por Estado</label
+        >
         <select
           id="filtroEstado"
           class="form-select"
@@ -53,172 +65,46 @@
         </select>
       </div>
     </div>
+    <hr class="linea-separadora" />
     <!-- Mensaje cuando no hay usuarios filtrados -->
     <div v-if="noUsuariosMensaje" class="alert alert-warning text-center">
       {{ noUsuariosMensaje }}
     </div>
 
-    <!-- <div class="row g-4">
-      <div
-        class="col-12 col-md-6 col-lg-4"
-        v-for="usuario in usuariosFiltrados"
-        :key="usuario.idUsuario"
-      >
-        <div class="card shadow h-100 border-0">
-          <div class="card-header bg-primary text-white">
-            <h5 class="mb-0 d-flex align-items-center">
-              {{ usuario.nombre }} {{ usuario.apellidos }}
-            </h5>
-          </div>
-          <div class="card-body">
-            <p class="card-text"><strong>Email:</strong> {{ usuario.email }}</p>
-            <p class="card-text">
-              <strong>Curso:</strong> {{ usuario.cursoNombre }}
-            </p>
-            <p class="card-text">
-              <strong>Rol:</strong> {{ usuario.rolNombre }}
-            </p>
-          </div>
-          <div class="card-footer d-flex justify-content-between">
-            <button
-              class="btn btn-outline-primary btn-sm"
-              @click="abrirModalCambio('curso', usuario)"
-            >
-              Cambiar Curso
-            </button>
-            <button
-              class="btn btn-outline-success btn-sm"
-              @click="abrirModalCambio('rol', usuario)"
-            >
-              Cambiar Rol
-            </button>
-            <button
-              class="btn btn-outline-warning btn-sm"
-              @click="abrirModalCambio('estado', usuario)"
-            >
-              Cambiar Estado
-            </button>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
     <!-- Tarjetas de Usuarios -->
-    <div
-      class="row row-cols-xl-3 row-cols-lg-2 row-cols-1 d-flex"
-    >
+    <div class="row row-cols-xl-3 row-cols-lg-2 row-cols-1 d-flex">
       <div
         class="col"
         v-for="usuario in usuariosFiltrados"
         :key="usuario.idUsuario"
       >
         <div class="card-usuario">
-          <div class="card-encabezado">
-            <i class="fas fa-info-circle info-icon"></i>
+          <div
+            class="card-encabezado"
+            style="background-color: #7782c6"
+          >
+            <i
+              class="fas fa-info-circle info-icon"
+              @click="mostrarInformacionUsuario(usuario)"
+            ></i>
           </div>
           <div class="card-cuerpo">
             <div class="profile-info">
               <img :src="usuario.imagen" />
               <div class="user-details">
-                <div class="user-name">
+                <div class="titulo" style="font-weight: 600">
                   {{ usuario.nombre }} {{ usuario.apellidos }}
                 </div>
-                <div class="user-curso">{{ usuario.cursoNombre }}</div>
+                <div class="user-curso subtitulo" style="font-size: 13px">
+                  {{ usuario.cursoNombre }}
+                </div>
               </div>
             </div>
             <div class="btn-group">
-              <button @click="abrirModalCambio('curso', usuario)">
-                Cambiar Curso
-              </button>
-              <button @click="abrirModalCambio('rol', usuario)">
-                Cambiar Rol
-              </button>
-              <button @click="abrirModalCambio('estado', usuario)">
-                Cambiar Estado
-              </button>
+              <button @click="cambiarCurso(usuario)">Cambiar Curso</button>
+              <button @click="cambiarRol(usuario)">Cambiar Rol</button>
+              <button @click="cambiarEstado(usuario)">Cambiar Estado</button>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal General -->
-    <div
-      v-if="modalAbierto"
-      class="modal fade show"
-      tabindex="-1"
-      style="display: block; background: rgba(0, 0, 0, 0.5)"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Cambiar {{ tipoCambio }}</h5>
-            <button
-              type="button"
-              class="btn-close"
-              @click="cerrarModal"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div v-if="tipoCambio === 'curso'">
-              <label for="nuevoCurso" class="form-label">Nuevo Curso</label>
-              <select
-                v-model="datosCambio.curso"
-                id="nuevoCurso"
-                class="form-select"
-              >
-                <option
-                  v-for="curso in cursos"
-                  :key="curso.idCurso"
-                  :value="curso.idCurso"
-                >
-                  {{ curso.nombre }}
-                </option>
-              </select>
-            </div>
-            <div v-if="tipoCambio === 'rol'">
-              <label for="nuevoRol" class="form-label">Nuevo Rol</label>
-              <select
-                v-model="datosCambio.rol"
-                id="nuevoRol"
-                class="form-select"
-              >
-                <option
-                  v-for="role in roles"
-                  :key="role.idRole"
-                  :value="role.idRole"
-                >
-                  {{ role.roleName }}
-                </option>
-              </select>
-            </div>
-            <div v-if="tipoCambio === 'estado'">
-              <label for="nuevoEstado" class="form-label">Nuevo Estado</label>
-              <select
-                v-model="datosCambio.estado"
-                id="nuevoEstado"
-                class="form-select"
-              >
-                <option :value="true">Activo</option>
-                <option :value="false">Inactivo</option>
-              </select>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="cerrarModal"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="guardarCambio"
-            >
-              Guardar
-            </button>
           </div>
         </div>
       </div>
@@ -255,6 +141,253 @@ export default {
     };
   },
   methods: {
+    async cambiarCurso(usuario) {
+      const { value: nuevoCurso } = await Swal.fire({
+        title: "Seleccione un nuevo curso",
+        html: `
+      <div style="text-align: left; margin-top: 10px;">
+        ${this.cursos
+          .map(
+            (curso) => `
+          <div style="margin-bottom: 10px;">
+            <input 
+              type="radio" 
+              id="curso-${curso.idCurso}" 
+              name="curso" 
+              value="${curso.idCurso}" 
+              ${curso.idCurso === usuario.idCurso ? "checked" : ""}>
+            <label for="curso-${curso.idCurso}">${curso.nombre}</label>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    `,
+        preConfirm: () => {
+          const selected = Swal.getPopup().querySelector(
+            'input[name="curso"]:checked'
+          );
+          return selected ? selected.value : null;
+        },
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        customClass: {
+          cancelButton: "btn-red", // Aplica una clase personalizada al botón cancelar
+        },
+        focusConfirm: false,
+        allowOutsideClick: false, // Evita que se cierre al hacer clic fuera
+      });
+
+      if (nuevoCurso) {
+        // Mantén el SweetAlert visible y muestra el indicador de carga
+        Swal.fire({
+          title: "Guardando...",
+          text: "Por favor, espere mientras se actualiza el curso.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        try {
+          // Realiza la actualización en la API
+          await this.adminService.updateCursoUsuario(
+            usuario.idUsuario,
+            nuevoCurso
+          );
+
+          // Recarga los datos
+          await this.cargarDatos();
+
+          // Muestra un mensaje de éxito y cierra el SweetAlert
+          Swal.fire("¡Éxito!", "El curso ha sido actualizado.", "success");
+        } catch (error) {
+          // Muestra un mensaje de error sin cerrar el SweetAlert principal
+          Swal.fire({
+            title: "¡Error!",
+            text: "No se pudo actualizar el curso. Por favor, inténtelo de nuevo.",
+            icon: "error",
+            confirmButtonText: "Cerrar",
+          });
+        }
+
+        this.resetFiltros();
+      }
+    },
+    async cambiarRol(usuario) {
+      const { value: nuevoRol } = await Swal.fire({
+        title: "Seleccione un nuevo rol",
+        html: `
+        <div style="text-align: left; margin-top: 10px;">
+          ${this.roles
+            .map(
+              (role) => `
+            <div style="margin-bottom: 10px;">
+              <input 
+                type="radio" 
+                id="rol-${role.idRole}" 
+                name="rol" 
+                value="${role.idRole}" 
+                ${role.idRole === usuario.idRole ? "checked" : ""}>
+              <label for="rol-${role.idRole}">${role.roleName}</label>
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+      `,
+        preConfirm: () => {
+          const selected = Swal.getPopup().querySelector(
+            'input[name="rol"]:checked'
+          );
+          return selected ? selected.value : null;
+        },
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        customClass: {
+          cancelButton: "btn-red", // Aplica una clase personalizada al botón cancelar
+        },
+        focusConfirm: false,
+        allowOutsideClick: false, // Evita que se cierre al hacer clic fuera
+      });
+
+      if (nuevoRol) {
+        // Mantén el SweetAlert visible y muestra el indicador de carga
+        Swal.fire({
+          title: "Guardando...",
+          text: "Por favor, espere mientras se actualiza el rol.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        try {
+          // Realiza la actualización en la API
+          await this.adminService.updateRolUsuario(usuario.idUsuario, nuevoRol);
+
+          // Recarga los datos
+          await this.cargarDatos();
+
+          // Muestra un mensaje de éxito y cierra el SweetAlert
+          Swal.fire("¡Éxito!", "El rol ha sido actualizado.", "success");
+        } catch (error) {
+          // Muestra un mensaje de error sin cerrar el SweetAlert principal
+          Swal.fire({
+            title: "¡Error!",
+            text: "No se pudo actualizar el rol. Por favor, inténtelo de nuevo.",
+            icon: "error",
+            confirmButtonText: "Cerrar",
+          });
+        }
+
+        this.resetFiltros();
+      }
+    },
+    async cambiarEstado(usuario) {
+      const { value: nuevoEstado, isConfirmed } = await Swal.fire({
+        title: "Cambiar Estado",
+        text: `Selecciona el nuevo estado de usuario`,
+        icon: "warning",
+        html: `
+      <div style="text-align: left; margin-top: 10px;">
+        <div>
+          <input 
+            type="radio" 
+            id="activo" 
+            name="estado" 
+            value="true" 
+            ${usuario.estadoUsuario ? "checked" : ""}>
+          <label for="activo">Activo</label>
+        </div>
+        <div>
+          <input 
+            type="radio" 
+            id="inactivo" 
+            name="estado" 
+            value="false" 
+            ${!usuario.estadoUsuario ? "checked" : ""}>
+          <label for="inactivo">Inactivo</label>
+        </div>
+      </div>
+    `,
+        preConfirm: () => {
+          const selected = Swal.getPopup().querySelector(
+            'input[name="estado"]:checked'
+          );
+          return selected ? selected.value : null;
+        },
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        customClass: {
+          cancelButton: "btn-red",
+        },
+        focusConfirm: false,
+        allowOutsideClick: false,
+      });
+
+      // Solo continuar si el usuario presiona "Guardar" (isConfirmed es true)
+      if (isConfirmed && nuevoEstado !== null) {
+        // Mostrar mensaje de carga mientras se actualiza el estado
+        Swal.fire({
+          title: "Guardando...",
+          text: "Por favor, espere mientras se actualiza el estado.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        try {
+          // Actualizar el estado del usuario
+          await this.adminService.updateEstadoUsuario(
+            usuario.idUsuario,
+            nuevoEstado === "true"
+          );
+          await this.cargarDatos();
+          Swal.fire(
+            "¡Éxito!",
+            `El estado ha sido actualizado a ${
+              nuevoEstado === "true" ? "activo" : "inactivo"
+            }.`,
+            "success"
+          );
+        } catch (error) {
+          Swal.fire({
+            title: "¡Error!",
+            text: "No se pudo actualizar el estado. Por favor, inténtelo de nuevo.",
+            icon: "error",
+            confirmButtonText: "Cerrar",
+          });
+        }
+
+        this.resetFiltros();
+      }
+    },
+
+    resetFiltros() {
+      this.rolSeleccionado = "";
+      this.cursoSeleccionado = "";
+      this.estadoSeleccionado = "";
+    },
+    mostrarInformacionUsuario(usuario) {
+      Swal.fire({
+        title: "Información del Usuario",
+        html: `
+        <strong>Nombre:</strong> ${usuario.nombre} ${usuario.apellidos}<br>
+        <strong>Curso:</strong> ${usuario.cursoNombre}<br>
+        <strong>Rol:</strong> ${usuario.rolNombre}<br>
+        <strong>Estado:</strong> ${
+          usuario.estadoUsuario ? "Activo" : "Inactivo"
+        }
+      `,
+        icon: "info",
+        confirmButtonText: "OK",
+      });
+    },
     async cargarDatos() {
       try {
         const [usuarios, cursos, cursosUsuarios] = await Promise.all([
@@ -338,26 +471,6 @@ export default {
         this.noUsuariosMensaje = "";
       }
     },
-    abrirModalCambio(tipo, usuario) {
-      this.tipoCambio = tipo;
-      this.datosCambio.usuarioId = usuario.idUsuario;
-
-      if (tipo === "curso") {
-        this.datosCambio.curso = usuario.idCurso;
-      } else if (tipo === "rol") {
-        this.datosCambio.rol = usuario.idRole;
-        this.cargarRoles();
-      } else if (tipo === "estado") {
-        this.datosCambio.estado = usuario.activo;
-      }
-      this.modalAbierto = true;
-    },
-
-    cerrarModal() {
-      this.modalAbierto = false;
-      this.tipoCambio = "";
-      this.datosCambio = { usuarioId: null, curso: null, rol: null };
-    },
 
     async guardarCambio() {
       try {
@@ -387,11 +500,7 @@ export default {
         this.cursoSeleccionado = "";
         this.estadoSeleccionado = "";
 
-        Swal.fire(
-          "¡Éxito!",
-          `El ${this.tipoCambio} fue actualizado.`,
-          "success"
-        );
+        Swal.fire("¡Éxito!", `El curso fue actualizado.`, "success");
       } catch (error) {
         Swal.fire(
           "¡Error!",
@@ -411,7 +520,7 @@ export default {
 
 <style>
 .card-usuario:last-child {
-  margin-right: 0; /* Elimina el margen derecho de la última tarjeta */
+  margin-right: 0;
 }
 
 .user-curso {
@@ -442,12 +551,12 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  justify-content: center; /* Cambiar a 'center' para centrar tarjetas */
+  justify-content: center;
 }
 
 .card-usuario {
-  width: 100%; /* Full width dentro de su columna de Bootstrap */
-  max-width: 480px; /* Limitar ancho máximo */
+  width: 100%;
+  max-width: 480px;
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -497,11 +606,6 @@ export default {
   text-align: left;
 }
 
-.user-name {
-  font-size: 18px;
-  font-weight: bold;
-}
-
 .btn-group {
   display: flex;
   justify-content: space-between;
@@ -513,5 +617,12 @@ export default {
     display: grid !important;
     justify-content: center !important;
   }
+}
+
+.swal2-cancel.btn-red {
+  background-color: #ff4d4f !important; /* Rojo intenso */
+  color: white !important; /* Texto blanco */
+  border: none !important; /* Sin borde */
+  box-shadow: none !important; /* Sin sombra */
 }
 </style>

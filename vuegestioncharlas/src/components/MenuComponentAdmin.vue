@@ -25,16 +25,6 @@
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link
-              class="nav-link"
-              to="/gestionprofesores"
-              :class="{ selected: isSelected('/gestionprofesores') }"
-              @click="setSelected('/gestionprofesores')"
-            >
-              <i class="fas fa-chalkboard-teacher"></i> Gestión de Profesores
-            </router-link>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="#" @click.prevent="logout">
               <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </a>
