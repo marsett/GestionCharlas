@@ -26,7 +26,7 @@
 
             <!-- Contenido principal de la tarjeta -->
             <div class="card-body p-4 text-center">
-              <p class="card-text px-5">
+              <p class="card-text px-lg-5">
                 <span v-if="isRondaAbierta">
                   {{ puedeSubirCharla 
                     ? 'Actualmente hay una ronda abierta para subir charlas. ¡Aprovecha la oportunidad de compartir tus ideas!' 
@@ -63,7 +63,7 @@
 
             <!-- Contenido principal -->
             <div class="card-body p-4 text-center">
-              <p class="card-text px-5">
+              <p class="card-text px-lg-5">
                 <span v-if="isVotacionActiva">
                   {{ !puedeVotar 
                     ? 'La votación está activa, pero ya has emitido tu voto. ¡Gracias por participar!' 
@@ -77,13 +77,20 @@
               
               <!-- Botón para votar -->
               <button 
-              class="btn" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-black'"
+              class="btn me-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-black'"
                 :disabled="!isVotacionActiva || !puedeVotar"
+              >
+                Votar charla
+              </button>
+
+              <!-- Botón para ir a charlas -->
+              <button 
+                class="btn btn-mover"
                 @click="$router.push('/charlas')"
               >
-                Ir a Votar
+                Ir a charlas
               </button>
-            </div>
+            </div> 
           </div>
         </div>
       </div>
@@ -134,7 +141,7 @@
           
           <div class="mb-4 ps-3 col-md-4">
             <h2 class="mb-4 pt-0 espacio-150">Presentaciones</h2>
-            <ul class="list-group">
+            <ul class="list-group mt-4">
               <!-- Iterar sobre las fechas de eventos tipo "purple" -->
               <li 
                 class="list-group-item d-flex justify-content-between align-items-center"
@@ -142,7 +149,7 @@
                 :key="index"
               >
                 <div class="d-flex align-items-center">
-                  <span class="badge rounded-circle me-2" style="background-color: purple; color: white;">
+                  <span class="badge rounded-circle me-3" style="background-color: purple; color: white;">
                     {{ new Date(evento.date).getDate() }}
                   </span>
                   {{ evento.title }}
@@ -461,7 +468,7 @@ export default {
 
     formatoMes(fecha) {
       const opciones = { month: 'long' };  // 'long' te da el nombre completo del mes, 'short' lo da abreviado.
-      return new Date(fecha).toLocaleDateString('es-ES', opciones);
+      return new Date(fecha).toLocaleDateString('es-ES', opciones).replace(/^./, letra => letra.toUpperCase());
     },
 
 
@@ -733,6 +740,26 @@ export default {
     background-color: #436c60 !important;
   }
 
+  .btn-mover {
+    background-color: #7293A0 !important; 
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn-mover:active {
+    border-color: #64808b !important;
+    background-color: #64808b !important;
+    color: white;
+  }
+
+  .btn-mover:hover {
+    border-color: #64808b !important;
+    background-color: #64808b !important;
+    color: white;
+  }
+
   ::v-deep(.btn-secondary) {
     background-color: #cccccc !important;
     border: none;
@@ -742,8 +769,8 @@ export default {
   }
 
   ::v-deep(button.fc-today-button.fc-button.fc-button-primary) {
-    background-color: #436c60;
-    border-color: #436c60;
+    background-color: #7293A0;
+    border-color: #7293A0;
     color: white;
   }
 
@@ -827,7 +854,7 @@ export default {
   }
 
   .espacio-150{
-    margin-top: 148px;
+    margin-top: 150px;
   }
 
 

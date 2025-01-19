@@ -1,16 +1,15 @@
 <template>
-  <div class="login-background position-relative vh-100 d-flex align-items-center justify-content-center">
+  <div class="login-background position-relative vh-sm-auto d-flex align-items-center justify-content-center my-lg-0 my-md-2 mx-2 my-4 mx-sm-4">
     <!-- Contenedor principal -->
-    <div class="row shadow-lg mx-2 mx-md-0 rounded-3 overflow-hidden login-container p-3" style="max-width: 900px;">
+    <div class="row shadow-lg mx-2 mx-md-2 mx-lg-0 p-md-3 rounded-3 login-container" style="max-width: 900px;">
       
       <!-- Columna del Formulario -->
-      <div class="col-md-8 p-5">
-        <h3 class="text-center fw-bold mb-4 w-100">Crear tu cuenta</h3>
-
+      <div class="col-md-8 px-3 py-4 pe-md-5 ps-md-4">
+        <h3 class="text-center fw-bold mb-4 w-100 mt-3 mt-md-2">Crear tu cuenta</h3>
         <!-- Formulario -->
         <form @submit.prevent="registerUser">
             <div class="row row-cols-md-2 row-cols-1">
-                <div class="mb-3">
+                <div class="mb-3 pe-2">
                     <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
                     <input
                     type="text"
@@ -22,7 +21,7 @@
                     />
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 ps-2">
                     <label for="apellidos" class="form-label">Apellidos <span class="text-danger">*</span></label>
                     <input
                     type="text"
@@ -47,7 +46,7 @@
                 placeholder="username"
                 required
               />
-              <span class="input-group-text">@tajamar365.com</span>
+              <span class="input-group-text px-2 px-sm-3">@tajamar365.com</span>
             </div>
           </div>
 
@@ -117,7 +116,7 @@
                     id="idCurso"
                     v-model="form.idCurso"
                     :readonly="isLoading"
-                    class="form-control"
+                    class="form-control shadow-input"
                     placeholder="XXXX"
                   />
                 </div>
@@ -132,7 +131,7 @@
                     id="profesorPassword"
                     v-model="profesorPassword"
                     :readonly="isLoading"
-                    class="form-control"
+                    class="form-control shadow-input"
                     placeholder="Introduce tu clave de profesor"
                   />
                 </div>
@@ -147,12 +146,6 @@
         </form>
 
         <!-- Spinner de Carga -->
-        <div v-if="isLoading" class="position-absolute top-50 start-50 translate-middle">
-          <div class="spinner-border text-success" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
-        </div>
-
         <!-- Manto blanco sobre el formulario -->
         <div v-if="isLoading" class="overlay">
           <div class="spinner-border text-success" role="status">
@@ -168,19 +161,18 @@
       </div>
 
       <!-- Columna de Ilustración -->
-      <div class="col-md-4 p-5 d-flex align-items-center justify-content-center rounded-3 bg-white">
+      <div class="col-md-4 p-5 m-0 bg-white d-flex align-items-center justify-content-center rounded-3">
         <img
           src="../assets/icono.png"
           alt="Ilustración de registro"
-          class="img-fluid"
-          style="max-height: 400px; width: 100%; object-fit: cover;"
+          class="imagen-ajustada "
         />
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script scoped>
 import Swal from "sweetalert2";
 import AuthService from "@/services/AuthService";
 
@@ -344,12 +336,13 @@ export default {
 </script>
 
 <style>
-  .login-background {
+  .login-background{
     background-color: #FDFAFA;
   }
 
   .login-container {
     background-color: #F5ECD5;
+    height: auto;
   }
 
   .btn-success {
@@ -380,18 +373,62 @@ export default {
     justify-content: center; /* Centrado horizontal */
   }
 
-  /* Sombreado interno para las cajas de entrada */
   .shadow-input {
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra interna ligera */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); 
     border-radius: 0.375rem; 
     border: 1px solid #ccc; 
     padding: 0.5rem; 
   }
 
-  /* Cambiar color de sombreado al enfocar */
   .shadow-input:focus {
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 4px rgba(0, 123, 255, 0.5);
-    border-color: #007bff;
-    outline: none;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 4px rgba(87, 142, 126, 0.5); 
+    border-color: #578E7E; 
+    outline: none; 
+  }
+
+
+  .imagen-ajustada {
+    max-height: 400px; 
+    width: auto;
+    max-width: 100%; 
+  }
+
+  .vh-sm-auto {
+    height: auto;
+  }
+
+  .form-check-input:checked, .form-check-input:active{
+    background-color: #578E7E; /* Verde oscuro */
+    border-color: #436c60; /* Borde más oscuro */
+    box-shadow: 0 0 8px rgba(87, 142, 126, 0.5); 
+  }
+
+
+  @media (min-width: 768px) {
+    .login-container {
+      max-height: 760px;
+    }
+
+    .vh-sm-auto {
+      height: 100vh; 
+    }
+  }
+
+  @media (max-width: 768px) {
+    .imagen-ajustada {
+      max-height: 150px; /* Ajuste para pantallas más pequeñas */
+    }
+  }
+
+  @media (max-width: 576px) {
+    .imagen-ajustada {
+      max-height: 100px; 
+    }
+  }
+
+  @media (max-width: 350px) {
+    .imagen-ajustada {
+      max-height: 60px; 
+    }
   }
 </style>
