@@ -1,67 +1,278 @@
 <template>
-    <div class="container">
-        <ul class="nav justify-content-end">
-            <li class="nav-item" v-for="(item, index) in navItems" :key="index"
-                :class="{ 'active': activeIndex === index || isActiveRoute(item) }">
-                <a class="nav-link" :class="{ 'hovered': hoveredIndex === index || isActiveRoute(item) }"
-                    @mouseenter="hoveredIndex = index" @mouseleave="hoveredIndex = null" @click="setActive(index)"
-                    :href="item.link">{{ item.name }}</a>
-            </li>
+  <div class="nav">
+    <div class="container d-flex align-items-center justify-content-between">
+      <!-- Logo a la izquierda -->
+      <div class="logo-container">
+        <img
+          src="../assets/logo-tajamar.png"
+          alt="logo tajamar"
+          class="logo_tajamar"
+        />
+      </div>
+
+      <!-- Links centrados -->
+      <ul class="nav nav-custom justify-content-center m-0">
+        <li
+          class="nav-item"
+          v-for="(item, index) in navItems"
+          :key="index"
+          :class="{ active: activeIndex === index || isActiveRoute(item) }"
+        >
+          <a
+            class="nav-link"
+            :class="{ hovered: hoveredIndex === index || isActiveRoute(item) }"
+            @mouseenter="hoveredIndex = index"
+            @mouseleave="hoveredIndex = null"
+            @click="setActive(index)"
+            :href="item.link"
+          >
+            <i :class="item.icon"></i>
+            {{ item.name }}
+          </a>
+        </li>
+      </ul>
+
+      <div class="profile-container dropdown">
+        <!-- Botón desplegable -->
+        <div
+          class="d-flex align-items-center dropdown-toggle"
+          id="dropdownProfile"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          role="button"
+        >
+          <!-- Imagen de perfil -->
+          <div class="profile-circle">
+            <img :src="imagen" alt="profile" class="img-fluid rounded-circle" />
+          </div>
+          <!-- Nombre del usuario -->
+          <h2 class="profile-name ms-2">{{ nombre }}</h2>
+        </div>
+
+        <!-- Menú desplegable -->
+        <ul
+          class="dropdown-menu dropdown-menu-end"
+          aria-labelledby="dropdownProfile"
+        >
+          <li><a class="dropdown-item" href="/perfilalumno">Mi Perfil</a></li>
+          <li>
+            <a class="dropdown-item" href="#" @click.prevent="logout">
+              <i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a
+            >
+          </li>
         </ul>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
+import PerfilService from "@/services/PerfilService";
+import Cookies from "cookies-js";
+import Swal from "sweetalert2";
+const servicePerf = new PerfilService();
 export default {
-    data() {
-        return {
-            activeIndex: null,  // Indice del enlace activo
-            hoveredIndex: null, // Indice del enlace con hover
-            navItems: [
-                { name: 'Home', link: '/' },
-                { name: 'Charlas', link: '/charlasalumno' },
-                { name: 'Perfil', link: '/perfilalumno' },
-                { name: 'Cerrar Sesión', link: '/contact' }
-            ] // Elementos del menú con enlaces
-        };
+  data() {
+    return {
+      nombre: "",
+      activeIndex: null, // Indice del enlace activo
+      hoveredIndex: null, // Indice del enlace con hover
+      navItems: [
+        { name: "Home", link: "/", icon: "fa-solid fa-house" },
+        { name: "Charlas", link: "/charlas", icon: "fa-solid fa-comments" },
+      ], // Elementos del menú con enlaces
+    };
+  },
+  methods: {
+    setActive(index) {
+      this.activeIndex = index; // Establecer el índice activo
     },
-    methods: {
-        setActive(index) {
-            this.activeIndex = index; // Establecer el índice activo
-        },
-        isActiveRoute(item) {
-            return this.$route.path === item.link; // Verifica si la ruta actual es la del enlace
+    isActiveRoute(item) {
+      return this.$route.path === item.link; // Verifica si la ruta actual es la del enlace
+    },
+    logout() {
+      Swal.fire({
+        title: "¿Quieres cerrar la sesión?",
+        text: "Una vez cerrada, para volver a acceder al contenido, necesitarás iniciar sesión de nuevo.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Cerrar sesión",
+        cancelButtonText: "Cancelar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Cookies.expire("bearer_token");
+          this.$router.push("/login");
         }
-    }
+      });
+    },
+  },
+  mounted() {
+    servicePerf
+      .getUsuarioPerfil()
+      .then((response) => {
+        this.nombre = response.usuario.nombre;
+        this.imagen = response.usuario.imagen;
+        this.role = response.usuario.idRole;
+      })
+      .catch((error) => {
+        console.error("Error al obtener los datos de usuario:", error);
+      });
+  },
 };
 </script>
 
 <style scoped>
-li{
-    margin: 0 8px 0px 0;
+.dropdown-menu {
+  min-width: 150px;
+  font-family: "Montserrat", serif;
+  font-weight: 600;
+  font-size: 16px;
 }
-.nav{
-    margin-top: 20px;
+/* Contenedor principal del nav */
+.nav {
+  position: relative;
+  padding: 50px;
+  background-image: radial-gradient(circle, #a8d1ac, #7ca982);
+  box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.5);
 }
-/* Redondear las esquinas superiores por defecto */
+
+/* Contenedor interno con flex */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Distribuye los elementos */
+  position: relative;
+}
+
+/* Logo a la izquierda */
+.logo-container {
+  position: absolute;
+  left: 20px; /* Ajusta la distancia desde el borde izquierdo */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.logo_tajamar {
+  height: 50px;
+  object-fit: contain;
+}
+
+/* Menú de links centrado */
+.nav-custom {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); /* Centrado horizontal */
+  margin: 0; /* Sin margen para evitar desplazamientos */
+  display: flex;
+  gap: 15px; /* Espaciado entre los enlaces */
+  list-style: none;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Links del menú */
 .nav-link {
-  border-top-left-radius: 10px; /* Redondear la esquina superior izquierda */
-  border-top-right-radius: 10px; /* Redondear la esquina superior derecha */
-  color: #3D3D3D;
+  border-radius: 20px;
+  color: #3d3d3d;
   font-size: 18px;
+  font-family: "Montserrat", serif;
+  font-weight: semibold;
+  text-decoration: none;
+}
+.dropdown-toggle {
+  padding: 5px 20px 5px 20px;
 }
 
-/* Redondear las esquinas superiores en el estado hover */
+.dropdown-menu {
+  width: 100%; /* Igualar el ancho del contenedor */
+  border: none; /* Eliminar bordes predeterminados de Bootstrap */
+  padding: 0; /* Eliminar espacio extra interno */
+  background-color: #527c58; /* Mismo fondo que en hovered */
+}
+.dropdown-item {
+  border: none; /* Sin bordes entre elementos */
+  color: #3d3d3d; /* Color del texto */
+  padding: 10px 20px; /* Espaciado interno */
+  font-family: "Montserrat", serif;
+  font-size: 16px;
+}
+.profile-container .dropdown-item:hover,
+.profile-container .dropdown-item:active {
+  background-color: white; /* Fondo al hacer hover o clic */
+  color: #3d3d3d; /* Texto blanco para mejor contraste */
+  border-radius: 10px; /* Redondear bordes */
+
+}
+.profile-container .dropdown-toggle:hover,
+.profile-container .dropdown-toggle:active,
+.profile-container .dropdown-toggle[aria-expanded="true"] {
+  background-color: rgba(82, 124, 88, 60%);
+  color: #3d3d3d;
+  border-radius: 10px; /* Redondear bordes */
+}
+
+/* Estado hover */
 .nav-link.hovered {
-  background-color: #F5ECD5; /* Color de fondo al pasar el ratón */
-  color: #3D3D3D; /* Color del texto cuando el ratón está encima */
+  background-color: rgba(82, 124, 88, 60%);
+  color: #3d3d3d;
+  transition-delay: 0.1s;
 }
 
-/* Redondear las esquinas superiores en el estado active */
+/* Estado activo */
 .nav-link.active {
-  background-color: #F5ECD5; /* Color de fondo cuando está activo */
-  color: #3D3D3D; /* Color del texto cuando está activo */
+  background-color: #527c58;
+  font-size: 20px;
+  color: #3d3d3d;
+}
+.nav-link {
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
 }
 
+/* Contenedor del perfil a la derecha */
+.profile-container {
+  position: absolute;
+  right: 20px; /* Ajusta la distancia desde el borde derecho */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center; /* Alinea verticalmente imagen y texto */
+  gap: 10px; /* Espaciado entre la imagen y el nombre */
+}
 
+/* Círculo para la imagen de perfil */
+.profile-circle {
+  width: 70px;
+  height: 70px;
+  overflow: hidden;
+  border: 2px solid #3d3d3d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+}
+
+/* Imagen dentro del círculo */
+.profile-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Estilo del nombre del usuario */
+.profile-name {
+  margin: 0;
+  font-size: 18px;
+  font-family: "Montserrat", serif;
+  font-weight: bold;
+  color: #3d3d3d;
+  white-space: nowrap;
+}
 </style>

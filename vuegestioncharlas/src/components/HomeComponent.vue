@@ -624,6 +624,13 @@ export default {
     margin-top: 0px!important;
   }
 
+<<<<<<< HEAD
+.container{
+  padding:55px 20px 0px 20px;
+}
+  /* Estilo para la card activa (cuando está disponible) */
+=======
+>>>>>>> 78b806e710c2101bc0515b04152f0ab849c9fdf2
   .active-card {
     transition: box-shadow 0.3s ease-in-out;
   }
