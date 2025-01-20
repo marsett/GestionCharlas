@@ -43,51 +43,6 @@
       </div>
       <hr />
 
-      <!-- <div class="row">
-        <div class="col-md-4">
-          <div class="course-card">
-            <div
-              class="card-header d-flex justify-content-between align-items-center"
-            >
-              <button class="btn btn-success status">Activo</button>
-            </div>
-            <div class="card-body">
-              <h5>Curso 2024-2025</h5>
-              <p>Descripción</p>
-            </div>
-            <button class="add-button">+</button>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="course-card">
-            <div
-              class="card-header d-flex justify-content-between align-items-center"
-            >
-              <button class="btn btn-danger status">Inactivo</button>
-            </div>
-            <div class="card-body">
-              <h5>Curso 2023-2024</h5>
-              <p>Descripción</p>
-            </div>
-            <button class="add-button">+</button>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="course-card">
-            <div
-              class="card-header d-flex justify-content-between align-items-center"
-            >
-              <button class="btn btn-danger status">Inactivo</button>
-            </div>
-            <div class="card-body">
-              <h5>Curso 2022-2023</h5>
-              <p>Descripción</p>
-            </div>
-            <button class="add-button">+</button>
-          </div>
-        </div>
-      </div> -->
-
       <div v-if="cargando" class="text-center mb-4">
         <div class="spinner-border" role="status">
           <span class="visually-hidden">Cargando cursos...</span>
@@ -100,7 +55,8 @@
             <div
               class="card-header d-flex justify-content-between align-items-center"
             >
-              <button style="margin-left: auto"
+              <button
+                style="margin-left: auto"
                 class="btn"
                 :class="cursoData.curso.activo ? 'btn-success' : 'btn-danger'"
               >
@@ -110,6 +66,12 @@
             <div class="card-body">
               <h5>{{ cursoData.curso.nombre }}</h5>
               <p>Alumnos: {{ cursoData.numeroAlumnos }}</p>
+              <button
+                class="btn btn-primary mt-3"
+                @click="verAlumnos()"
+              >
+                Ver Alumnos
+              </button>
             </div>
           </div>
         </div>
@@ -134,6 +96,7 @@
       </div>
     </div>
   </div>
+  <router-view />
 </template>
 
 
@@ -155,6 +118,9 @@ export default {
     };
   },
   methods: {
+    verAlumnos() {
+        this.$router.push(`/perfilprofesor/alumnos`);
+    },
     mostrarDetalles() {
       Swal.fire({
         title: "Detalles del Usuario", // Título del SweetAlert
