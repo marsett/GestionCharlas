@@ -75,28 +75,30 @@
                 </span>
               </p>
               
-              <!-- Botón para votar -->
-              <button 
-              class="btn me-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-black'"
-                :disabled="!isVotacionActiva || !puedeVotar"
-              >
-                Votar charla
-              </button>
-
               <!-- Botón para ir a charlas -->
               <button 
-                class="btn btn-mover"
+                class="btn btn-mover me-1"
                 @click="$router.push('/charlas')"
               >
                 Ir a charlas
               </button>
+
+              <!-- Botón charlas o formulario -->
+              <button 
+                class="btn ms-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-black'"
+                :disabled="!isVotacionActiva || !puedeVotar"
+                v-if="!isVotacionActiva || !puedeVotar"
+              >
+                Votar charla
+              </button>
+              <FormVotacion @evaluarRondas="actualizarContenido"  v-else />
             </div> 
           </div>
         </div>
       </div>
 
       <div class="row mt-3 mb-4 pt-0">
-        <div class="mb-4 col-md-8">
+        <div class="mb-4 col-lg-8">
           <h1 class="mb-4 mt-2 pt-0 fw-semibold">Calendario</h1>
             <!-- Guía de colores -->
             <div>
@@ -139,22 +141,33 @@
             </div>
           </div>
           
-          <div class="mb-4 ps-3 col-md-4">
+          <div class="mb-4 ps-lg-3 col-12 col-lg-4">
             <h2 class="mb-4 pt-0 espacio-150">Presentaciones</h2>
             <ul class="list-group mt-4">
               <!-- Iterar sobre las fechas de eventos tipo "purple" -->
               <li 
-                class="list-group-item d-flex justify-content-between align-items-center"
+                class="list-group-item"
                 v-for="(evento, index) in eventosPresentaciones" 
                 :key="index"
               >
-                <div class="d-flex align-items-center">
-                  <span class="badge rounded-circle me-3" style="background-color: purple; color: white;">
+                <!-- Contenedor alineado horizontalmente -->
+                <div class="d-flex align-items-center flex-nowrap w-100">
+                  <!-- Badge para el día -->
+                  <span 
+                    class="badge rounded-circle me-3" 
+                    style="background-color: purple; color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
+                  >
                     {{ new Date(evento.date).getDate() }}
                   </span>
-                  {{ evento.title }}
+                  <!-- Título del evento -->
+                  <span class="flex-grow-1 text-truncate">
+                    {{ evento.title }}
+                  </span>
+                  <!-- Fecha del mes -->
+                  <small class="text-muted ms-3">
+                    {{ formatoMes(evento.date) }}
+                  </small>
                 </div>
-                <small class="text-muted">{{ formatoMes(evento.date) }}</small>
               </li>
             </ul>
           </div>
@@ -226,6 +239,7 @@ import FormNewCharla from './FormNewCharla.vue';
 
 
 import { Chart, CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend } from 'chart.js';
+import FormVotacion from './FormVotacion.vue';
 
 // Registrar las escalas, elementos, y otros componentes
 Chart.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend);
@@ -238,6 +252,7 @@ export default {
   components: {
     FullCalendar,
     FormNewCharla,
+    FormVotacion,
   },
   data() {
     return {
@@ -694,12 +709,10 @@ export default {
 
   .active-tab {
     background-color: #F5ECD5; 
-    color: #333; 
   }
 
   .inactive-tab {
-    background-color: #F5ECD5;
-    color: #721c24; 
+    background-color: #F5ECD5; 
   }
 
   .card-body {
@@ -761,10 +774,21 @@ export default {
   }
 
   ::v-deep(.btn-secondary) {
-    background-color: #cccccc !important;
+    background-color: #7293A0 !important;
     border: none;
     color: white;
     border-radius: 8px;
+  }
+
+  ::v-deep(.btn-secondary:hover) {
+    background-color: #64808b !important;
+  }
+
+  ::v-deep(.btn-secondary:active) {
+    background-color: #64808b !important;
+  }
+
+  ::v-deep(.btn-secondary:disabled) {
     cursor: not-allowed;
   }
 
@@ -842,11 +866,16 @@ export default {
     border-radius: 8px;
     margin-bottom: 10px;
     padding: 10px 15px;
+    display: flex; /* Para asegurar que el contenedor sea flexible */
+    flex-direction: row; /* Alinea el contenido horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    justify-content: space-between; /* Espacia los elementos */
   }
 
+
   .badge {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -854,8 +883,16 @@ export default {
   }
 
   .espacio-150{
-    margin-top: 150px;
+    margin-top: 10px;
   }
+
+  @media (min-width: 992px) {
+    .espacio-150 {
+      margin-top: 150px;
+    }
+  } 
+
+
 
 
   ::v-deep(){

@@ -1,89 +1,62 @@
 <template>
-  <div>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-        Subir charla
-    </button>
-
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
+    <div class="d-inline">
+        <!-- Botón para abrir el modal -->
+        <button type="button" class="btn btn-primary ms-1" data-bs-toggle="modal" data-bs-target="#votarModal">
+            Votar Charla
+        </button>
+  
+        <!-- Modal para votar charla -->
+        <div class="modal fade" id="votarModal" tabindex="-1" aria-labelledby="votarModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Registrar charla</h1>
+                    <h5 class="modal-title" id="votarModalLabel">Votar Charla</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-start">
-                    <!-- Formulario -->
-                    <form id="formCharla">
+                <div class="modal-body">
+                    <!-- Formulario de voto -->
+                    <form id="formCharla" @submit.prevent="submitVote">
                         <div class="row g-3">
-                        <!-- Título -->
-                        <div class="col-md-12">
-                            <label for="titulo" class="form-label">Título: <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="titulo" v-model="form.titulo" placeholder="Ejemplo: Innovación en tecnología educativa" required>
-                        </div>
-                        <!-- Descripción -->
-                        <div class="col-md-12">
-                            <label for="descripcion" class="form-label">Descripción: <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="descripcion" v-model="form.descripcion" rows="4" placeholder="Explica brevemente el contenido y objetivos de la charla" required></textarea>
-                        </div>
-                        <!-- Fecha Propuesta -->
-                        <div class="col-md-6">
-                            <label for="fechaPropuesta" class="form-label">Fecha propuesta: <span class="text-danger">*</span></label>
-                            <!-- <input type="datetime-local" class="form-control" id="fechaPropuesta" v-model="form.fechaPropuesta" required> -->
-                            <input
-                                type="date"
-                                class="form-control"
-                                id="fechaPropuesta"
-                                v-model="form.fechaPropuesta"
-                                :min="fechaPropuesta"
-                                disabled
-                                required
-                            />
-                        </div>
-                        <!-- ID Ronda -->
-                        <div class="col-md-6">
-                            <label for="idRonda" class="form-label">Ronda disponible: <span class="text-danger">*</span></label>
-                            <select class="form-select" id="idRonda" v-model="form.idRonda" @change="changeRangeMax()" required>
-                                <option value="" disabled selected>--- Seleccionar ---</option>
-                                <option v-for="ronda in rondasDisponibles" :key="ronda.id" :value="ronda.id">
+                            <!-- ID Ronda -->
+                            <div class="col-md-12">
+                                <label for="idRonda" class="form-label">Rondas disponibles: <span class="text-danger">*</span></label>
+                                <select class="form-select" v-model="form.idRonda" required>
+                                    <option value="" disabled selected>--- Seleccionar ronda ---</option>
+                                    <option v-for="ronda in rondasDisponibles" :key="ronda.id" :value="ronda.id">
                                     {{ ronda.descripcion }}
-                                </option>
-                            </select>
-                        </div>
-                        <!-- Tiempo -->
-                        <div class="col-md-12">
-                            <label for="tiempo" class="form-label">
-                                Duración (en minutos): <span class="text-danger">*</span>
-                            </label>
-                            <div class="d-flex align-items-center justify-content-between">
-                                <!-- Input tipo range -->
-                                <input 
-                                    type="range" 
-                                    class="form-range" 
-                                    min="5" 
-                                    :max="maxTiempo" 
-                                    step="5" 
-                                    id="tiempo" 
-                                    v-model="form.tiempo" 
-                                    required 
-                                    :disabled="!form.idRonda" 
-                                />
-                                <!-- Mostrar el valor de tiempo -->
-                                <span style="font-weight: bold; font-size: 1em; width: 100px; padding-left: 20px;">{{ form.tiempo }} mins</span>
+                                    </option>
+                                </select>
                             </div>
+
+                            <!-- ID Charla -->
+                            <div class="col-md-12">
+                                <label for="idCharla" class="form-label">Charlas por ronda: <span class="text-danger">*</span></label>       
+                                <select class="form-select" v-model="form.idCharla" required>
+                                    <option value="" disabled selected> 
+                                        <!-- Si no hay ronda seleccionada, muestra un mensaje indicativo -->
+                                        {{ form.idRonda === "" ? 'Seleccionar una ronda primero' : '--- Seleccionar charla ---' }}
+                                    </option>
+                                    <template v-if="form.idRonda">
+                                        <!-- Mostrar opciones de charla solo si hay una ronda seleccionada -->
+                                        <option v-for="charla in charlasDisponibles" :key="charla.id" :value="charla.id">
+                                        {{ charla.titulo }}
+                                        </option>
+                                    </template>
+                                </select>
+                            </div>
+
+
                         </div>
-                        </div>
+
+                        <!-- Botón para votar -->
+                        <button type="reset" class="btn btn-secondary mt-3 me-1" @click="clearForm()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary mt-3 ms-1">Votar</button>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearForm()" id="cancelarFormNew">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" form="formCharla" @click.prevent="submitCharla">Subir</button>
                 </div>
             </div>
         </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -97,14 +70,17 @@ export default {
     data() {
         return {
             form: {
-                titulo: "",
-                descripcion: "",
-                tiempo: 0,
-                fechaPropuesta: this.getCurrentDate(),
-                idRonda: "",
+                idVoto: 0,
+                idCharla: "",
+                idUsuario: 0,
+                idRonda: ""
             },
             rondasDisponibles: [],
-            maxTiempo: 30
+            charlasDisponibles: [
+                { id: 1, titulo: 'Charla 1: El futuro de la educación' },
+                { id: 2, titulo: 'Charla 2: Tecnología y sostenibilidad' },
+                { id: 3, titulo: 'Charla 3: Inteligencia artificial en medicina' }
+            ],
         };
     },
     mounted(){
@@ -142,6 +118,11 @@ export default {
         });
     },
     methods: {
+        submitVote() {
+            console.log("Voto enviado con los siguientes datos:", this.form);
+            // Aquí se realizaría una petición HTTP para enviar los datos del formulario al servidor
+            // Por ejemplo: axios.post('/votar-charla', this.form)
+        },
         puedeSubirCharlaEnRonda(ronda, charlas) {
             const charlasEnRonda = charlas.filter(charla => charla.charla.idRonda === ronda.id);
             return charlasEnRonda.length === 0 ? true : false;
@@ -196,11 +177,8 @@ export default {
         },
         clearForm() {
             this.form = {
-                titulo: "",
-                descripcion: "",
-                tiempo: 0,
-                fechaPropuesta: "",
-                idRonda: "",
+                idCharla: "",
+                idRonda: ""
             };
         },
         changeRangeMax(){
@@ -234,5 +212,10 @@ export default {
     .modal-header{
         background-color: #578e73;
         color: white;
+    }
+
+    label{
+        display: block;
+        text-align: left;
     }
 </style>
