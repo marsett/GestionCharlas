@@ -13,45 +13,33 @@
     </div>
 
     <div v-else>
-      <div v-for="charla in charlas" :key="charla.charla.idCharla" class="card mb-4">
-        <div class="card-header d-flex justify-content-between">
-          <h5>{{ charla.charla.titulo }}</h5>
-          <small class="text-muted">Fecha propuesta: {{ formatDate(charla.charla.fechaPropuesta) }}</small>
-        </div>
-        <div class="card-body">
-          <p><strong>Estado:</strong> {{ charla.charla.estadoCharla }}</p>
-          <p><strong>Curso:</strong> {{ charla.charla.nombreCurso }}</p>
-          <p><strong>Duración:</strong> {{ charla.charla.tiempo }} minutos</p>
-
-          <button v-if="!charla.showDetails" @click="charla.showDetails = true" class="btn btn-primary mt-3">
-            Ver Detalles
-          </button>
-
-          <div v-if="charla.showDetails">
-            <p><strong>Descripción:</strong> {{ charla.charla.descripcion }}</p>
-
-            <h6>Recursos:</h6>
-            <ul>
-              <li v-for="recurso in charla.recursos" :key="recurso.idRecurso">
-                <a :href="recurso.url" target="_blank">{{ recurso.nombre }}</a>: {{ recurso.descripcion }}
-              </li>
-            </ul>
-
-            <h6>Comentarios:</h6>
-            <div v-for="comentario in charla.comentarios" :key="comentario.idComentario" class="mb-2">
-              <p><strong>{{ comentario.usuario }}:</strong> {{ comentario.contenido }}</p>
-              <small class="text-muted">{{ formatDate(comentario.fecha) }}</small>
+      <div class="chats">
+        <div v-for="charla in charlas" :key="charla.charla.idCharla" class="chat-card">
+          <div class="chat-image">
+            <img :src="charla.charla.imagen || 'https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg'" alt="Imagen charla" />
+          </div>
+          <div class="chat-info">
+            <div class="chat-details">
+              <h5 class="chat-title">{{ charla.charla.titulo }}</h5>
+              <p class="chat-description">{{ charla.charla.descripcion }}</p>
+              <button 
+                @click="charla.showDetails = !charla.showDetails" 
+                class="btn btn-round">
+                +
+              </button>
             </div>
-
-            <button @click="charla.showDetails = false" class="btn btn-secondary mt-3">
-              Ocultar Detalles
-            </button>
+            <div v-if="charla.showDetails" class="additional-details">
+              <p><strong>Fecha Propuesta:</strong> {{ charla.charla.fechaPropuesta }}</p>
+              <p><strong>Usuario:</strong> {{ charla.charla.usuario }}</p>
+              <p><strong>Curso:</strong> {{ charla.charla.nombreCurso }}</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import PerfilService from "@/services/PerfilService";
@@ -95,32 +83,157 @@ export default {
 };
 </script>
 
+
+
 <style scoped>
 .container {
-  padding: 20px;
+  padding: 30px;
 }
 
-.card {
-  border-radius: 10px;
+.chats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 20px;
+  margin-top: -30px;
+}
+
+.chat-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #cfcece; 
+  padding: 15px;
+  width: 100%;
+  max-width: 300px; 
+  min-height: 250px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.chat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chat-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  max-height: 120px;
+  overflow: hidden;
+}
+
+.chat-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.chat-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-grow: 1;
+}
+
+.chat-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333; 
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.chat-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #afaeae; 
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.chat-description {
+  font-size: 13px;
+  color: #666; 
+  white-space: normal;
+  word-wrap: break-word;
+  margin-bottom: 12px;
+}
+
+.btn-round {
+  align-self: flex-end;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
   border: none;
-  background-color: #f9f9f9;
+  background-color: #555; 
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 
-.card-title {
-  font-size: 1.25rem;
+.btn-round:hover {
+  background-color: #333; 
+  transform: scale(1.1);
 }
 
-.card-text {
-  font-size: 1rem;
-  color: #6c757d;
+.additional-details {
+  background-color: #a1a0a0; 
+  padding: 10px;
+  margin-top: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #e3e3e3; 
 }
 
-.card-header {
-  background-color: #f1f1f1;
-  border-bottom: 1px solid #e0e0e0;
+@media (max-width: 768px) {
+  .chat-card {
+    width: 100%;
+  }
+
+  .chat-title {
+    font-size: 16px;
+  }
+
+  .chat-description {
+    font-size: 12px;
+  }
+
+  .btn-round {
+    font-size: 18px;
+  }
 }
 
-.btn {
-  font-size: 0.9rem;
+@media (max-width: 576px) {
+  .chat-card {
+    padding: 12px;
+    min-height: 230px;
+  }
+
+  .chat-title {
+    font-size: 14px;
+  }
+
+  .chat-description {
+    font-size: 11px;
+  }
+
+  .btn-round {
+    font-size: 16px;
+  }
 }
+
 </style>

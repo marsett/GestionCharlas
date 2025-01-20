@@ -1,22 +1,19 @@
 <template>
-  <div class="login-background position-relative vh-100 d-flex align-items-center justify-content-center">
-
-
+  <div class="login-background position-relative vh-100 d-flex align-items-center justify-content-center my-lg-0 my-md-2 mx-2 my-4 mx-sm-4">
     <!-- Contenedor principal -->
-    <div class="row shadow-lg mx-2 mx-md-0 rounded-3 overflow-hidden login-container" style="max-width: 900px;">
+    <div class="row shadow-lg mx-2 mx-md-2 mx-lg-0 rounded-3 overflow-hidden login-container" style="max-width: 900px;">
       <!-- Columna de Ilustración -->
-      <div class="col-md-4 p-5 m-3 bg-white d-flex align-items-center justify-content-center rounded-3">
+      <div class="col-md-4 p-5 m-0 m-md-3 bg-white d-flex align-items-center justify-content-center rounded-3">
         <img
           src="../assets/icono.png"
           alt="Ilustración de inicio de sesión"
-          class="img-fluid"
-          style="max-height: 400px;"
+          class="imagen-ajustada"
         />
       </div>
 
       <!-- Columna del Formulario -->
-      <div class="col-md-7 p-5">
-        <h3 class="text-center fw-bold mb-4 w-100">Iniciar sesión</h3>
+      <div class="col-md-7 px-3 py-4 p-md-5">
+        <h3 class="text-center fw-bold mb-4 w-100 mt-3 mt-md-0">Iniciar sesión</h3>
 
         <!-- Formulario -->
         <form @submit.prevent="loginUser">
@@ -33,7 +30,7 @@
                     :readonly="isLoading"
                     required
                   >
-                  <span class="input-group-text" id="basic-addon3">@tajamar365.com</span>
+                  <span class="input-group-text px-2 px-sm-3" id="basic-addon3">@tajamar365.com</span>
                 </div>
             </div>
 
@@ -69,16 +66,7 @@
         </form>
 
         <!-- Spinner de Carga -->
-        <div
-          v-if="isLoading"
-          class="position-absolute top-50 start-50 translate-middle"
-        >
-          <div class="spinner-border text-success" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
-        </div>
-
-         <!-- Manto blanco sobre el formulario -->
+        <!-- Manto blanco sobre el formulario -->
         <div
           v-if="isLoading"
           class="overlay"
@@ -189,20 +177,24 @@ export default {
 };
 </script>
 
-<style >
+<style scoped>
   .login-background {
     background-color: #FDFAFA;
   }
+
   .logo-container {
     z-index: 10;
   }
+
   .login-container{
     background-color: #F5ECD5;
   }
+
   .btn-success{
     background-color: #578E7E;
     border-color: #578E7E;
   }
+
   .btn-success:active, .btn-success:hover{
     border-color: #436c60;
     background-color: #436c60;
@@ -223,12 +215,12 @@ export default {
     cursor: pointer;
   }
 
-  .swal2-popup.swal2-modal {
+  ::v-deep(.swal2-popup.swal2-modal) {
     border-radius: 10px !important;
   }
 
   /* Si necesitas personalizar los botones */
-  .swal2-confirm, .swal2-cancel {
+  ::v-deep(.swal2-confirm, .swal2-cancel) {
     background: #578E7E;
   }
     
@@ -255,8 +247,33 @@ export default {
 
   /* Cambiar color de sombreado al enfocar */
   .shadow-input:focus {
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 4px rgba(0, 123, 255, 0.5);
-    border-color: #007bff;
-    outline: none;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 4px rgba(87, 142, 126, 0.5); 
+    border-color: #578E7E; 
+    outline: none; 
   }
+  
+  .imagen-ajustada {
+    max-height: 400px; 
+    width: auto;
+    max-width: 100%; 
+  }
+
+  @media (max-width: 768px) {
+    .imagen-ajustada {
+      max-height: 150px; /* Ajuste para pantallas más pequeñas */
+    }
+  }
+
+  @media (max-width: 576px) {
+    .imagen-ajustada {
+      max-height: 100px; 
+    }
+  }
+
+  @media (max-width: 350px) {
+    .imagen-ajustada {
+      max-height: 60px; 
+    }
+  }
+
 </style>
