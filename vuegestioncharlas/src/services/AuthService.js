@@ -6,7 +6,7 @@ export default class AuthService {
         return new Promise((resolve, reject) => {
             const endpoint = 'api/auth/login';
             const json = JSON.stringify({
-                userName,
+                userName: userName+'@tajamar365.com',
                 password
             });
             axios.post(
@@ -35,7 +35,7 @@ export default class AuthService {
                 idUsuario: form.idUsuario,
                 nombre: form.nombre,
                 apellidos: form.apellidos,
-                email: form.email,
+                email: form.email+'@tajamar365.com',
                 estadoUsuario: form.estadoUsuario,
                 imagen: form.imagen,
                 password: form.password,
@@ -67,7 +67,7 @@ export default class AuthService {
                 idUsuario: form.idUsuario,
                 nombre: form.nombre,
                 apellidos: form.apellidos,
-                email: form.email,
+                email: form.email+'@tajamar365.com',
                 estadoUsuario: form.estadoUsuario,
                 imagen: form.imagen,
                 password: form.password,

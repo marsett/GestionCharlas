@@ -5,21 +5,28 @@
       v-if="cargando"
       class="d-flex justify-content-center align-items-center vh-100"
     >
-      <div class="spinner-border text-primary" role="status">
+      <div class="spinner-border text-success" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
     </div>
 
-    <div class="container my-3" v-if="role == 2">
-      <h1 class="fw-semibold mt-4 mt-md-5">Hola, {{ nombre }} !</h1>
-      <div class="row row-cols-1 row-cols-md-2 my-4 pt-2">
-        <!-- Card para ronda abierta (no activa) -->
+    <div class="container my-3" v-if="role == 2 && !cargando">
+      <h1 class="fw-bold">Hola, {{ nombre }} !</h1>
+      <div class="row row-cols-1 row-cols-md-2 mb-3 mt-4 pt-4">
+        <!-- Card para ronda abierta -->
         <div class="col mb-3">
-          <div :class="{'card': true, 'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
-            <div class="card-body text-center">
-              <h5 class="card-title">📢 Ronda Abierta</h5>
-              <p class="card-text">
-                <!-- Mensaje para indicar si puede subir charla o no -->
+          <div class="custom-card" :class="{'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
+
+            <!-- Sección superior con forma de pestaña -->
+            <div class="card-header">
+              <div class="tab-header" :class="{'active-tab': isRondaAbierta, 'inactive-tab': !isRondaAbierta}">
+                📢 {{ isRondaAbierta ? 'Rondas abiertas' : 'Sin rondas abiertas' }}
+              </div>
+            </div>
+
+            <!-- Contenido principal de la tarjeta -->
+            <div class="card-body p-4 text-center">
+              <p class="card-text px-lg-5">
                 <span v-if="isRondaAbierta">
                   {{ puedeSubirCharla 
                     ? 'Actualmente hay una ronda abierta para subir charlas. ¡Aprovecha la oportunidad de compartir tus ideas!' 
@@ -29,26 +36,34 @@
                   No hay rondas abiertas para subir charlas.
                 </span>
               </p>
-              <!-- Button en lugar de router link porque si pones 2 condiciones para que sea disabled, no tiene ningun efecto -->
+
+              <!-- Botón o formulario -->
               <button 
-                :class="isRondaAbierta && puedeSubirCharla ? 'btn btn-primary' : 'btn btn-secondary'"
+                class="btn" :class="isRondaAbierta && puedeSubirCharla ? 'btn-primary' : 'btn-secondary text-black'"
                 :disabled="!isRondaAbierta || !puedeSubirCharla"
-                @click="$router.push('/charlas')"
                 v-if="!isRondaAbierta || !puedeSubirCharla"
               >
                 Subir charla
               </button>
-              <FormNewCharla @evaluarRondas="actualizarContenido" v-else/>
+              <FormNewCharla @evaluarRondas="actualizarContenido" v-else />
             </div>
-          </div>  
+          </div>
         </div>
-      
+
         <!-- Card para votación activa (activa o no activa) -->
         <div class="col mb-3">
-          <div :class="{'card': true, 'inactive-card': !isVotacionActiva, 'active-card': isVotacionActiva}">
-            <div class="card-body text-center">
-              <h5 class="card-title">🔔 Votación Activa</h5>
-              <p class="card-text">
+          <div class="custom-card border-0" :class="{'card': true, 'inactive-card': !isVotacionActiva, 'active-card': isVotacionActiva}">
+            
+            <!-- Sección superior con forma de pestaña -->
+            <div class="card-header border-0">
+              <div class="tab-header" :class="{'active-tab': isVotacionActiva, 'inactive-tab': !isVotacionActiva}">
+                🔔 {{ isVotacionActiva ? 'Votaciones activas' : 'Sin votaciones activas' }}
+              </div>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="card-body p-4 text-center">
+              <p class="card-text px-lg-5">
                 <span v-if="isVotacionActiva">
                   {{ !puedeVotar 
                     ? 'La votación está activa, pero ya has emitido tu voto. ¡Gracias por participar!' 
@@ -59,62 +74,93 @@
                   No hay votaciones activas en este momento.
                 </span>
               </p>
+              
+              <!-- Botón para votar -->
               <button 
-                :class="isVotacionActiva && puedeVotar ? 'btn btn-primary' : 'btn btn-secondary'"
+              class="btn me-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-black'"
                 :disabled="!isVotacionActiva || !puedeVotar"
+              >
+                Votar charla
+              </button>
+
+              <!-- Botón para ir a charlas -->
+              <button 
+                class="btn btn-mover"
                 @click="$router.push('/charlas')"
               >
-                Ir a Votar
+                Ir a charlas
               </button>
-            </div>
+            </div> 
           </div>
         </div>
       </div>
 
-      <div class="mb-4">
-        <h1 class="mt-4 pt-0 mt-md-4 pt-md-3">Calendario</h1>
-        <hr class="  mb-4 pb-2">
-        <!-- Guía de colores -->
-        <div>
-          <div class="row">
-            <!-- Ronda Abierta -->
-            <div class="col-md-auto">
-              <div class="d-flex align-items-center">
-                <div class="color-box" style="background-color: blue;"></div>
-                <span class="ms-2">Ronda abierta</span>
+      <div class="row mt-3 mb-4 pt-0">
+        <div class="mb-4 col-md-8">
+          <h1 class="mb-4 mt-2 pt-0 fw-semibold">Calendario</h1>
+            <!-- Guía de colores -->
+            <div>
+              <div class="row">
+                <!-- Ronda Abierta -->
+                <div class="col-md-auto">
+                  <div class="d-flex align-items-md-center">
+                    <div class="color-box" style="background-color: blue;"></div>
+                    <span class="ms-2">Ronda abierta</span>
+                  </div>
+                </div>
+                <!-- Votación Activa -->
+                <div class="col-md-auto">
+                  <div class="d-flex align-items-md-center">
+                    <div class="color-box" style="background-color: green;"></div>
+                    <span class="ms-2">Votación activa</span>
+                  </div>
+                </div>
+                <!-- Votación Terminada -->
+                <div class="col-md-auto">
+                  <div class="d-flex align-items-md-center">
+                    <div class="color-box" style="background-color: purple;"></div>
+                    <span class="ms-2">Presentación</span>
+                  </div>
+                </div>
               </div>
+              <p class="text-secondary small mt-2">
+                <b>Nota:</b> Para ver los detalles de un día específico, haz clic en la parte de la casilla correspondiente a ese día.
+              </p>
             </div>
-            <!-- Votación Activa -->
-            <div class="col-md-auto">
-              <div class="d-flex align-items-center">
-                <div class="color-box" style="background-color: green;"></div>
-                <span class="ms-2">Votación activa</span>
-              </div>
-            </div>
-            <!-- Votación Terminada -->
-            <div class="col-md-auto">
-              <div class="d-flex align-items-center">
-                <div class="color-box" style="background-color: purple;"></div>
-                <span class="ms-2">Presentación</span>
+
+            <!-- Calendario -->
+            <div class="mt-3">
+              <!-- Contenedor con scroll horizontal -->
+              <div class="parent-container">
+                <div class="calendar-wrapper">
+                  <FullCalendar :options="calendarOptions"/>
+                </div>
               </div>
             </div>
           </div>
-          <p class="text-secondary small mt-2">
-            <b>Nota:</b> En el calendario se muestra el título de la ronda. Para ver los detalles de un día específico, haz clic en cualquier parte de la casilla correspondiente a ese día.
-          </p>
-        </div>
-
-        <!-- Calendario -->
-        <div class="mt-3">
-          <!-- Contenedor con scroll horizontal -->
-          <div class="parent-container">
-            <div class="calendar-wrapper">
-              <FullCalendar :options="calendarOptions" @mouseover="cambiarCursor"/>
-            </div>
+          
+          <div class="mb-4 ps-3 col-md-4">
+            <h2 class="mb-4 pt-0 espacio-150">Presentaciones</h2>
+            <ul class="list-group mt-4">
+              <!-- Iterar sobre las fechas de eventos tipo "purple" -->
+              <li 
+                class="list-group-item d-flex justify-content-between align-items-center"
+                v-for="(evento, index) in eventosPresentaciones" 
+                :key="index"
+              >
+                <div class="d-flex align-items-center">
+                  <span class="badge rounded-circle me-3" style="background-color: purple; color: white;">
+                    {{ new Date(evento.date).getDate() }}
+                  </span>
+                  {{ evento.title }}
+                </div>
+                <small class="text-muted">{{ formatoMes(evento.date) }}</small>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
-    </div>
+
 
     <div class="container my-5" v-if="role == 1 && !cargando">
       <h2 class="text-center mb-4 fw-bold">{{ curso }}</h2>
@@ -202,6 +248,7 @@ export default {
         locale: esLocale, 
         events: []
       },
+      eventosPresentaciones: [],
       nombre: "",
       role: "",
       curso:"",
@@ -376,11 +423,17 @@ export default {
 
               if (ahora <= fechaPresentacion) {
                 // Evento de presentación de la charla
-                events.push({
+                const eventoPresentacion = {
                   title: `${ronda.descripcionModulo}`,
                   date: fechaPresentacion.toISOString().split('T')[0],
                   color: 'purple',
-                });
+                };
+
+                events.push(eventoPresentacion);
+
+                // Añadir directamente a eventosPresentaciones
+                this.eventosPresentaciones.push(eventoPresentacion);
+                this.eventosPresentaciones.sort((a, b) => new Date(a.date) - new Date(b.date));
               }
 
             });
@@ -412,6 +465,12 @@ export default {
         this.cargando = false;
       });
     },
+
+    formatoMes(fecha) {
+      const opciones = { month: 'long' };  // 'long' te da el nombre completo del mes, 'short' lo da abreviado.
+      return new Date(fecha).toLocaleDateString('es-ES', opciones).replace(/^./, letra => letra.toUpperCase());
+    },
+
 
     actualizarContenido() {
       this.evaluarRondas();
@@ -545,45 +604,45 @@ export default {
           }
       });
     },
-
-    cambiarCursor(event) {
-      event.target.style.cursor = 'pointer';
+    watch: {
+      'calendarOptions.events': {
+        handler(newEvents) {
+          this.eventosPresentaciones = newEvents.filter(evento => evento.color === 'purple');
+        },
+        immediate: true,
+        deep: true
+      }
     },
   },
 }
 </script>
 
 <style scoped>
+  .container{
+    background-color: #FDFAFA!important;
+    padding:55px 20px 0px 20px;
+    margin-top: 0px!important;
+  }
+
+<<<<<<< HEAD
+.container{
+  padding:55px 20px 0px 20px;
+}
   /* Estilo para la card activa (cuando está disponible) */
+=======
+>>>>>>> 78b806e710c2101bc0515b04152f0ab849c9fdf2
   .active-card {
     transition: box-shadow 0.3s ease-in-out;
   }
 
   .active-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-  }
-
-  /* Estilo para la card inactiva (cuando no está disponible) */
-  .inactive-card {
-    background-color: #f8f9fa; 
-    opacity: 0.6; 
-    pointer-events: none; 
-  }
-
-  .inactive-card .card-body .btn {
-    background-color: #6c757d; 
-    border-color: #6c757d;
-    pointer-events: none; 
-  }
-
-  td:hover{
-    cursor: pointer;
+    box-shadow: 0 15px 30px -15px rgba(213, 206, 188, 0.55);
   }
 
   .color-box {
     width: 20px;
     height: 20px;
-    border-radius: 50%; /* Para hacer las cajas redondas */
+    border-radius: 50%;
   }
 
   span {
@@ -606,4 +665,235 @@ export default {
     height: 400px;
     width: 400px;
   }
+
+  .custom-card {
+    background-color: #f9f5ec; 
+    border-radius: 15px; 
+    position: relative; 
+    overflow: hidden; 
+    padding-top: 44px; 
+    transition: all 0.3s ease;
+  }
+
+  .card-header{
+    width: 100%;
+    background-color: #FDFAFA;
+    height: 43px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .tab-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #F5ECD5; 
+    padding: 8px 24px;
+    border-radius: 16px 16px 0 0; 
+    font-size: 18px; 
+    font-weight: bold;
+    color: #333; 
+    text-align: center;
+    box-shadow: 2px 2px 4px #e2dbc787; 
+    transition: background-color 0.3s ease;
+  }
+
+  .active-tab {
+    background-color: #F5ECD5; 
+    color: #333; 
+  }
+
+  .inactive-tab {
+    background-color: #F5ECD5;
+    color: #721c24; 
+  }
+
+  .card-body {
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    border: 2px solid #e2dbc787; 
+  }
+
+  .card-title {
+    font-size: 18px; 
+    color: #333; 
+    margin-bottom: 12px; 
+    font-weight: bold;
+  }
+
+  .card-text {
+    font-size: 17px;
+    color: #555; 
+    margin-bottom: 16px;
+  }
+
+  ::v-deep(.btn-primary) {
+    background-color: #578e73 !important; 
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  ::v-deep(.btn-primary:active) {
+    border-color: #436c60 !important;
+    background-color: #436c60 !important;
+  }
+
+  ::v-deep(.btn-primary:hover) {
+    border-color: #436c60 !important;
+    background-color: #436c60 !important;
+  }
+
+  .btn-mover {
+    background-color: #7293A0 !important; 
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn-mover:active {
+    border-color: #64808b !important;
+    background-color: #64808b !important;
+    color: white;
+  }
+
+  .btn-mover:hover {
+    border-color: #64808b !important;
+    background-color: #64808b !important;
+    color: white;
+  }
+
+  ::v-deep(.btn-secondary) {
+    background-color: #cccccc !important;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: not-allowed;
+  }
+
+  ::v-deep(button.fc-today-button.fc-button.fc-button-primary) {
+    background-color: #7293A0;
+    border-color: #7293A0;
+    color: white;
+  }
+
+
+  ::v-deep(.fc-prev-button.fc-button.fc-button-primary){
+    background-color: #578e73;
+    border-color: #578e73;
+    color: white;
+  }
+
+  ::v-deep(.fc-next-button.fc-button.fc-button-primary){
+    background-color: #578e73;
+    border-color: #578e73;
+    color: white;
+  }
+
+  ::v-deep(
+    .fc-prev-button.fc-button.fc-button-primary:hover, 
+    .fc-prev-button.fc-button.fc-button-primary:active
+  ){
+    border-color: #436c60;
+    background-color: #436c60;
+    color: white;
+  }
+
+  ::v-deep(
+    .fc-next-button.fc-button.fc-button-primary:hover,
+    .fc-next-button.fc-button.fc-button-primary:active
+  ){
+    border-color: #436c60;
+    background-color: #436c60;
+    color: white;
+  }
+
+  ::v-deep(.fc-next-button.fc-button.fc-button-primary){
+    background-color: #578e73;
+    border-color: #578e73;
+    color: white;
+  }
+
+  ::v-deep(.fc-toolbar-title::first-letter){
+    text-transform: uppercase;
+  }
+
+  ::v-deep(.fc-scrollgrid.fc-scrollgrid-liquid){
+    background-color: white;
+  }
+  ::v-deep(.fc-col-header-cell.fc-day){
+    background-color: #3D3D3D;
+  }
+  ::v-deep(.fc-col-header-cell-cushion){
+    color: #F5ECD5;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  ::v-deep(.fc-daygrid-day-number){
+    color: #3D3D3D;
+    cursor: pointer;
+  }
+
+  ::v-deep(.fc-daygrid-day.fc-day-today){
+    background-color: #F5ECD5;
+  }
+
+  .list-group-item {
+    background-color: #f9f5ec;
+    border: 2px solid #F5ECD5;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+  }
+
+  .badge {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .espacio-150{
+    margin-top: 150px;
+  }
+
+
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+  ::v-deep(){
+    
+  }
+
 </style>

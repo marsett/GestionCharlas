@@ -1,5 +1,5 @@
 <template>
-  <MenuComponentAlumno v-if="isLoggedIn && userRole === 'ALUMNO'" />
+  <MenuWavyComponent v-if="isLoggedIn && userRole === 'ALUMNO'" />
   <MenuComponentProfesor v-if="isLoggedIn && userRole === 'PROFESOR'" />
   <MenuComponentAdmin v-if="isLoggedIn && userRole === 'ADMINISTRADOR'" />
   <router-view></router-view>
@@ -7,14 +7,14 @@
 
 <script>
 import Cookies from "cookies-js";
-import MenuComponentAlumno from "./components/MenuAlumnoComponent.vue";
 import MenuComponentProfesor from "./components/MenuComponentProfesor.vue";
 import MenuComponentAdmin from "./components/MenuComponentAdmin.vue";
+import MenuWavyComponent from "./components/MenuWavyComponent.vue";
 
 export default {
   name: "App",
   components: {
-    MenuComponentAlumno,
+    MenuWavyComponent,
     MenuComponentProfesor,
     MenuComponentAdmin,
 
@@ -47,4 +47,7 @@ export default {
 </script>
 
 <style>
+body{
+  background-color: #FDFAFA!important;
+}
 </style>

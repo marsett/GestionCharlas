@@ -7,8 +7,8 @@
       </div>
 
       <div class="profile-content row align-items-center position-relative">
-        <div class="col-12 col-md-4 d-flex justify-content-center">
-          <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image mb-3" @click="triggerFileInput"/>
+        <div class="col-12 col-md-3 d-flex justify-content-center mb-3 mb-md-0"> <!-- Cambié col-md-4 por col-md-3 -->
+          <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image" @click="triggerFileInput"/>
           <input
             type="file"
             ref="fileInput"
@@ -17,17 +17,17 @@
             @change="handleFileChange"
           />
         </div>
-        <div class="col-12 col-md-8 mt-3 pt-3">
+        <div class="col-12 col-md-9 mt-3 pt-3">
           <h1 class="name text-center text-md-start">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
           <p class="bio text-center text-md-start">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
-          <div class="profile-buttons mt-3 d-flex justify-content-center flex-column flex-md-row">
+          <div class="profile-buttons mt-3 d-flex justify-content-end flex-column flex-md-row">
             <button class="btn btn-password me-2" @click="mostrarFormularioContrasena()">Editar Contraseña</button>
             <button class="btn btn-activo" :class="{'active': usuario.estadoUsuario === 'Activo'}" @click="mostrarEstadoActivo">
               {{ usuario.estadoUsuario === 'Activo' ? 'Activo' : 'Inactivo' }}
             </button>
           </div>
         </div>
-      </div>
+    </div>
 
       <hr />
       <CharlasAlumnoComponent :usuario="usuario" />
@@ -38,6 +38,7 @@
     <p>Cargando perfil...</p>
   </div>
 </template>
+
 
 
 <script>
@@ -149,11 +150,11 @@ export default {
   height: 250px;
   border-radius: 20px; 
   border: 8px solid #e0e0e0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   object-fit: cover;
   margin-top: -100px;
-
+  margin-right: -70px; /* Añadimos este margen */
 }
+
 
 @media (max-width: 768px) {
   .profile-image {
@@ -161,9 +162,9 @@ export default {
     height: 200px;
     border-radius: 20px; 
     border: 8px solid #e0e0e0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     object-fit: cover;
     margin-top: -100px;
+    margin-right: -5px; /* Añadimos este margen */
   }
 
   .col-12.col-md-4 {
@@ -172,6 +173,7 @@ export default {
     align-items: center;
   }
 }
+
 
 .name {
   font-size: 24px;
@@ -192,7 +194,7 @@ export default {
 .profile-buttons {
   margin-top: 20px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   flex-wrap: wrap;
 }
 
@@ -202,14 +204,14 @@ export default {
   padding: 10px 15px;
 }
 
+
 @media (max-width: 768px) {
   .profile-buttons {
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-end;
   }
-}
-
-.swal-popup-bootstrap {
+  }
+  .swal-popup-bootstrap {
   border-radius: 0px !important;
   width: 100% !important;
   max-width: 500px;

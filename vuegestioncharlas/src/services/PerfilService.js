@@ -99,8 +99,7 @@ export default class PerfilService {
                 });
         });
     }
-
-    getRondasProfesor() {
+      getRondasProfesor() {
         return axios.get(Global.urlBase + "api/Profesor/RondasProfesor", {
             headers: { Authorization: Cookies.get("bearer_token") },
         }).then(response => response.data);
@@ -145,7 +144,6 @@ export default class PerfilService {
             });
         });
     }
-
     updateContrasenia(nuevacontrasenia) {
         return new Promise((resolve, reject) => {
             const endpoint = `/api/usuarios/updatepasswordusuario`;
@@ -167,5 +165,7 @@ export default class PerfilService {
                 reject(error);
             });
         });
-    }
+    } 
+    
+    
 }
