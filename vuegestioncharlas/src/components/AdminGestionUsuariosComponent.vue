@@ -518,7 +518,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card-usuario:last-child {
   margin-right: 0;
 }

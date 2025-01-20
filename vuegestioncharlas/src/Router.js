@@ -10,6 +10,7 @@ import CharlasComponent from './components/CharlasComponent.vue';
 import CharlasAlumnoComponent from './components/CharlasAlumnoComponent.vue';
 import AdminGestionUsuariosComponent from "@/components/AdminGestionUsuariosComponent";
 import NotFoundComponent from "./components/NotFoundComponent.vue";
+import AlumnosCursoProfesorComponent from "@/components/AlumnosCursoProfesorComponent";
 
 const routes = [
     {
@@ -54,7 +55,7 @@ const routes = [
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {
-                next(); 
+                next();
             } else {
                 next('/login');
             }
@@ -66,11 +67,11 @@ const routes = [
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {
-                next(); 
+                next();
             } else {
                 next('/login');
             }
-        }
+        },
     },
     {
         path: '/charlas',
@@ -78,7 +79,7 @@ const routes = [
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {
-                next(); 
+                next();
             } else {
                 next('/login');
             }
@@ -90,24 +91,38 @@ const routes = [
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {
-                next(); 
+                next();
             } else {
                 next('/login');
             }
         }
     },
     {
-    path: '/gestionusuarios',
+        path: '/gestionusuarios',
         component: AdminGestionUsuariosComponent,
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {
-                next(); 
+                next();
             } else {
                 next('/login');
             }
         }
     },
+    {
+        path: '/perfilprofesor/alumnos',
+        name: 'alumnos',
+        component: AlumnosCursoProfesorComponent,
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token');
+            if (token) {
+                next();
+            } else {
+                next('/login');
+            }
+        }
+    },
+
     // Ruta catch-all para manejar Not Found
     {
         path: '/:pathMatch(.*)*',

@@ -279,7 +279,7 @@ export default {
         email: "",
         estadoUsuario: true,
         imagen:
-          "https://cdn.pixabay.com/photo/2017/11/10/05/48/user-2935527_640.png",
+          "https://fpprofessionaleducation.tajamar.es/wp-content/uploads/2019/04/escudo-positivo.jpg",
         password: "",
         idRole: "",
         idCurso: "",

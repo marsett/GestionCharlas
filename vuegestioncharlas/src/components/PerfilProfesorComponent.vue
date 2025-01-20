@@ -1,164 +1,104 @@
 <template>
   <div class="container mt-5" v-if="usuario">
-    <div
-      class="card shadow-lg p-4 rounded mx-auto"
-      style="width: 100%; max-width: 1100px"
-    >
-      <div class="row text-center text-md-start">
-        <div class="col-12 col-md-3 mb-4 mb-md-0">
-          <img
-            :src="usuario.imagen"
-            alt="Foto de perfil"
-            @click="triggerFileInput"
-            class="profile-image img-fluid rounded-circle border-primary mb-3"
-            style="width: 150px; height: 150px; object-fit: cover"
-          />
-          <input
-            type="file"
-            ref="fileInput"
-            accept="image/*"
-            style="display: none"
-            @change="handleFileChange"
-          />
+    <div class="profile-card">
+      <div
+        class="profile-header"
+        style="display: flex; align-items: center; padding: 10px"
+      >
+        <button
+          class="btn btn-secondary"
+          style="margin-left: auto; margin-bottom: auto"
+          @click="mostrarDetalles"
+        >
+          Detalles
+        </button>
+      </div>
+
+      <div class="profile-content">
+        <img
+          :src="usuario.imagen"
+          alt="Foto de perfil"
+          @click="triggerFileInput"
+          class="profile-image"
+        />
+        <input
+          type="file"
+          ref="fileInput"
+          accept="image/*"
+          style="display: none"
+          @change="handleFileChange"
+        />
+        <div class="profile-info">
+          <h3>{{ usuario.nombre }} {{ usuario.apellidos }}</h3>
+          <p>{{ usuario.curso }}</p>
         </div>
-        <div class="col-12 col-md-9">
-          <h4 class="font-weight-bold">
-            {{ usuario.nombre }} {{ usuario.apellidos }}
-          </h4>
-          <p class="text-muted">
+        <div class="profile-buttons text-end">
+          <button class="btn btn-secondary">
             {{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}
-          </p>
+          </button>
+          <button class="btn btn-secondary">
+            {{ usuario.estadoUsuario ? "Activo" : "Inactivo" }}
+          </button>
+        </div>
+      </div>
+      <hr />
 
-          <div v-if="!editMode">
-            <div class="list-group">
-              <div class="list-group-item">
-                <strong>Nombre:</strong> {{ usuario.nombre }}
-              </div>
-              <div class="list-group-item">
-                <strong>Apellidos:</strong> {{ usuario.apellidos }}
-              </div>
-              <div class="list-group-item">
-                <strong>Email:</strong> {{ usuario.email }}
-              </div>
-              <div class="list-group-item">
-                <strong>Curso:</strong> {{ usuario.curso }}
-              </div>
-            </div>
-          </div>
+      <div v-if="cargando" class="text-center mb-4">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando cursos...</span>
         </div>
       </div>
 
-      <div class="d-flex gap-3 mt-4 justify-content-center justify-content-md-start">
-        <button
-          class="btn"
-          :class="{ 'btn-primary': seccionActiva === 'rondas', 'btn-outline-primary': seccionActiva !== 'rondas' }"
-          @click="mostrarRondas"
-        >
-          Ver Rondas
-        </button>
-        <button
-          class="btn"
-          :class="{ 'btn-secondary': seccionActiva === 'alumnos', 'btn-outline-secondary': seccionActiva !== 'alumnos' }"
-          @click="mostrarAlumnos"
-        >
-          Ver Alumnos
-        </button>
-      </div>
-
-      <!-- Tabla de Rondas -->
-      <div v-if="seccionActiva === 'rondas'" class="mt-4">
-
-        <!-- Mostrar spinner mientras se cargan las rondas -->
-        <div v-if="cargando" class="d-flex justify-content-center my-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
-        </div>
-
-        <!-- Mostrar mensaje si no hay alumnos -->
-        <div v-else-if="!rondas.length && !cargando" class="alert alert-warning text-center my-4">
-          No hay rondas creadas.
-        </div>
-
-        <h5 v-if="!cargando">Rondas</h5>
-        <table class="table table-bordered table-hover" v-if="!cargando">
-          <thead>
-            <tr>
-              <th>Descripción</th>
-              <th>Duración</th>
-              <th>Fecha Cierre</th>
-              <th>Fecha Límite Votación</th>
-              <th>Fecha Presentación</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="ronda in rondas" :key="ronda.idRonda">
-              <td>{{ ronda.descripcionModulo }}</td>
-              <td>{{ ronda.duracion }} minutos</td>
-              <td>{{  new Date(ronda.fechaCierre).toLocaleDateString()  }}</td>
-              <td>
-                {{ new Date(ronda.fechaPresentacion).toLocaleDateString() }}
-              </td>
-              <td>
-                {{ new Date(ronda.fechaLimiteVotacion).toLocaleDateString() }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Lista de Alumnos -->
-      <div v-if="seccionActiva === 'alumnos'" class="mt-4">
-        <h5 v-if="!cargando">Alumnos del Curso</h5>
-
-        <!-- Mostrar spinner mientras se cargan los alumnos -->
-        <div v-if="cargando" class="d-flex justify-content-center my-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
-        </div>
-
-        <!-- Mostrar mensaje si no hay alumnos -->
-        <div v-else-if="!alumnos.length && !cargando" class="alert alert-warning text-center my-4">
-          No hay alumnos en el curso.
-        </div>
-
-        <!-- Mostrar lista de alumnos -->
-        <ul v-else class="list-group">
-          <li
-            class="list-group-item"
-            v-for="alumno in alumnos"
-            :key="alumno.alumno.idUsuario"
-          >
-            <div class="d-flex align-items-center justify-content-between">
-              <div class="d-flex align-items-center">
-                <img
-                  :src="alumno.alumno.imagen"
-                  alt="Foto de Alumno"
-                  class="rounded-circle border-primary me-3"
-                  style="width: 50px; height: 50px; object-fit: cover"
-                />
-                <div>
-                  <strong>{{ alumno.alumno.usuario }}</strong>
-                  <p class="text-muted">{{ alumno.alumno.email }}</p>
-                </div>
-              </div>
+      <div class="row" v-if="!cargando">
+        <div class="col-md-4" v-for="(cursoData, index) in cursos" :key="index">
+          <div class="course-card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
               <button
-                class="btn btn-danger btn-sm ms-auto"
-                @click="abrirAlerta(alumno.alumno)"
+                style="margin-left: auto"
+                class="btn"
+                :class="cursoData.curso.activo ? 'btn-success' : 'btn-danger'"
               >
-                Desactivar
+                {{ cursoData.curso.activo ? "Activo" : "Inactivo" }}
               </button>
             </div>
-          </li>
-        </ul>
+            <div class="card-body">
+              <h5>{{ cursoData.curso.nombre }}</h5>
+              <p>Alumnos: {{ cursoData.numeroAlumnos }}</p>
+              <button
+                class="btn btn-primary mt-3"
+                @click="verAlumnos()"
+              >
+                Ver Alumnos
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalles del usuario -->
+      <div v-if="showDetails">
+        <div class="list-group">
+          <div class="list-group-item">
+            <strong>Nombre:</strong> {{ usuario.nombre }}
+          </div>
+          <div class="list-group-item">
+            <strong>Apellidos:</strong> {{ usuario.apellidos }}
+          </div>
+          <div class="list-group-item">
+            <strong>Email:</strong> {{ usuario.email }}
+          </div>
+          <div class="list-group-item">
+            <strong>Curso:</strong> {{ usuario.curso }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div v-else>
-    <p>Cargando perfil...</p>
-  </div>
+  <router-view />
 </template>
+
 
 <script>
 import PerfilService from "@/services/PerfilService";
@@ -171,12 +111,29 @@ export default {
       usuario: null,
       rondas: [],
       alumnos: [],
+      cursos: [],
       seccionActiva: null, // 'rondas' o 'alumnos'
       perfilService: new PerfilService(),
       cargando: false,
     };
   },
   methods: {
+    verAlumnos() {
+        this.$router.push(`/perfilprofesor/alumnos`);
+    },
+    mostrarDetalles() {
+      Swal.fire({
+        title: "Detalles del Usuario", // Título del SweetAlert
+        html: `
+          <strong>Nombre:</strong> ${this.usuario.nombre} <br>
+          <strong>Apellidos:</strong> ${this.usuario.apellidos} <br>
+          <strong>Email:</strong> ${this.usuario.email} <br>
+          <strong>Curso Actual:</strong> ${this.usuario.curso} <br>
+        `,
+        icon: "info", // Tipo de ícono (puedes cambiarlo por otro si lo deseas)
+        confirmButtonText: "Cerrar", // Botón para cerrar el alert
+      });
+    },
     async cargarPerfil() {
       try {
         const data = await this.perfilService.getUsuarioPerfil();
@@ -221,37 +178,55 @@ export default {
     async mostrarRondas() {
       try {
         this.seccionActiva = "rondas";
-        this.cargando = true; 
+        this.cargando = true;
         const data = await this.perfilService.getRondasProfesor();
         this.rondas = data;
       } catch (error) {
         console.error("Error al cargar las rondas:", error);
         alert("No se pudieron cargar las rondas.");
-      }
-      finally {
+      } finally {
         this.cargando = false; // Ocultar spinner
+      }
+    },
+    async cargarCursos() {
+      try {
+        this.cargando = true;
+        const data = await this.perfilService.getAlumnosCursoProfesor();
+        console.log(data);
+        // Asegúrate de que los cursos se asignan correctamente
+        this.cursos = data.map((cursoData) => ({
+          curso: cursoData.curso,
+          numeroAlumnos: cursoData.numeroAlumnos,
+        }));
+      } catch (error) {
+        console.error("Error al cargar los cursos:", error);
+        alert("No se pudieron cargar los cursos.");
+      } finally {
+        this.cargando = false; // Desactiva el spinner
       }
     },
     async mostrarAlumnos() {
       try {
         this.seccionActiva = "alumnos";
-        this.cargando = true; 
+        this.cargando = true;
         const data = await this.perfilService.getAlumnosCursoProfesor();
         // Si 'data' es un array de cursos con sus alumnos
         // Filtrar solo alumnos con estadoUsuario activo
-        this.alumnos = data.length > 0 
-          ? data[0].alumnos.filter(alumno => alumno.alumno.estadoUsuario == true) 
-          : [];
+        this.alumnos =
+          data.length > 0
+            ? data[0].alumnos.filter(
+                (alumno) => alumno.alumno.estadoUsuario == true
+              )
+            : [];
       } catch (error) {
         console.error("Error al cargar los alumnos:", error);
         alert("No se pudieron cargar los alumnos.");
-      }
-      finally {
+      } finally {
         this.cargando = false; // Ocultar spinner
       }
     },
     abrirAlerta(alumno) {
-      if(alumno.estadoUsuario == true){
+      if (alumno.estadoUsuario == true) {
         Swal.fire({
           title: "¿Estás seguro?",
           text: `Estás a punto de desactivar al usuario "${alumno.usuario}"`,
@@ -267,21 +242,33 @@ export default {
       }
     },
     async cambiarEstadoAlumno(alumno) {
-      if(alumno.estadoUsuario == true){
+      if (alumno.estadoUsuario == true) {
         try {
           // Realizar la eliminación en el servidor
-          await this.perfilService.updateEstadoUsuario(alumno.idUsuario, !alumno.estadoUsuario);
-          Swal.fire("Estado cambiado", `El usuario "${alumno.usuario}" ha sido desactivado correctamente. Ahora no podrá acceder al sistema.`, "success");
+          await this.perfilService.updateEstadoUsuario(
+            alumno.idUsuario,
+            !alumno.estadoUsuario
+          );
+          Swal.fire(
+            "Estado cambiado",
+            `El usuario "${alumno.usuario}" ha sido desactivado correctamente. Ahora no podrá acceder al sistema.`,
+            "success"
+          );
           await this.mostrarAlumnos();
         } catch (error) {
           console.error("Error al eliminar el alumno:", error);
-          Swal.fire("Error en la Operación", "No se pudo desactivar al usuario. Por favor, inténtalo más tarde.", "error");
+          Swal.fire(
+            "Error en la Operación",
+            "No se pudo desactivar al usuario. Por favor, inténtalo más tarde.",
+            "error"
+          );
         }
       }
     },
   },
   created() {
     this.cargarPerfil();
+    this.cargarCursos();
   },
 };
 </script>
@@ -334,5 +321,99 @@ export default {
     width: 180px;
     height: 180px;
   }
+}
+
+body {
+  background-color: #f5f5f5;
+}
+
+.profile-card {
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.profile-header {
+  background-color: #a0a0a0;
+  height: 150px;
+  border-radius: 10px 10px 0 0;
+}
+
+.profile-content {
+  display: flex;
+  margin-top: -80px;
+  gap: 20px;
+}
+
+.profile-image {
+  width: 240px;
+  height: 240px;
+  border-radius: 30px;
+  object-fit: cover;
+  margin-left: 20px;
+  margin-bottom: 30px;
+}
+
+.profile-info {
+  display: block;
+  flex-grow: 1;
+  margin-top: auto;
+  padding-bottom: 80px;
+}
+
+.profile-info h3 {
+  margin: 0;
+}
+
+.profile-buttons {
+  margin-top: 20px;
+  margin-top: auto;
+  padding-bottom: 0px;
+}
+
+.profile-buttons button {
+  margin-right: 20px;
+}
+
+.course-card {
+  background-color: #d6d6d6;
+  border-radius: 10px;
+  position: relative;
+}
+
+.course-card .card-header {
+  background-color: #a0a0a0;
+  padding: 20px;
+  border-radius: 10px 10px 0 0;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.course-card .status {
+  font-size: 12px;
+  padding: 5px 10px;
+  margin-left: auto;
+}
+
+.course-card .card-body {
+  padding: 15px;
+}
+
+.course-card .add-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 25px;
+  height: 25px;
+  background-color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-weight: bold;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
 }
 </style>
