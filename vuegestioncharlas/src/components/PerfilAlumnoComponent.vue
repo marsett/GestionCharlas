@@ -1,40 +1,44 @@
 <template>
-  <div class="container mt-5">
-    <div v-if="usuario">
-      <div class="card shadow-sm text-center text-md-start profile-container">
-        <div class="profile-header"></div>
-        <div class="profile-back">
-          <div class="row align-items-center position-relative">
-            <div class="col-12 col-md-4 position-absolute start-50 translate-middle">
-              <img :src="usuario.imagen" alt="Foto de perfil" class="img-fluid rounded-circle profile-image mb-3" />
-            </div>
-            <div class="col-12 col-md-8 offset-md-4 mt-3 pt-3">
-              <h1 class="name">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
-              <p class="bio">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
-              <div class="profile-buttons mt-3">
-                <button id="first" class="btn-password me-2" @click="mostrarFormularioContrasena()">Editar Contraseña</button>
-                <button 
-                  id="first" 
-                  class="btn-activo" 
-                  :class="{'active': usuario.estadoUsuario === 'Activo'}"
-                  @click="mostrarEstadoActivo"
-                >
-                  Activo
-                </button>
-              </div>
-            </div>
+  <div class="container mt-5" v-if="usuario">
+    <div class="profile-card">
+      <div class="profile-header" style="background-color: #7787bd; height: 200px;">
+        <div class="profile-info text-center">
+        </div>
+      </div>
+
+      <div class="profile-content row align-items-center position-relative">
+        <div class="col-12 col-md-4 d-flex justify-content-center">
+          <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image mb-3" @click="triggerFileInput"/>
+          <input
+            type="file"
+            ref="fileInput"
+            accept="image/*"
+            style="display: none"
+            @change="handleFileChange"
+          />
+        </div>
+        <div class="col-12 col-md-8 mt-3 pt-3">
+          <h1 class="name text-center text-md-start">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
+          <p class="bio text-center text-md-start">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
+          <div class="profile-buttons mt-3 d-flex justify-content-center flex-column flex-md-row">
+            <button class="btn btn-password me-2" @click="mostrarFormularioContrasena()">Editar Contraseña</button>
+            <button class="btn btn-activo" :class="{'active': usuario.estadoUsuario === 'Activo'}" @click="mostrarEstadoActivo">
+              {{ usuario.estadoUsuario === 'Activo' ? 'Activo' : 'Inactivo' }}
+            </button>
           </div>
         </div>
       </div>
 
-      <hr>
+      <hr />
       <CharlasAlumnoComponent :usuario="usuario" />
     </div>
-    <div v-else>
-      <p>Cargando perfil...</p>
-    </div>
+  </div>
+
+  <div v-else>
+    <p>Cargando perfil...</p>
   </div>
 </template>
+
 
 <script>
 import Swal from 'sweetalert2';
@@ -66,7 +70,7 @@ export default {
     mostrarFormularioContrasena() {
       Swal.fire({
         title: "Editar Contraseña",
-        html: `
+        html: ` 
           <div class="form-group">
             <input type="password" id="contraseniaNueva" class="form-control" placeholder="Contraseña Nueva">
           </div>
@@ -99,10 +103,13 @@ export default {
     },
 
     mostrarEstadoActivo() {
+      const estado = this.usuario.estadoUsuario; // Obtener el estado del usuario
+
+      // Condicional para mostrar un mensaje según el estado
       Swal.fire({
         title: "Estado del Usuario",
-        text: "Este usuario está activo",
-        icon: "info",
+        text: `Este usuario está ${estado === 'Activo' ? 'activo' : 'inactivo'}`,
+        icon: estado === 'Activo' ? "success" : "warning",
         confirmButtonText: "Aceptar"
       });
     }
@@ -114,48 +121,72 @@ export default {
 </script>
 
 <style scoped>
-.profile-container {
-  max-width: 100%;
-  margin: 0 auto;
+
+.profile-card {
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
 }
 
 .profile-header {
-  position: relative;
-  width: 100%;
+  background-color: #7787bd;
   height: 200px;
-  background-color: rgb(230, 159, 133);
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: center; 
+  align-items: center;   
 }
 
-.profile-back {
-  background-color: #98cce4;
-  padding-top: 60px;
-  width: 100%;
-  padding-bottom: 20px;
+.profile-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 .profile-image {
-  position: absolute;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  border: 3px solid #fff;
+  width: 250px;
+  height: 250px;
+  border-radius: 20px; 
+  border: 8px solid #e0e0e0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+  margin-top: -100px;
+
+}
+
+@media (max-width: 768px) {
+  .profile-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 20px; 
+    border: 8px solid #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+    margin-top: -100px;
+  }
+
+  .col-12.col-md-4 {
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+  }
 }
 
 .name {
   font-size: 24px;
   font-weight: bold;
-  color: #333;
-  margin-top: 60px;
+  color: #777;
+  text-align: center;
 }
 
 .bio {
   font-size: 14px;
   color: #777;
-  margin: 10px 0;
+  font-weight: bold;
+  margin: 30px 0;
+  text-align: center;
+
 }
 
 .profile-buttons {
@@ -165,26 +196,16 @@ export default {
   flex-wrap: wrap;
 }
 
-@media (min-width: 768px) {
-  .profile-container {
-    padding: 30px;
-    border-radius: 10px;
-  }
+.profile-buttons button {
+  width: auto;
+  margin: 5px;
+  padding: 10px 15px;
+}
 
-  .profile-header {
-    height: 200px;
-  }
-
-  .profile-image {
-    width: 150px;
-    height: 150px;
-    bottom: 60px;
-    left: -40%;
-    transform: translateX(-50%);
-  }
-
-  .profile-back {
-    padding-top: 40px;
+@media (max-width: 768px) {
+  .profile-buttons {
+    flex-direction: row;
+    justify-content: center;
   }
 }
 
@@ -211,8 +232,7 @@ export default {
   margin-bottom: 10px;
 }
 
-.swal-confirm-btn,
-.swal-cancel-btn {
+.swal-confirm-btn, .swal-cancel-btn {
   width: 48%;
   font-size: 16px;
   padding: 12px 0;
@@ -263,8 +283,7 @@ button:hover {
   color: #512399;
 }
 
-button:before,
-button:after {
+button:before, button:after {
   content: '';
   position: absolute;
   top: 0;
@@ -282,8 +301,7 @@ button:after {
   bottom: 0;
 }
 
-button:hover:before,
-button:hover:after {
+button:hover:before, button:hover:after {
   width: 100%;
   transition: 800ms ease all;
 }
@@ -293,10 +311,6 @@ button:hover:after {
     height: 45px;
     font-size: 1em;
   }
-
-  button:hover {
-    background: #fff;
-    color: #512399;
-  }
 }
+
 </style>

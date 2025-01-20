@@ -16,7 +16,7 @@
       <div class="chats">
         <div v-for="charla in charlas" :key="charla.charla.idCharla" class="chat-card">
           <div class="chat-image">
-            <img src="https://www.esdesignbarcelona.com/sites/default/files/2023-07/funciones-de-la-imagen-1_0.png" alt="Imagen charla" />
+            <img :src="charla.charla.imagen || 'https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg'" alt="Imagen charla" />
           </div>
           <div class="chat-info">
             <div class="chat-details">
@@ -39,6 +39,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import PerfilService from "@/services/PerfilService";
@@ -94,17 +95,17 @@ export default {
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 20px;
-  margin-top: -50px;
+  margin-top: -30px;
 }
 
 .chat-card {
   display: flex;
   flex-direction: column;
-  background-color: #c8bfe0;
-  padding: 20px;
+  background-color: #cfcece; 
+  padding: 15px;
   width: 100%;
-  max-width: 320px;
-  min-height: 350px;
+  max-width: 300px; 
+  min-height: 250px;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
@@ -112,19 +113,19 @@ export default {
 }
 
 .chat-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .chat-image {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f5f5f5;
-  padding: 10px;
+  background-color: #f0f0f0;
+  padding: 8px;
   border-radius: 8px;
-  margin-bottom: 15px;
-  max-height: 160px;
+  margin-bottom: 12px;
+  max-height: 120px;
   overflow: hidden;
 }
 
@@ -139,14 +140,13 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   flex-grow: 1;
-  
 }
 
 .chat-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
+  color: #333; 
+  margin-bottom: 8px;
   text-align: center;
 }
 
@@ -154,30 +154,30 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background-color: #b0afdb;
-  padding: 15px;
+  background-color: #afaeae; 
+  padding: 12px;
   border-radius: 8px;
-  margin-top: 15px;
+  margin-top: 12px;
   width: 100%;
 }
 
 .chat-description {
-  font-size: 14px;
-  color: #555;
+  font-size: 13px;
+  color: #666; 
   white-space: normal;
   word-wrap: break-word;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .btn-round {
   align-self: flex-end;
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   border: none;
-  background-color: #1AAB8A;
+  background-color: #555; 
   color: white;
-  font-size: 22px;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -186,37 +186,22 @@ export default {
 }
 
 .btn-round:hover {
-  background-color: #147d5c;
+  background-color: #333; 
   transform: scale(1.1);
 }
 
 .additional-details {
-  background-color: #ab9cbd;
-  padding: 12px;
-  margin-top: 15px;
+  background-color: #a1a0a0; 
+  padding: 10px;
+  margin-top: 12px;
   border-radius: 8px;
-  font-size: 14px;
-  color: #e3e3ec;
+  font-size: 12px;
+  color: #e3e3e3; 
 }
 
 @media (max-width: 768px) {
   .chat-card {
     width: 100%;
-  }
-
-  .chat-title {
-    font-size: 18px;
-  }
-
-  .chat-description {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 576px) {
-  .chat-card {
-    padding: 15px;
-    min-height: 300px;
   }
 
   .chat-title {
@@ -231,4 +216,24 @@ export default {
     font-size: 18px;
   }
 }
+
+@media (max-width: 576px) {
+  .chat-card {
+    padding: 12px;
+    min-height: 230px;
+  }
+
+  .chat-title {
+    font-size: 14px;
+  }
+
+  .chat-description {
+    font-size: 11px;
+  }
+
+  .btn-round {
+    font-size: 16px;
+  }
+}
+
 </style>
