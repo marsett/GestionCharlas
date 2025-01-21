@@ -91,6 +91,28 @@ export default class CharlasService {
         });
     }
 
+    getCharlasRonda(idRonda) {
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/charlas/charlasronda/'+idRonda;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener las charlas de una ronda: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
     setCharla(form){
         return new Promise((resolve, reject) => {
             const endpoint = 'api/charlas';
@@ -171,6 +193,38 @@ export default class CharlasService {
             })
             .catch(error => {
                 console.error("Error al obtener el curso del profesor en la creacion de ronda: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    setVoto(idRonda, idCharla){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/votos';
+            const token = Cookies.get('bearer_token');
+            const iduser = Cookies.get('user_id');
+            const json = JSON.stringify({
+                idVoto: 0,
+                idCharla: idCharla,
+                idUsuario: iduser,
+                idRonda: idRonda
+            });
+            
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al crear el voto:", error.response ? error.response.data : error);
                 reject(error);
             });
         });
