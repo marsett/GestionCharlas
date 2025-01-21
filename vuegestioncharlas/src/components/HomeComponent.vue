@@ -85,7 +85,7 @@
 
               <!-- Botón charlas o formulario -->
               <button 
-                class="btn ms-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-black'"
+                class="btn ms-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-white'"
                 :disabled="!isVotacionActiva || !puedeVotar"
                 v-if="!isVotacionActiva || !puedeVotar"
               >
