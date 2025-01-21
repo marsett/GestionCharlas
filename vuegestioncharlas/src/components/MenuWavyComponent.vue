@@ -36,6 +36,7 @@
         <!-- Botón desplegable -->
         <div
           class="d-flex align-items-center dropdown-toggle"
+          data-bs-offset="absolute"
           id="dropdownProfile"
           data-bs-toggle="dropdown"
           aria-expanded="false"
@@ -51,12 +52,20 @@
 
         <!-- Menú desplegable -->
         <ul
-          class="dropdown-menu dropdown-menu-end"
+          class="dropdown-menu dropdown-menu-end "
           aria-labelledby="dropdownProfile"
         >
-          <li><a class="dropdown-item" href="/perfilalumno">Mi Perfil</a></li>
+          <li class="d-flex justify-content-center">
+            <hr
+              class="dropdown-divider"
+              style="width: 175px; border: 0.1px solid #3d3d3d; margin-bottom: 15px;" 
+            />
+          </li>
+
+          <li><a class="dropdown-item pill-link" href="/perfilalumno"><i class="fas fa-user"></i> Mi Perfil</a></li>
+
           <li>
-            <a class="dropdown-item" href="#" @click.prevent="logout">
+            <a class="dropdown-item pill-link" href="#" @click.prevent="logout">
               <i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a
             >
           </li>
@@ -129,7 +138,40 @@ export default {
   font-family: "Montserrat", serif;
   font-weight: 600;
   font-size: 16px;
+
 }
+.pill-link {
+  display: inline-block; /* Ajusta el ancho al contenido del texto */
+  text-align: center; /* Centra el texto dentro de la píldora */
+  border-radius: 20px; /* Forma de píldora */
+  padding: 10px 15px; /* Espaciado interno */
+  width: 80%; /*Para el ancho de las pildoritas */
+  background-color: #f8f9fa; /* Fondo similar a btn-light */
+  color: #212529; /* Color del texto */
+  text-decoration: none; /* Elimina el subrayado */
+  font-family: "Montserrat", serif; /* Fuente consistente */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Animación */
+  margin-bottom: 10px; /* Separación entre píldoras */
+}
+
+/* Hover y focus */
+.pill-link:hover,
+.pill-link:focus {
+  background-color: #e2e6ea; /* Fondo más oscuro al pasar el cursor */
+  color: #212529; /* Mantén el color del texto */
+}
+
+/* Estado activo */
+.pill-link:active {
+  background-color: #ced4da; /* Fondo más oscuro al hacer clic */
+  color: #212529;
+}
+
+/* Centrar las píldoras dentro del dropdown */
+.dropdown-menu {
+  text-align: center; /* Centra los elementos dentro del menú */
+}
+
 /* Contenedor principal del nav */
 .nav {
   position: relative;
@@ -142,14 +184,16 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Distribuye los elementos */
+  justify-content: space-between;
+  /* Distribuye los elementos */
   position: relative;
 }
 
 /* Logo a la izquierda */
 .logo-container {
   position: absolute;
-  left: 20px; /* Ajusta la distancia desde el borde izquierdo */
+  left: 20px;
+  /* Ajusta la distancia desde el borde izquierdo */
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -165,10 +209,13 @@ export default {
 .nav-custom {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%); /* Centrado horizontal */
-  margin: 0; /* Sin margen para evitar desplazamientos */
+  transform: translateX(-50%);
+  /* Centrado horizontal */
+  margin: 0;
+  /* Sin margen para evitar desplazamientos */
   display: flex;
-  gap: 15px; /* Espaciado entre los enlaces */
+  gap: 15px;
+  /* Espaciado entre los enlaces */
   list-style: none;
   background-image: none !important;
   box-shadow: none !important;
@@ -183,36 +230,64 @@ export default {
   font-weight: semibold;
   text-decoration: none;
 }
+
 .dropdown-toggle {
   padding: 5px 20px 5px 20px;
 }
 
 .dropdown-menu {
-  width: 100%; /* Igualar el ancho del contenedor */
-  border: none; /* Eliminar bordes predeterminados de Bootstrap */
-  padding: 0; /* Eliminar espacio extra interno */
-  background-color: #527c58; /* Mismo fondo que en hovered */
+  width: 100%;
+  /* Igualar el ancho del contenedor */
+  border: none;
+  /* Eliminar bordes predeterminados de Bootstrap */
+  padding: 0;
+  /* Eliminar espacio extra interno */
+  background-color: #749d78;
+  /* Mismo fondo que en hovered */
+  border: 2px solid #3d3d3d;
+  border-top: none;
 }
+
 .dropdown-item {
-  border: none; /* Sin bordes entre elementos */
-  color: #3d3d3d; /* Color del texto */
-  padding: 10px 20px; /* Espaciado interno */
+  border: none;
+  /* Sin bordes entre elementos */
+  color: #3d3d3d;
+  /* Color del texto */
+  padding: 10px 20px;
+  /* Espaciado interno */
   font-family: "Montserrat", serif;
   font-size: 16px;
 }
-.profile-container .dropdown-item:hover,
-.profile-container .dropdown-item:active {
-  background-color: white; /* Fondo al hacer hover o clic */
-  color: #3d3d3d; /* Texto blanco para mejor contraste */
-  border-radius: 10px; /* Redondear bordes */
 
+.profile-container .dropdown-toggle:hover {
+  background-color: rgba(82, 124, 88, 0.6);
+  /* Fondo al hacer hover */
+  color: #3d3d3d;
+  border-radius: 10px;
+  /* Redondear bordes */
 }
-.profile-container .dropdown-toggle:hover,
+
 .profile-container .dropdown-toggle:active,
 .profile-container .dropdown-toggle[aria-expanded="true"] {
-  background-color: rgba(82, 124, 88, 60%);
-  color: #3d3d3d;
-  border-radius: 10px; /* Redondear bordes */
+  background-color: #749d78;
+  /* Fondo del dropdown */
+  color: white;
+  /* Color del texto en el estado activo */
+  border-radius: 10px;
+  /* Redondear bordes */
+}
+
+.profile-container .dropdown-toggle[aria-expanded="true"] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border: 2px solid #3d3d3d;
+  border-bottom: none;
+}
+
+/* Cuando el dropdown está abierto (menú desplegable) */
+.profile-container .dropdown-menu {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 /* Estado hover */
@@ -228,6 +303,7 @@ export default {
   font-size: 20px;
   color: #3d3d3d;
 }
+
 .nav-link {
   font-family: "Montserrat", serif;
   font-optical-sizing: auto;
@@ -238,12 +314,15 @@ export default {
 /* Contenedor del perfil a la derecha */
 .profile-container {
   position: absolute;
-  right: 20px; /* Ajusta la distancia desde el borde derecho */
+  right: 20px;
+  /* Ajusta la distancia desde el borde derecho */
   top: 50%;
   transform: translateY(-50%);
   display: flex;
-  align-items: center; /* Alinea verticalmente imagen y texto */
-  gap: 10px; /* Espaciado entre la imagen y el nombre */
+  align-items: center;
+  /* Alinea verticalmente imagen y texto */
+  gap: 10px;
+  /* Espaciado entre la imagen y el nombre */
 }
 
 /* Círculo para la imagen de perfil */
@@ -257,6 +336,7 @@ export default {
   align-items: center;
   justify-content: center;
   background-color: white;
+  margin-right: 15px;
 }
 
 /* Imagen dentro del círculo */
@@ -274,5 +354,6 @@ export default {
   font-weight: bold;
   color: #3d3d3d;
   white-space: nowrap;
+  margin-right: 10px;
 }
 </style>
