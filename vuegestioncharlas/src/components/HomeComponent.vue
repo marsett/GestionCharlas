@@ -20,7 +20,7 @@
             <!-- Sección superior con forma de pestaña -->
             <div class="card-header">
               <div class="tab-header" :class="{'active-tab': isRondaAbierta, 'inactive-tab': !isRondaAbierta}">
-                📢 {{ isRondaAbierta ? 'Rondas abiertas' : 'Sin rondas abiertas' }}
+                <i class="fa-regular fa-folder-open me-2"></i> {{ isRondaAbierta ? 'Rondas abiertas' : 'Sin rondas abiertas' }}
               </div>
             </div>
 
@@ -57,7 +57,7 @@
             <!-- Sección superior con forma de pestaña -->
             <div class="card-header border-0">
               <div class="tab-header" :class="{'active-tab': isVotacionActiva, 'inactive-tab': !isVotacionActiva}">
-                🔔 {{ isVotacionActiva ? 'Votaciones activas' : 'Sin votaciones activas' }}
+                <i class="fa-solid fa-bell me-2"></i> {{ isVotacionActiva ? 'Votaciones activas' : 'Sin votaciones activas' }}
               </div>
             </div>
 
@@ -85,7 +85,7 @@
 
               <!-- Botón charlas o formulario -->
               <button 
-                class="btn ms-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-white'"
+                class="btn ms-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-whiite'"
                 :disabled="!isVotacionActiva || !puedeVotar"
                 v-if="!isVotacionActiva || !puedeVotar"
               >
@@ -97,6 +97,8 @@
         </div>
       </div>
 
+      <hr class="my-4 py-2">
+
       <div class="row mt-3 mb-4 pt-0">
         <div class="mb-4 col-lg-8">
           <h1 class="mb-4 mt-2 pt-0 fw-semibold">Calendario</h1>
@@ -106,21 +108,21 @@
                 <!-- Ronda Abierta -->
                 <div class="col-md-auto">
                   <div class="d-flex align-items-md-center">
-                    <div class="color-box" style="background-color: blue;"></div>
+                    <div class="color-box" style="background-color: #b75d69;"></div>
                     <span class="ms-2">Ronda abierta</span>
                   </div>
                 </div>
                 <!-- Votación Activa -->
                 <div class="col-md-auto">
                   <div class="d-flex align-items-md-center">
-                    <div class="color-box" style="background-color: green;"></div>
+                    <div class="color-box" style="background-color: #40685c;"></div>
                     <span class="ms-2">Votación activa</span>
                   </div>
                 </div>
                 <!-- Votación Terminada -->
                 <div class="col-md-auto">
                   <div class="d-flex align-items-md-center">
-                    <div class="color-box" style="background-color: purple;"></div>
+                    <div class="color-box" style="background-color: #314B78;"></div>
                     <span class="ms-2">Presentación</span>
                   </div>
                 </div>
@@ -155,7 +157,7 @@
                   <!-- Badge para el día -->
                   <span 
                     class="badge rounded-circle me-3" 
-                    style="background-color: purple; color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
+                    style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
                   >
                     {{ new Date(evento.date).getDate() }}
                   </span>
@@ -334,13 +336,13 @@ export default {
 
             // Determinar el tipo de evento según el color
             switch (event.color) {
-              case 'blue':
+              case '#b75d69':
                 eventType = "Ronda Abierta";
                 break;
-              case 'green':
+              case '#40685c':
                 eventType = "Votación Activa";
                 break;
-              case 'purple':
+              case '#314B78':
                 eventType = "Presentación";
                 break;
               default:
@@ -403,7 +405,7 @@ export default {
                   title: `${ronda.descripcionModulo}`,
                   start: ahora.toISOString().split('T')[0],
                   end: fechaCierre.toISOString().split('T')[0],
-                  color: 'blue'
+                  color: '#b75d69'
                 });
 
                 // Verificar si el alumno ya tiene una charla asociada a esta ronda
@@ -432,7 +434,7 @@ export default {
                   title: `${ronda.descripcionModulo}`,
                   start: fechaCierre.toISOString().split('T')[0],
                   end: fechaLimiteVotacion.toISOString().split('T')[0],
-                  color: 'green'
+                  color: '#40685c'
                 });
               }
 
@@ -441,7 +443,7 @@ export default {
                 const eventoPresentacion = {
                   title: `${ronda.descripcionModulo}`,
                   date: fechaPresentacion.toISOString().split('T')[0],
-                  color: 'purple',
+                  color: '#314B78',
                 };
 
                 events.push(eventoPresentacion);
@@ -622,7 +624,7 @@ export default {
     watch: {
       'calendarOptions.events': {
         handler(newEvents) {
-          this.eventosPresentaciones = newEvents.filter(evento => evento.color === 'purple');
+          this.eventosPresentaciones = newEvents.filter(evento => evento.color === '#314B78');
         },
         immediate: true,
         deep: true
@@ -634,9 +636,17 @@ export default {
 
 <style scoped>
   .container{
-    background-color: #FDFAFA!important;
+    /* background-color: #FDFAFA!important; */
     padding:55px 20px 0px 20px;
-    margin-top: 0px!important;
+    margin-top: 0px !important;
+    margin-bottom: 30px !important;
+    background: linear-gradient(
+      to top,
+      hsla(128, 21%, 57%, 0.5) 0%,   
+      #FDFAFA 68%    
+    );
+    border-radius: 18px;
+    color: inherit;
   }
 
   .active-card {
@@ -736,7 +746,7 @@ export default {
   }
 
   ::v-deep(.btn-primary) {
-    background-color: #578e73 !important; 
+    background-color: #40685c !important; 
     border: none;
     color: white;
     border-radius: 8px;
@@ -744,17 +754,17 @@ export default {
   }
 
   ::v-deep(.btn-primary:active) {
-    border-color: #436c60 !important;
-    background-color: #436c60 !important;
+    border-color: #40685c !important;
+    background-color: #40685ceb !important;
   }
 
   ::v-deep(.btn-primary:hover) {
-    border-color: #436c60 !important;
-    background-color: #436c60 !important;
+    border-color: #40685c !important;
+    background-color: #40685ceb !important;
   }
 
   .btn-mover {
-    background-color: #7293A0 !important; 
+    background-color: #314B78 !important; 
     border: none;
     color: white;
     border-radius: 8px;
@@ -762,19 +772,19 @@ export default {
   }
 
   .btn-mover:active {
-    border-color: #64808b !important;
-    background-color: #64808b !important;
+    border-color: #314B78 !important;
+    background-color: #314b78e0 !important;
     color: white;
   }
 
   .btn-mover:hover {
-    border-color: #64808b !important;
-    background-color: #64808b !important;
+    border-color: #314B78 !important;
+    background-color: #314b78e0 !important;
     color: white;
   }
 
   ::v-deep(.btn-secondary) {
-    background-color: #7293A0 !important;
+    background-color: #8aa095 !important;
     border: none;
     color: white;
     border-radius: 8px;
@@ -788,26 +798,27 @@ export default {
     background-color: #64808b !important;
   }
 
-  ::v-deep(.btn-secondary:disabled) {
-    cursor: not-allowed;
+  ::v-deep(.btn.ms-2.btn-secondary.text-whiite){
+    background-color: #8aa095 !important; 
+    opacity: 1;
   }
 
   ::v-deep(button.fc-today-button.fc-button.fc-button-primary) {
-    background-color: #7293A0;
-    border-color: #7293A0;
+    background-color: #8aa095;
+    border-color: #8aa095;
     color: white;
   }
 
 
   ::v-deep(.fc-prev-button.fc-button.fc-button-primary){
-    background-color: #578e73;
-    border-color: #578e73;
+    background-color: #40685c;
+    border-color: #40685c;
     color: white;
   }
 
   ::v-deep(.fc-next-button.fc-button.fc-button-primary){
-    background-color: #578e73;
-    border-color: #578e73;
+    background-color: #40685c;
+    border-color: #40685c;
     color: white;
   }
 
@@ -815,8 +826,8 @@ export default {
     .fc-prev-button.fc-button.fc-button-primary:hover, 
     .fc-prev-button.fc-button.fc-button-primary:active
   ){
-    border-color: #436c60;
-    background-color: #436c60;
+    border-color: #40685ceb;
+    background-color: #40685ceb;
     color: white;
   }
 
@@ -824,14 +835,14 @@ export default {
     .fc-next-button.fc-button.fc-button-primary:hover,
     .fc-next-button.fc-button.fc-button-primary:active
   ){
-    border-color: #436c60;
-    background-color: #436c60;
+    border-color: #40685ceb;
+    background-color: #40685ceb;
     color: white;
   }
 
   ::v-deep(.fc-next-button.fc-button.fc-button-primary){
-    background-color: #578e73;
-    border-color: #578e73;
+    background-color: #436c60;
+    border-color: #436c60;
     color: white;
   }
 
@@ -842,6 +853,11 @@ export default {
   ::v-deep(.fc-scrollgrid.fc-scrollgrid-liquid){
     background-color: white;
   }
+  
+  ::v-deep(.fc-daygrid-day-frame.fc-scrollgrid-sync-inner){
+    min-height: 100px;
+  }
+
   ::v-deep(.fc-col-header-cell.fc-day){
     background-color: #3D3D3D;
   }
@@ -861,8 +877,10 @@ export default {
   }
 
   .list-group-item {
-    background-color: #f9f5ec;
-    border: 2px solid #F5ECD5;
+    background-color: #ced7e7;
+    border: 1px solid #314b7882;
+    /* background-color: #f9f5ec;
+    border: 2px solid #F5ECD5; */
     border-radius: 8px;
     margin-bottom: 10px;
     padding: 10px 15px;
@@ -874,6 +892,7 @@ export default {
 
 
   .badge {
+    background-color: #314B78;
     width: 40px;
     height: 40px;
     display: flex;
@@ -892,12 +911,6 @@ export default {
     }
   } 
 
-
-
-
-  ::v-deep(){
-    
-  }
   ::v-deep(){
     
   }
