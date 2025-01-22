@@ -20,7 +20,7 @@
             <!-- Sección superior con forma de pestaña -->
             <div class="card-header">
               <div class="tab-header" :class="{'active-tab': isRondaAbierta, 'inactive-tab': !isRondaAbierta}">
-                📢 {{ isRondaAbierta ? 'Rondas abiertas' : 'Sin rondas abiertas' }}
+                <i class="fa-regular fa-folder-open me-2"></i> {{ isRondaAbierta ? 'Rondas abiertas' : 'Sin rondas abiertas' }}
               </div>
             </div>
 
@@ -57,7 +57,7 @@
             <!-- Sección superior con forma de pestaña -->
             <div class="card-header border-0">
               <div class="tab-header" :class="{'active-tab': isVotacionActiva, 'inactive-tab': !isVotacionActiva}">
-                🔔 {{ isVotacionActiva ? 'Votaciones activas' : 'Sin votaciones activas' }}
+                <i class="fa-solid fa-bell me-2"></i> {{ isVotacionActiva ? 'Votaciones activas' : 'Sin votaciones activas' }}
               </div>
             </div>
 
@@ -75,28 +75,32 @@
                 </span>
               </p>
               
-              <!-- Botón para votar -->
-              <button 
-              class="btn me-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-black'"
-                :disabled="!isVotacionActiva || !puedeVotar"
-              >
-                Votar charla
-              </button>
-
               <!-- Botón para ir a charlas -->
               <button 
-                class="btn btn-mover"
+                class="btn btn-mover me-1"
                 @click="$router.push('/charlas')"
               >
                 Ir a charlas
               </button>
+
+              <!-- Botón charlas o formulario -->
+              <button 
+                class="btn ms-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-whiite'"
+                :disabled="!isVotacionActiva || !puedeVotar"
+                v-if="!isVotacionActiva || !puedeVotar"
+              >
+                Votar charla
+              </button>
+              <FormVotacion @evaluarRondas="actualizarContenido"  v-else />
             </div> 
           </div>
         </div>
       </div>
 
+      <hr class="my-4 py-2">
+
       <div class="row mt-3 mb-4 pt-0">
-        <div class="mb-4 col-md-8">
+        <div class="mb-4 col-lg-8">
           <h1 class="mb-4 mt-2 pt-0 fw-semibold">Calendario</h1>
             <!-- Guía de colores -->
             <div>
@@ -104,21 +108,21 @@
                 <!-- Ronda Abierta -->
                 <div class="col-md-auto">
                   <div class="d-flex align-items-md-center">
-                    <div class="color-box" style="background-color: blue;"></div>
+                    <div class="color-box" style="background-color: #b75d69;"></div>
                     <span class="ms-2">Ronda abierta</span>
                   </div>
                 </div>
                 <!-- Votación Activa -->
                 <div class="col-md-auto">
                   <div class="d-flex align-items-md-center">
-                    <div class="color-box" style="background-color: green;"></div>
+                    <div class="color-box" style="background-color: #40685c;"></div>
                     <span class="ms-2">Votación activa</span>
                   </div>
                 </div>
                 <!-- Votación Terminada -->
                 <div class="col-md-auto">
                   <div class="d-flex align-items-md-center">
-                    <div class="color-box" style="background-color: purple;"></div>
+                    <div class="color-box" style="background-color: #314B78;"></div>
                     <span class="ms-2">Presentación</span>
                   </div>
                 </div>
@@ -139,22 +143,33 @@
             </div>
           </div>
           
-          <div class="mb-4 ps-3 col-md-4">
+          <div class="mb-4 ps-lg-3 col-12 col-lg-4">
             <h2 class="mb-4 pt-0 espacio-150">Presentaciones</h2>
             <ul class="list-group mt-4">
               <!-- Iterar sobre las fechas de eventos tipo "purple" -->
               <li 
-                class="list-group-item d-flex justify-content-between align-items-center"
+                class="list-group-item"
                 v-for="(evento, index) in eventosPresentaciones" 
                 :key="index"
               >
-                <div class="d-flex align-items-center">
-                  <span class="badge rounded-circle me-3" style="background-color: purple; color: white;">
+                <!-- Contenedor alineado horizontalmente -->
+                <div class="d-flex align-items-center flex-nowrap w-100">
+                  <!-- Badge para el día -->
+                  <span 
+                    class="badge rounded-circle me-3" 
+                    style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
+                  >
                     {{ new Date(evento.date).getDate() }}
                   </span>
-                  {{ evento.title }}
+                  <!-- Título del evento -->
+                  <span class="flex-grow-1 text-truncate">
+                    {{ evento.title }}
+                  </span>
+                  <!-- Fecha del mes -->
+                  <small class="text-muted ms-3">
+                    {{ formatoMes(evento.date) }}
+                  </small>
                 </div>
-                <small class="text-muted">{{ formatoMes(evento.date) }}</small>
               </li>
             </ul>
           </div>
@@ -226,6 +241,7 @@ import FormNewCharla from './FormNewCharla.vue';
 
 
 import { Chart, CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend } from 'chart.js';
+import FormVotacion from './FormVotacion.vue';
 
 // Registrar las escalas, elementos, y otros componentes
 Chart.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend);
@@ -238,6 +254,7 @@ export default {
   components: {
     FullCalendar,
     FormNewCharla,
+    FormVotacion,
   },
   data() {
     return {
@@ -319,13 +336,13 @@ export default {
 
             // Determinar el tipo de evento según el color
             switch (event.color) {
-              case 'blue':
+              case '#b75d69':
                 eventType = "Ronda Abierta";
                 break;
-              case 'green':
+              case '#40685c':
                 eventType = "Votación Activa";
                 break;
-              case 'purple':
+              case '#314B78':
                 eventType = "Presentación";
                 break;
               default:
@@ -388,7 +405,7 @@ export default {
                   title: `${ronda.descripcionModulo}`,
                   start: ahora.toISOString().split('T')[0],
                   end: fechaCierre.toISOString().split('T')[0],
-                  color: 'blue'
+                  color: '#b75d69'
                 });
 
                 // Verificar si el alumno ya tiene una charla asociada a esta ronda
@@ -417,7 +434,7 @@ export default {
                   title: `${ronda.descripcionModulo}`,
                   start: fechaCierre.toISOString().split('T')[0],
                   end: fechaLimiteVotacion.toISOString().split('T')[0],
-                  color: 'green'
+                  color: '#40685c'
                 });
               }
 
@@ -426,7 +443,7 @@ export default {
                 const eventoPresentacion = {
                   title: `${ronda.descripcionModulo}`,
                   date: fechaPresentacion.toISOString().split('T')[0],
-                  color: 'purple',
+                  color: '#314B78',
                 };
 
                 events.push(eventoPresentacion);
@@ -607,7 +624,7 @@ export default {
     watch: {
       'calendarOptions.events': {
         handler(newEvents) {
-          this.eventosPresentaciones = newEvents.filter(evento => evento.color === 'purple');
+          this.eventosPresentaciones = newEvents.filter(evento => evento.color === '#314B78');
         },
         immediate: true,
         deep: true
@@ -619,18 +636,19 @@ export default {
 
 <style scoped>
   .container{
-    background-color: #FDFAFA!important;
+    /* background-color: #FDFAFA!important; */
     padding:55px 20px 0px 20px;
-    margin-top: 0px!important;
+    margin-top: 0px !important;
+    margin-bottom: 30px !important;
+    background: linear-gradient(
+      to top,
+      hsla(128, 21%, 57%, 0.5) 0%,   
+      #FDFAFA 68%    
+    );
+    border-radius: 18px;
+    color: inherit;
   }
 
-<<<<<<< HEAD
-.container{
-  padding:55px 20px 0px 20px;
-}
-  /* Estilo para la card activa (cuando está disponible) */
-=======
->>>>>>> 78b806e710c2101bc0515b04152f0ab849c9fdf2
   .active-card {
     transition: box-shadow 0.3s ease-in-out;
   }
@@ -701,12 +719,10 @@ export default {
 
   .active-tab {
     background-color: #F5ECD5; 
-    color: #333; 
   }
 
   .inactive-tab {
-    background-color: #F5ECD5;
-    color: #721c24; 
+    background-color: #F5ECD5; 
   }
 
   .card-body {
@@ -730,7 +746,7 @@ export default {
   }
 
   ::v-deep(.btn-primary) {
-    background-color: #578e73 !important; 
+    background-color: #40685c !important; 
     border: none;
     color: white;
     border-radius: 8px;
@@ -738,17 +754,17 @@ export default {
   }
 
   ::v-deep(.btn-primary:active) {
-    border-color: #436c60 !important;
-    background-color: #436c60 !important;
+    border-color: #40685c !important;
+    background-color: #40685ceb !important;
   }
 
   ::v-deep(.btn-primary:hover) {
-    border-color: #436c60 !important;
-    background-color: #436c60 !important;
+    border-color: #40685c !important;
+    background-color: #40685ceb !important;
   }
 
   .btn-mover {
-    background-color: #7293A0 !important; 
+    background-color: #314B78 !important; 
     border: none;
     color: white;
     border-radius: 8px;
@@ -756,41 +772,53 @@ export default {
   }
 
   .btn-mover:active {
-    border-color: #64808b !important;
-    background-color: #64808b !important;
+    border-color: #314B78 !important;
+    background-color: #314b78e0 !important;
     color: white;
   }
 
   .btn-mover:hover {
-    border-color: #64808b !important;
-    background-color: #64808b !important;
+    border-color: #314B78 !important;
+    background-color: #314b78e0 !important;
     color: white;
   }
 
   ::v-deep(.btn-secondary) {
-    background-color: #cccccc !important;
+    background-color: #8aa095 !important;
     border: none;
     color: white;
     border-radius: 8px;
-    cursor: not-allowed;
+  }
+
+  ::v-deep(.btn-secondary:hover) {
+    background-color: #64808b !important;
+  }
+
+  ::v-deep(.btn-secondary:active) {
+    background-color: #64808b !important;
+  }
+
+  ::v-deep(.btn.ms-2.btn-secondary.text-whiite){
+    background-color: #8aa095 !important; 
+    opacity: 1;
   }
 
   ::v-deep(button.fc-today-button.fc-button.fc-button-primary) {
-    background-color: #7293A0;
-    border-color: #7293A0;
+    background-color: #8aa095;
+    border-color: #8aa095;
     color: white;
   }
 
 
   ::v-deep(.fc-prev-button.fc-button.fc-button-primary){
-    background-color: #578e73;
-    border-color: #578e73;
+    background-color: #40685c;
+    border-color: #40685c;
     color: white;
   }
 
   ::v-deep(.fc-next-button.fc-button.fc-button-primary){
-    background-color: #578e73;
-    border-color: #578e73;
+    background-color: #40685c;
+    border-color: #40685c;
     color: white;
   }
 
@@ -798,8 +826,8 @@ export default {
     .fc-prev-button.fc-button.fc-button-primary:hover, 
     .fc-prev-button.fc-button.fc-button-primary:active
   ){
-    border-color: #436c60;
-    background-color: #436c60;
+    border-color: #40685ceb;
+    background-color: #40685ceb;
     color: white;
   }
 
@@ -807,14 +835,14 @@ export default {
     .fc-next-button.fc-button.fc-button-primary:hover,
     .fc-next-button.fc-button.fc-button-primary:active
   ){
-    border-color: #436c60;
-    background-color: #436c60;
+    border-color: #40685ceb;
+    background-color: #40685ceb;
     color: white;
   }
 
   ::v-deep(.fc-next-button.fc-button.fc-button-primary){
-    background-color: #578e73;
-    border-color: #578e73;
+    background-color: #436c60;
+    border-color: #436c60;
     color: white;
   }
 
@@ -825,6 +853,11 @@ export default {
   ::v-deep(.fc-scrollgrid.fc-scrollgrid-liquid){
     background-color: white;
   }
+  
+  ::v-deep(.fc-daygrid-day-frame.fc-scrollgrid-sync-inner){
+    min-height: 100px;
+  }
+
   ::v-deep(.fc-col-header-cell.fc-day){
     background-color: #3D3D3D;
   }
@@ -844,16 +877,24 @@ export default {
   }
 
   .list-group-item {
-    background-color: #f9f5ec;
-    border: 2px solid #F5ECD5;
+    background-color: #ced7e7;
+    border: 1px solid #314b7882;
+    /* background-color: #f9f5ec;
+    border: 2px solid #F5ECD5; */
     border-radius: 8px;
     margin-bottom: 10px;
     padding: 10px 15px;
+    display: flex; /* Para asegurar que el contenedor sea flexible */
+    flex-direction: row; /* Alinea el contenido horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    justify-content: space-between; /* Espacia los elementos */
   }
 
+
   .badge {
-    width: 30px;
-    height: 30px;
+    background-color: #314B78;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -861,13 +902,15 @@ export default {
   }
 
   .espacio-150{
-    margin-top: 150px;
+    margin-top: 10px;
   }
 
+  @media (min-width: 992px) {
+    .espacio-150 {
+      margin-top: 150px;
+    }
+  } 
 
-  ::v-deep(){
-    
-  }
   ::v-deep(){
     
   }

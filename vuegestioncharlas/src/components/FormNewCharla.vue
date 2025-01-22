@@ -11,7 +11,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Registrar charla</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-start">
                     <!-- Formulario -->
@@ -227,5 +227,12 @@ export default {
 </script>
 
 <style scoped>
+    .modal {
+        --bs-modal-border-color: none;
+    }
 
+    .modal-header{
+        background-color: #578e73;
+        color: white;
+    }
 </style>
