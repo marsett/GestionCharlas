@@ -1,6 +1,16 @@
 <template>
+  <!-- Botón de retroceder -->
+  <button class="btn-retroceder" @click="volverAtras">
+    <i class="fas fa-arrow-left"></i>
+    <!-- Ícono de retroceder -->
+  </button>
   <div class="container my-4 p-4">
+    <h2 class="mb-4 text-center" style="font-size: 42px; font-weight: 400px">
+      Gestión de Alumnos
+    </h2>
+    <hr class="linea-separadora" />
     <!-- Mostrar spinner mientras se cargan los alumnos -->
+
     <div v-if="cargando" class="d-flex justify-content-center my-4">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Cargando...</span>
@@ -38,7 +48,17 @@
               </div>
             </div>
             <div class="btn-group">
-              <button @click="abrirAlerta(alumno.alumno)">Desactivar</button>
+              <!-- Solo mostrar el botón si el curso está activo -->
+              <button
+                @click="abrirAlerta(alumno.alumno)"
+                v-text="alumno.alumno.estadoUsuario ? 'Desactivar' : 'Activar'"
+                :style="{
+                  backgroundColor: alumno.alumno.estadoUsuario
+                    ? '#ff4d4f'
+                    : '#4CAF50',
+                  color: 'white',
+                }"
+              ></button>
             </div>
           </div>
         </div>
@@ -59,11 +79,13 @@ export default {
       alumnos: [],
       cargando: false,
       perfilService: new PerfilService(),
+      curso: { activo: false },
     };
   },
   methods: {
     abrirAlerta(alumno) {
-      if (alumno.estadoUsuario == true) {
+      if (alumno.estadoUsuario) {
+        // Si el alumno está activo, se le pregunta si quiere desactivarlo
         Swal.fire({
           title: "¿Estás seguro?",
           text: `Estás a punto de desactivar al usuario "${alumno.usuario}"`,
@@ -73,47 +95,63 @@ export default {
           cancelButtonText: "Cancelar",
         }).then((result) => {
           if (result.isConfirmed) {
-            this.cambiarEstadoAlumno(alumno);
+            this.cambiarEstadoAlumno(alumno, false); // Desactivar
+          }
+        });
+      } else {
+        // Si el alumno está inactivo, se le pregunta si quiere activarlo
+        Swal.fire({
+          title: "¿Deseas activar al alumno?",
+          text: `El alumno "${alumno.usuario}" está desactivado. ¿Deseas activarlo?`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Sí, activar",
+          cancelButtonText: "No, cancelar",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.cambiarEstadoAlumno(alumno, true); // Activar
           }
         });
       }
     },
-    async cambiarEstadoAlumno(alumno) {
-      if (alumno.estadoUsuario == true) {
+
+    async cambiarEstadoAlumno(alumno, activar) {
+      Swal.fire({
+        title: activar ? "Activando..." : "Desactivando...",
+        text: `Por favor, espere mientras se ${
+          activar ? "activa" : "desactiva"
+        } al usuario.`,
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      try {
+        // Realiza la actualización en la API para activar o desactivar al alumno
+        await this.perfilService.updateEstadoUsuario(alumno.idUsuario, activar);
+
+        // Recarga los datos de los alumnos
+        await this.cargarAlumnos();
+
+        // Muestra un mensaje de éxito
+        Swal.fire(
+          "¡Éxito!",
+          `El usuario "${alumno.usuario}" ha sido ${
+            activar ? "activado" : "desactivado"
+          }.`,
+          "success"
+        );
+      } catch (error) {
+        // Muestra un mensaje de error
         Swal.fire({
-          title: "Desactivando...",
-          text: "Por favor, espere mientras se desactiva al usuario.",
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
+          title: "¡Error!",
+          text: `No se pudo ${
+            activar ? "activar" : "desactivar"
+          } el usuario. Por favor, inténtelo de nuevo.`,
+          icon: "error",
+          confirmButtonText: "Cerrar",
         });
-
-        try {
-          // Realiza la actualización en la API para desactivar al alumno
-          await this.perfilService.updateEstadoUsuario(
-            alumno.idUsuario,
-            !alumno.estadoUsuario
-          );
-
-          // Recarga los datos de los alumnos
-          await this.cargarAlumnos();
-
-          // Muestra un mensaje de éxito y cierra el SweetAlert
-          Swal.fire(
-            "¡Éxito!",
-            `El usuario "${alumno.usuario}" ha sido desactivado.`,
-            "success"
-          );
-        } catch (error) {
-          // Muestra un mensaje de error sin cerrar el SweetAlert principal
-          Swal.fire({
-            title: "¡Error!",
-            text: "No se pudo desactivar el usuario. Por favor, inténtelo de nuevo.",
-            icon: "error",
-            confirmButtonText: "Cerrar",
-          });
-        }
       }
     },
 
@@ -121,15 +159,17 @@ export default {
       Swal.fire({
         title: "Información del Usuario",
         html: `
+        <div style="text-align: left;">
       <strong>Nombre:</strong> ${alumno.alumno.usuario}<br>
       <strong>Curso:</strong> ${alumno.alumno.curso}<br>
       <strong>Email:</strong> ${alumno.alumno.email}<br>
-      <strong>Charlas totales:</strong> ${
+      <strong>Charlas totales:</strong>
+       ${
         alumno.charlasTotales
       }<br> <!-- Aquí accedes a charlasTotales -->
       <strong>Estado:</strong> ${
         alumno.alumno.estadoUsuario ? "Activo" : "Inactivo"
-      }
+      } </div>
     `,
         icon: "info",
         confirmButtonText: "OK",
@@ -139,13 +179,10 @@ export default {
       try {
         this.seccionActiva = "alumnos";
         this.cargando = true;
+        console.log("Cargando alumnos...");
         const data = await this.perfilService.getAlumnosCursoProfesor();
-        this.alumnos =
-          data.length > 0
-            ? data[0].alumnos.filter(
-                (alumno) => alumno.alumno.estadoUsuario == true
-              )
-            : [];
+        console.log("Los alumnos son: ", data);
+        this.alumnos = data.length > 0 ? data[0].alumnos : [];
       } catch (error) {
         console.error("Error al cargar los alumnos:", error);
         alert("No se pudieron cargar los alumnos.");
@@ -153,7 +190,11 @@ export default {
         this.cargando = false;
       }
     },
+    volverAtras() {
+      this.$router.go(-1); // Esto hace que el navegador vuelva a la página anterior
+    },
   },
+
   created() {
     this.cargarAlumnos();
   },
@@ -254,10 +295,43 @@ export default {
   margin-top: 20px;
 }
 
+.btn-retroceder {
+  background-color: #cbcbcb;
+  border: none;
+  padding: 8px 15px;
+  margin: 20px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  flex: 1;
+}
+
 @media (max-width: 991px) {
   .d-flex {
     display: grid !important;
     justify-content: center !important;
+  }
+
+  .card-usuario {
+    width: 400px; /* Ajusta el ancho máximo de las tarjetas */
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 450px) {
+  .card-usuario {
+    width: 350px; /* Ajusta el ancho máximo de las tarjetas */
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 400px) {
+  .card-usuario {
+    width: 300px; /* Ajusta el ancho máximo de las tarjetas */
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 

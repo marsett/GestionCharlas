@@ -7,9 +7,9 @@
       class="linea-separadora"
       style="width: 160px; margin: 10px auto 20px auto"
     />
-    <div class="row row-cols-md-3 row-cols-1">
+    <div class="row g-3">
       <!-- Filtro por Rol -->
-      <div class="col mb-3">
+      <div class="col-md-3 col-12">
         <label for="filtroRol" class="form-label subtitulo"
           >Filtrar por Rol</label
         >
@@ -27,7 +27,7 @@
       </div>
 
       <!-- Filtro por Curso -->
-      <div class="col mb-3">
+      <div class="col-md-3 col-12">
         <label for="filtroCurso" class="form-label subtitulo"
           >Filtrar por Curso</label
         >
@@ -49,7 +49,7 @@
       </div>
 
       <!-- Filtro por Estado -->
-      <div class="col mb-3">
+      <div class="col-md-3 col-12">
         <label for="filtroEstado" class="form-label subtitulo"
           >Filtrar por Estado</label
         >
@@ -64,7 +64,21 @@
           <option value="false">Inactivo</option>
         </select>
       </div>
+
+      <!-- Campo de Búsqueda -->
+      <div class="col-md-3 col-12">
+        <label for="buscadorNombre" class="form-label subtitulo">Buscar</label>
+        <input
+          type="text"
+          id="buscadorNombre"
+          class="form-control"
+          v-model="busqueda"
+          @input="filtrarUsuarios"
+          placeholder="Introduce el nombre o apellidos"
+        />
+      </div>
     </div>
+
     <hr class="linea-separadora" />
     <!-- Mensaje cuando no hay usuarios filtrados -->
     <div v-if="noUsuariosMensaje" class="alert alert-warning text-center">
@@ -79,10 +93,7 @@
         :key="usuario.idUsuario"
       >
         <div class="card-usuario">
-          <div
-            class="card-encabezado"
-            style="background-color: #7782c6"
-          >
+          <div class="card-encabezado" style="background-color: #7782c6">
             <i
               class="fas fa-info-circle info-icon"
               @click="mostrarInformacionUsuario(usuario)"
@@ -128,6 +139,7 @@ export default {
       rolSeleccionado: "",
       cursoSeleccionado: "",
       estadoSeleccionado: "",
+      busqueda: "",
       modalAbierto: false,
       tipoCambio: "",
       datosCambio: {
@@ -377,13 +389,15 @@ export default {
       Swal.fire({
         title: "Información del Usuario",
         html: `
+      <div style="text-align: left;">
         <strong>Nombre:</strong> ${usuario.nombre} ${usuario.apellidos}<br>
         <strong>Curso:</strong> ${usuario.cursoNombre}<br>
         <strong>Rol:</strong> ${usuario.rolNombre}<br>
         <strong>Estado:</strong> ${
           usuario.estadoUsuario ? "Activo" : "Inactivo"
         }
-      `,
+      </div>
+    `,
         icon: "info",
         confirmButtonText: "OK",
       });
@@ -459,6 +473,16 @@ export default {
         usuariosFiltrados = usuariosFiltrados.filter(
           (usuario) =>
             usuario.estadoUsuario === (this.estadoSeleccionado === "true")
+        );
+      }
+
+      // Filtro por búsqueda en nombre y apellidos
+      if (this.busqueda.trim() !== "") {
+        const busquedaLower = this.busqueda.toLowerCase();
+        usuariosFiltrados = usuariosFiltrados.filter(
+          (usuario) =>
+            usuario.nombre.toLowerCase().includes(busquedaLower) ||
+            usuario.apellidos.toLowerCase().includes(busquedaLower)
         );
       }
 
@@ -604,6 +628,7 @@ export default {
 
 .user-details {
   text-align: left;
+  margin-top: 40px;
 }
 
 .btn-group {

@@ -18,9 +18,9 @@
         <img
           :src="usuario.imagen"
           alt="Foto de perfil"
-          @click="triggerFileInput"
           class="profile-image"
         />
+        <i class="fa fa-pencil edit-icon" @click="triggerFileInput"></i>
         <input
           type="file"
           ref="fileInput"
@@ -68,7 +68,7 @@
               <p>Alumnos: {{ cursoData.numeroAlumnos }}</p>
               <button
                 class="btn btn-primary mt-3"
-                @click="verAlumnos()"
+                @click="verAlumnos(cursoData.curso.idCurso, cursoData.curso.activo)"
               >
                 Ver Alumnos
               </button>
@@ -118,8 +118,37 @@ export default {
     };
   },
   methods: {
-    verAlumnos() {
-        this.$router.push(`/perfilprofesor/alumnos`);
+    async verAlumnos(idCurso, activo) {
+      try {
+        this.cargando = true; // Mostrar spinner
+        let data;
+        if (!activo) {
+          data = await this.perfilService.getAlumnosCursoActivoProfesor(idCurso);
+        } else {
+          const cursosData = await this.perfilService.getAlumnosCursoProfesor();
+          data = cursosData.find((curso) => curso.curso.idCurso === idCurso);
+        }
+
+        if (data && data.alumnos) {
+          this.alumnos = data.alumnos;
+          this.$router.push(`/perfilprofesor/alumnos`); // Redirigir
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "Sin datos",
+            text: "No se encontraron alumnos para el curso seleccionado.",
+          });
+        }
+      } catch (error) {
+        console.error("Error al cargar los alumnos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un problema al cargar los datos. Inténtalo de nuevo.",
+        });
+      } finally {
+        this.cargando = false; // Ocultar spinner
+      }
     },
     mostrarDetalles() {
       Swal.fire({
@@ -274,9 +303,31 @@ export default {
 </script>
 
 <style scoped>
+.image-container {
+  position: relative;
+  display: inline-block;
+}
 .profile-image {
   border: 4px solid #007bff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.edit-icon {
+  height: 10%;
+  position: relative;
+  top: 0px; /* Ajusta según el espacio deseado */
+  right: 15px; /* Ajusta según el espacio deseado */
+  font-size: 20px; /* Tamaño del ícono */
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro translúcido */
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10; /* Asegura que esté encima de la imagen */
+}
+
+.edit-icon:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .card {
@@ -375,10 +426,17 @@ body {
   margin-right: 20px;
 }
 
+.row {
+  display: flex;
+  flex-wrap: wrap; /* Permite que las tarjetas se ajusten a varias filas */
+  gap: 15px; /* Espacio entre columnas */
+}
+
 .course-card {
   background-color: #d6d6d6;
   border-radius: 10px;
   position: relative;
+  height: 100%;
 }
 
 .course-card .card-header {
