@@ -181,4 +181,12 @@ export default {
         display: block;
         text-align: left;
     }
+
+    input:focus:not([type="range"]), 
+    textarea:focus, 
+    select:focus {
+        outline: none; 
+        border-color: #578e73; 
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); 
+    }
 </style>
