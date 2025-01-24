@@ -5,6 +5,8 @@
     <!-- Ícono de retroceder -->
   </button>
   <div class="container my-4 p-4">
+
+
     <h2 class="mb-4 text-center" style="font-size: 42px; font-weight: 400px">
       Gestión de Alumnos
     </h2>
@@ -164,9 +166,7 @@ export default {
       <strong>Curso:</strong> ${alumno.alumno.curso}<br>
       <strong>Email:</strong> ${alumno.alumno.email}<br>
       <strong>Charlas totales:</strong>
-       ${
-        alumno.charlasTotales
-      }<br> <!-- Aquí accedes a charlasTotales -->
+       ${alumno.charlasTotales}<br> <!-- Aquí accedes a charlasTotales -->
       <strong>Estado:</strong> ${
         alumno.alumno.estadoUsuario ? "Activo" : "Inactivo"
       } </div>
@@ -228,6 +228,7 @@ export default {
 .container {
   background-color: #d9d9d9;
   border-radius: 16px;
+  
 }
 
 .card-container {
@@ -236,6 +237,16 @@ export default {
   gap: 10px;
   justify-content: center;
 }
+
+@media (max-width: 575.98px) {
+  .container {
+    width: auto;
+    padding: 16px;
+  margin-right: 20px;
+  margin-left: 20px;
+  }
+}
+
 
 .card-usuario {
   width: 100%;
