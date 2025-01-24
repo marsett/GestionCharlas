@@ -15,11 +15,7 @@
       </div>
 
       <div class="profile-content">
-        <img
-          :src="usuario.imagen"
-          alt="Foto de perfil"
-          class="profile-image"
-        />
+        <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image" />
         <i class="fa fa-pencil edit-icon" @click="triggerFileInput"></i>
         <input
           type="file"
@@ -49,8 +45,16 @@
         </div>
       </div>
 
-      <div class="row" v-if="!cargando">
-        <div class="col-md-4" v-for="(cursoData, index) in cursos" :key="index">
+      <div
+        class="row row-cols-xl-3 row-cols-lg-2 row-cols-1 d-flex"
+        v-if="!cargando"
+      >
+        <div
+          class="col-12 col-sm-6 col-md-4"
+          style="margin-bottom: 20px"
+          v-for="(cursoData, index) in cursos"
+          :key="index"
+        >
           <div class="course-card">
             <div
               class="card-header d-flex justify-content-between align-items-center"
@@ -68,7 +72,9 @@
               <p>Alumnos: {{ cursoData.numeroAlumnos }}</p>
               <button
                 class="btn btn-primary mt-3"
-                @click="verAlumnos(cursoData.curso.idCurso, cursoData.curso.activo)"
+                @click="
+                  verAlumnos(cursoData.curso.idCurso, cursoData.curso.activo)
+                "
               >
                 Ver Alumnos
               </button>
@@ -123,7 +129,9 @@ export default {
         this.cargando = true; // Mostrar spinner
         let data;
         if (!activo) {
-          data = await this.perfilService.getAlumnosCursoActivoProfesor(idCurso);
+          data = await this.perfilService.getAlumnosCursoActivoProfesor(
+            idCurso
+          );
         } else {
           const cursosData = await this.perfilService.getAlumnosCursoProfesor();
           data = cursosData.find((curso) => curso.curso.idCurso === idCurso);
@@ -154,10 +162,12 @@ export default {
       Swal.fire({
         title: "Detalles del Usuario", // Título del SweetAlert
         html: `
+        <div style="text-align: left;">
           <strong>Nombre:</strong> ${this.usuario.nombre} <br>
           <strong>Apellidos:</strong> ${this.usuario.apellidos} <br>
           <strong>Email:</strong> ${this.usuario.email} <br>
           <strong>Curso Actual:</strong> ${this.usuario.curso} <br>
+          </div>
         `,
         icon: "info", // Tipo de ícono (puedes cambiarlo por otro si lo deseas)
         confirmButtonText: "Cerrar", // Botón para cerrar el alert
@@ -428,8 +438,8 @@ body {
 
 .row {
   display: flex;
-  flex-wrap: wrap; /* Permite que las tarjetas se ajusten a varias filas */
-  gap: 15px; /* Espacio entre columnas */
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .course-card {
@@ -437,6 +447,7 @@ body {
   border-radius: 10px;
   position: relative;
   height: 100%;
+  width: 100%;
 }
 
 .course-card .card-header {
@@ -473,5 +484,74 @@ body {
   line-height: 1;
   text-align: center;
   cursor: pointer;
+}
+@media (max-width: 991px) {
+  .d-flex {
+    justify-content: center !important;
+  }
+
+  .col-12 {
+    width: 80% !important; /* Asegura que las columnas ocupen todo el ancho */
+  }
+
+  .profile-content {
+    flex-wrap: wrap; /* Permite que los elementos se muevan a la siguiente línea */
+  }
+
+  .profile-info {
+    flex: 1; /* Ocupa el espacio disponible al lado de la imagen */
+    text-align: left; /* Mantiene el texto alineado a la izquierda */
+    margin-bottom: 0; /* Evita márgenes innecesarios */
+  }
+
+  .profile-info h3 {
+    margin-bottom: 5px; /* Reduce espacio entre el nombre y apellidos */
+  }
+
+  .profile-buttons {
+    width: 75%; /* El bloque de botones ocupará todo el ancho */
+    margin-top: 20px; /* Añade espacio entre los botones y los otros elementos */
+    display: flex;
+    align-items: center; /* Centra los botones horizontalmente */
+    margin-left: auto;
+    margin-right: auto;
+    gap: 15px;
+  }
+
+  .profile-buttons button {
+    flex: 1 1 auto;
+    margin: 0 auto;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 767px) {
+    .profile-info {
+      text-align: center; /* Centra los elementos en el eje horizontal */
+      padding-bottom: 0px;
+      flex: auto;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .profile-image {
+      width: 200px;
+      height: 200px;
+      border-radius: 30px;
+      object-fit: cover;
+      margin-left: 20px;
+      margin-bottom: 30px;
+    }
+  }
+
+  @media (max-width: 340px) {
+    .profile-image {
+      width: 150px;
+      height: 150px;
+      border-radius: 30px;
+      object-fit: cover;
+      margin-left: 20px;
+      margin-bottom: 30px;
+    }
+  }
 }
 </style>
