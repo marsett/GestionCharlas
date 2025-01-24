@@ -7,7 +7,7 @@
       >
         <button
           class="btn btn-secondary"
-          style="margin-left: auto; margin-bottom: auto"
+          style="margin-left: auto; margin-bottom: auto; background-color: #314B78;"
           @click="mostrarDetalles"
         >
           Detalles
@@ -15,12 +15,8 @@
       </div>
 
       <div class="profile-content">
-        <img
-          :src="usuario.imagen"
-          alt="Foto de perfil"
-          @click="triggerFileInput"
-          class="profile-image"
-        />
+        <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image" />
+        <i class="fa fa-pencil edit-icon" @click="triggerFileInput"></i>
         <input
           type="file"
           ref="fileInput"
@@ -33,75 +29,39 @@
           <p>{{ usuario.curso }}</p>
         </div>
         <div class="profile-buttons text-end">
-          <button class="btn btn-secondary">
+          <button class="btn btn-secondary no-hover">
             {{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}
           </button>
-          <button class="btn btn-secondary">
+          <button class="btn btn-secondary no-hover">
             {{ usuario.estadoUsuario ? "Activo" : "Inactivo" }}
           </button>
         </div>
       </div>
       <hr />
 
-      <!-- <div class="row">
-        <div class="col-md-4">
-          <div class="course-card">
-            <div
-              class="card-header d-flex justify-content-between align-items-center"
-            >
-              <button class="btn btn-success status">Activo</button>
-            </div>
-            <div class="card-body">
-              <h5>Curso 2024-2025</h5>
-              <p>Descripción</p>
-            </div>
-            <button class="add-button">+</button>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="course-card">
-            <div
-              class="card-header d-flex justify-content-between align-items-center"
-            >
-              <button class="btn btn-danger status">Inactivo</button>
-            </div>
-            <div class="card-body">
-              <h5>Curso 2023-2024</h5>
-              <p>Descripción</p>
-            </div>
-            <button class="add-button">+</button>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="course-card">
-            <div
-              class="card-header d-flex justify-content-between align-items-center"
-            >
-              <button class="btn btn-danger status">Inactivo</button>
-            </div>
-            <div class="card-body">
-              <h5>Curso 2022-2023</h5>
-              <p>Descripción</p>
-            </div>
-            <button class="add-button">+</button>
-          </div>
-        </div>
-      </div> -->
-
       <div v-if="cargando" class="text-center mb-4">
-        <div class="spinner-border" role="status">
+        <div class="spinner-border" style="margin-top: 20px;" role="status">
           <span class="visually-hidden">Cargando cursos...</span>
         </div>
       </div>
 
-      <div class="row" v-if="!cargando">
-        <div class="col-md-4" v-for="(cursoData, index) in cursos" :key="index">
+      <div
+        class="row row-cols-xl-3 row-cols-lg-2 row-cols-1 d-flex"
+        v-if="!cargando"
+      >
+        <div
+          class="col-12 col-sm-6 col-md-4"
+          style="margin-bottom: 20px"
+          v-for="(cursoData, index) in cursos"
+          :key="index"
+        >
           <div class="course-card">
             <div
               class="card-header d-flex justify-content-between align-items-center"
             >
-              <button style="margin-left: auto"
-                class="btn"
+              <button
+                style="margin-left: auto"
+                class="btn no-hover"
                 :class="cursoData.curso.activo ? 'btn-success' : 'btn-danger'"
               >
                 {{ cursoData.curso.activo ? "Activo" : "Inactivo" }}
@@ -110,6 +70,14 @@
             <div class="card-body">
               <h5>{{ cursoData.curso.nombre }}</h5>
               <p>Alumnos: {{ cursoData.numeroAlumnos }}</p>
+              <button
+                class="btn mt-3" style="background-color: #314B78; color: white;"
+                @click="
+                  verAlumnos(cursoData.curso.idCurso, cursoData.curso.activo)
+                "
+              >
+                Ver Alumnos
+              </button>
             </div>
           </div>
         </div>
@@ -134,6 +102,7 @@
       </div>
     </div>
   </div>
+  <router-view />
 </template>
 
 
@@ -155,14 +124,50 @@ export default {
     };
   },
   methods: {
+    async verAlumnos(idCurso, activo) {
+      try {
+        this.cargando = true; // Mostrar spinner
+        let data;
+        if (!activo) {
+          data = await this.perfilService.getAlumnosCursoActivoProfesor(
+            idCurso
+          );
+        } else {
+          const cursosData = await this.perfilService.getAlumnosCursoProfesor();
+          data = cursosData.find((curso) => curso.curso.idCurso === idCurso);
+        }
+
+        if (data && data.alumnos) {
+          this.alumnos = data.alumnos;
+          this.$router.push(`/perfilprofesor/alumnos`); // Redirigir
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "Sin datos",
+            text: "No se encontraron alumnos para el curso seleccionado.",
+          });
+        }
+      } catch (error) {
+        console.error("Error al cargar los alumnos:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un problema al cargar los datos. Inténtalo de nuevo.",
+        });
+      } finally {
+        this.cargando = false; // Ocultar spinner
+      }
+    },
     mostrarDetalles() {
       Swal.fire({
         title: "Detalles del Usuario", // Título del SweetAlert
         html: `
+        <div style="text-align: left;">
           <strong>Nombre:</strong> ${this.usuario.nombre} <br>
           <strong>Apellidos:</strong> ${this.usuario.apellidos} <br>
           <strong>Email:</strong> ${this.usuario.email} <br>
           <strong>Curso Actual:</strong> ${this.usuario.curso} <br>
+          </div>
         `,
         icon: "info", // Tipo de ícono (puedes cambiarlo por otro si lo deseas)
         confirmButtonText: "Cerrar", // Botón para cerrar el alert
@@ -308,9 +313,36 @@ export default {
 </script>
 
 <style scoped>
+.no-hover:active, .no-hover {
+  pointer-events: none;
+  border-radius: 16px;
+}
+
+.image-container {
+  position: relative;
+  display: inline-block;
+}
 .profile-image {
-  border: 4px solid #007bff;
+  border: 4px solid #314B78;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.edit-icon {
+  height: 10%;
+  position: relative;
+  top: 0px; 
+  right: 15px; 
+  font-size: 20px; 
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5); 
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10; 
+}
+
+.edit-icon:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .card {
@@ -330,7 +362,7 @@ export default {
 }
 
 .list-group-item strong {
-  color: #007bff;
+  color: #314B78;
 }
 
 @media (min-width: 768px) {
@@ -403,16 +435,25 @@ body {
   margin-top: 20px;
   margin-top: auto;
   padding-bottom: 0px;
+  
 }
 
 .profile-buttons button {
   margin-right: 20px;
 }
 
+.row {
+  display: flex;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .course-card {
   background-color: #d6d6d6;
   border-radius: 10px;
   position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 .course-card .card-header {
@@ -449,5 +490,74 @@ body {
   line-height: 1;
   text-align: center;
   cursor: pointer;
+}
+@media (max-width: 991px) {
+  .d-flex {
+    justify-content: center !important;
+  }
+
+  .col-12 {
+    width: 80% !important; 
+  }
+
+  .profile-content {
+    flex-wrap: wrap; 
+  }
+
+  .profile-info {
+    flex: 1; 
+    text-align: left; 
+    margin-bottom: 0; 
+  }
+
+  .profile-info h3 {
+    margin-bottom: 5px;
+  }
+
+  .profile-buttons {
+    width: 75%; 
+    margin-top: 20px; 
+    display: flex;
+    align-items: center; 
+    margin-left: auto;
+    margin-right: auto;
+    gap: 15px;
+  }
+
+  .profile-buttons button {
+    flex: 1 1 auto;
+    margin: 0 auto;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 767px) {
+    .profile-info {
+      text-align: center; 
+      padding-bottom: 0px;
+      flex: auto;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .profile-image {
+      width: 200px;
+      height: 200px;
+      border-radius: 30px;
+      object-fit: cover;
+      margin-left: 20px;
+      margin-bottom: 30px;
+    }
+  }
+
+  @media (max-width: 340px) {
+    .profile-image {
+      width: 150px;
+      height: 150px;
+      border-radius: 30px;
+      object-fit: cover;
+      margin-left: 20px;
+      margin-bottom: 30px;
+    }
+  }
 }
 </style>

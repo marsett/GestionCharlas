@@ -105,9 +105,31 @@ export default class PerfilService {
         }).then(response => response.data);
     }
 
+    // Este devuelve todos los cursos y sus alumnos
     getAlumnosCursoProfesor() {
         return new Promise((resolve, reject) => {
             const endpoint = "api/Profesor/AlumnosCursoProfesor";
+            const token = Cookies.get('bearer_token'); 
+
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token, 
+                },
+            })
+            .then(response => {
+                resolve(response.data); 
+            })
+            .catch(error => {
+                console.error("Error al obtener los alumnos de un profesor:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    // Solo el curso activo y sus alumnos
+    getAlumnosCursoActivoProfesor() {
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/Profesor/AlumnosCursoActivoProfesor";
             const token = Cookies.get('bearer_token'); 
 
             axios.get(Global.urlBase + endpoint, {

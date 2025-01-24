@@ -133,7 +133,9 @@ export default {
             this.isLoading = false;
 
             const role = data.role;
-            Cookies.set('user_role', role);
+            Cookies.set('user_role', role, { expires: fechaCaducidad });
+
+            Cookies.set('user_id', data.idrole, { expires: fechaCaducidad });
 
             if (role === "ADMINISTRADOR") {
             this.$router.push("/gestionusuarios");
