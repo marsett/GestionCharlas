@@ -64,14 +64,23 @@ body{
 }
 
 .swal2-cancel.swal2-styled.swal2-default-outline{
-  background-color: #6a8d92 !important;
+  background-color: #577478 !important;
 }
 
-.swal2-cancel.swal2-styled.swal2-default-outline{
+.swal2-cancel.swal2-styled{
   background-color: #577478 !important;
 }
 
 .spinner-border.text-success{
   color: #578e73 !important;
+}
+
+.spinner-border.text-primary{
+  color: #578e73 !important;
+}
+
+.swal2-loader {
+  border-top-color: #578e73;
+  border-bottom-color: #578e73;
 }
 </style>
