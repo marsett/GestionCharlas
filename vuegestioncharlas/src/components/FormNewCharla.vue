@@ -232,7 +232,67 @@ export default {
     }
 
     .modal-header{
-        background-color: #578e73;
+        background-color: #578e73 ;
         color: white;
     }
+
+    input:focus:not([type="range"]), 
+    textarea:focus, 
+    select:focus {
+        outline: none; 
+        border-color: #578e73; 
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); 
+    }
+
+    /* .form-range::-moz-range-thumb {
+        width: 1rem;
+        height: 1rem;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: #40685c;
+        border: 0;
+        border-radius: 1rem;
+        -moz-transition: background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        transition: background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    } */
+
+    .form-range::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Quitar el estilo predeterminado */
+        appearance: none;
+        width: 1rem;
+        height: 1rem;
+        background-color: #578e73;
+        border: 0;
+        border-radius: 1rem;
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); 
+        transition: background-color 0.15s ease-in-out, 
+                    border-color 0.15s ease-in-out, 
+                    box-shadow 0.15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .form-range:active::-webkit-slider-thumb {
+        box-shadow: 0 0 10px 3px rgba(40, 167, 69, 0.5); 
+    }
+
+    .form-range::-moz-range-thumb {
+        width: 1rem;
+        height: 1rem;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: #40685c; /* Color del "circulito" */
+        border: 0;
+        border-radius: 1rem;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.15s ease-in-out, 
+                    border-color 0.15s ease-in-out, 
+                    box-shadow 0.15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .form-range:active::-moz-range-thumb {
+        box-shadow: 0 0 10px 3px rgba(40, 167, 69, 0.5); /* Sombra verde intensa al mover */
+    }
+
+
 </style>

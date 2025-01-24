@@ -50,4 +50,28 @@ export default {
 body{
   background-color: #FDFAFA!important;
 }
+
+.swal2-confirm.swal2-styled {
+  background-color: #578e73 !important;
+}
+
+.swal2-confirm.swal2-styled.swal2-default-outline{
+  background-color: #578e73 !important;
+}
+
+.swal2-confirm.swal2-styled:hover {
+  background-color: #40685c !important;
+}
+
+.swal2-cancel.swal2-styled.swal2-default-outline{
+  background-color: #6a8d92 !important;
+}
+
+.swal2-cancel.swal2-styled.swal2-default-outline{
+  background-color: #577478 !important;
+}
+
+.spinner-border.text-success{
+  color: #578e73 !important;
+}
 </style>
