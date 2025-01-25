@@ -7,7 +7,7 @@
       >
         <button
           class="btn btn-secondary"
-          style="margin-left: auto; margin-bottom: auto"
+          style="margin-left: auto; margin-bottom: auto; background-color: #314B78;"
           @click="mostrarDetalles"
         >
           Detalles
@@ -29,10 +29,10 @@
           <p>{{ usuario.curso }}</p>
         </div>
         <div class="profile-buttons text-end">
-          <button class="btn btn-secondary">
+          <button class="btn btn-secondary no-hover">
             {{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}
           </button>
-          <button class="btn btn-secondary">
+          <button class="btn btn-secondary no-hover">
             {{ usuario.estadoUsuario ? "Activo" : "Inactivo" }}
           </button>
         </div>
@@ -40,7 +40,7 @@
       <hr />
 
       <div v-if="cargando" class="text-center mb-4">
-        <div class="spinner-border" role="status">
+        <div class="spinner-border" style="margin-top: 20px;" role="status">
           <span class="visually-hidden">Cargando cursos...</span>
         </div>
       </div>
@@ -61,7 +61,7 @@
             >
               <button
                 style="margin-left: auto"
-                class="btn"
+                class="btn no-hover"
                 :class="cursoData.curso.activo ? 'btn-success' : 'btn-danger'"
               >
                 {{ cursoData.curso.activo ? "Activo" : "Inactivo" }}
@@ -71,7 +71,7 @@
               <h5>{{ cursoData.curso.nombre }}</h5>
               <p>Alumnos: {{ cursoData.numeroAlumnos }}</p>
               <button
-                class="btn btn-primary mt-3"
+                class="btn mt-3" style="background-color: #314B78; color: white;"
                 @click="
                   verAlumnos(cursoData.curso.idCurso, cursoData.curso.activo)
                 "
@@ -313,27 +313,32 @@ export default {
 </script>
 
 <style scoped>
+.no-hover:active, .no-hover {
+  pointer-events: none;
+  border-radius: 16px;
+}
+
 .image-container {
   position: relative;
   display: inline-block;
 }
 .profile-image {
-  border: 4px solid #007bff;
+  border: 4px solid #314B78;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .edit-icon {
   height: 10%;
   position: relative;
-  top: 0px; /* Ajusta según el espacio deseado */
-  right: 15px; /* Ajusta según el espacio deseado */
-  font-size: 20px; /* Tamaño del ícono */
+  top: 0px; 
+  right: 15px; 
+  font-size: 20px; 
   color: white;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro translúcido */
+  background-color: rgba(0, 0, 0, 0.5); 
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
-  z-index: 10; /* Asegura que esté encima de la imagen */
+  z-index: 10; 
 }
 
 .edit-icon:hover {
@@ -357,7 +362,7 @@ export default {
 }
 
 .list-group-item strong {
-  color: #007bff;
+  color: #314B78;
 }
 
 @media (min-width: 768px) {
@@ -430,6 +435,7 @@ body {
   margin-top: 20px;
   margin-top: auto;
   padding-bottom: 0px;
+  
 }
 
 .profile-buttons button {
@@ -491,28 +497,28 @@ body {
   }
 
   .col-12 {
-    width: 80% !important; /* Asegura que las columnas ocupen todo el ancho */
+    width: 80% !important; 
   }
 
   .profile-content {
-    flex-wrap: wrap; /* Permite que los elementos se muevan a la siguiente línea */
+    flex-wrap: wrap; 
   }
 
   .profile-info {
-    flex: 1; /* Ocupa el espacio disponible al lado de la imagen */
-    text-align: left; /* Mantiene el texto alineado a la izquierda */
-    margin-bottom: 0; /* Evita márgenes innecesarios */
+    flex: 1; 
+    text-align: left; 
+    margin-bottom: 0; 
   }
 
   .profile-info h3 {
-    margin-bottom: 5px; /* Reduce espacio entre el nombre y apellidos */
+    margin-bottom: 5px;
   }
 
   .profile-buttons {
-    width: 75%; /* El bloque de botones ocupará todo el ancho */
-    margin-top: 20px; /* Añade espacio entre los botones y los otros elementos */
+    width: 75%; 
+    margin-top: 20px; 
     display: flex;
-    align-items: center; /* Centra los botones horizontalmente */
+    align-items: center; 
     margin-left: auto;
     margin-right: auto;
     gap: 15px;
@@ -526,7 +532,7 @@ body {
 
   @media (max-width: 767px) {
     .profile-info {
-      text-align: center; /* Centra los elementos en el eje horizontal */
+      text-align: center; 
       padding-bottom: 0px;
       flex: auto;
     }
