@@ -32,7 +32,7 @@
         </li>
       </ul>
 
-      <div class="profile-container dropdown">
+      <div class="profile-container justify-content-center">
         <!-- Botón desplegable -->
         <div
           class="d-flex align-items-center dropdown-toggle"
@@ -47,7 +47,7 @@
             <img :src="imagen" alt="profile" class="img-fluid rounded-circle" />
           </div>
           <!-- Nombre del usuario -->
-          <h2 class="profile-name ms-2">{{ nombre }}</h2>
+          <h2 class="profile-name ms-2">{{ nombre }} </h2>
         </div>
 
         <!-- Menú desplegable -->
@@ -175,7 +175,7 @@ export default {
 /* Contenedor principal del nav */
 .nav {
   position: relative;
-  padding: 50px;
+  padding: 20px;
   background-image: radial-gradient(circle, #a8d1ac, #7ca982);
   box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.5);
 }
@@ -290,6 +290,7 @@ export default {
   border-top-right-radius: 0;
 }
 
+
 /* Estado hover */
 .nav-link.hovered {
   background-color: rgba(82, 124, 88, 60%);
@@ -327,8 +328,8 @@ export default {
 
 /* Círculo para la imagen de perfil */
 .profile-circle {
-  width: 70px;
-  height: 70px;
+  width: 50px;
+  height: 50px;
   overflow: hidden;
   border: 2px solid #3d3d3d;
   border-radius: 50%;
@@ -355,5 +356,10 @@ export default {
   color: #3d3d3d;
   white-space: nowrap;
   margin-right: 10px;
+  min-width: 90px;
+  text-align: center;
+  overflow: hidden;/*Para ocularlo */
+  text-overflow: ellipsis;
+  max-width: calc(6ch + 1px);
 }
 </style>

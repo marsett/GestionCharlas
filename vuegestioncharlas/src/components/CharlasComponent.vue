@@ -4,41 +4,19 @@
       <!-- Filtros -->
       <div class="row row-cols-1 row-cols-md-2 mt-5">
         <div class="col">
-          <label for="filtroRonda" class="form-label fw-semibold h5"
-            >Filtrar por ronda:</label
-          >
-          <select
-            id="filtroRonda"
-            class="form-select"
-            v-model="filtroRonda"
-            @change="filtrarCharlas"
-          >
+          <label for="filtroRonda" class="form-label fw-semibold h5">Filtrar por ronda:</label>
+          <select id="filtroRonda" class="form-select" v-model="filtroRonda" @change="filtrarCharlas">
             <option value="0" selected>Todas las rondas</option>
-            <option
-              v-for="ronda in rondas"
-              :key="ronda.idRonda"
-              :value="ronda.idRonda"
-            >
+            <option v-for="ronda in rondas" :key="ronda.idRonda" :value="ronda.idRonda">
               {{ `Ronda ${ronda.idRonda} - ${ronda.descripcionModulo}` }}
             </option>
           </select>
         </div>
         <div class="col">
-          <label for="filtroEstado" class="form-label fw-semibold h5"
-            >Filtrar por estado:</label
-          >
-          <select
-            id="filtroEstado"
-            class="form-select"
-            v-model="filtroEstado"
-            @change="filtrarCharlas"
-          >
+          <label for="filtroEstado" class="form-label fw-semibold h5">Filtrar por estado:</label>
+          <select id="filtroEstado" class="form-select" v-model="filtroEstado" @change="filtrarCharlas">
             <option value="">Todos los Estados</option>
-            <option
-              v-for="estado in estadosDisponibles"
-              :key="estado"
-              :value="estado"
-            >
+            <option v-for="estado in estadosDisponibles" :key="estado" :value="estado">
               {{ estado }}
             </option>
           </select>
@@ -47,79 +25,35 @@
 
       <!-- Collapses de rondas -->
       <div class="accordion mt-4" id="accordionRondas">
-        <div
-          v-for="ronda in rondas"
-          :key="ronda.idRonda"
-          class="accordion-item"
-        >
+        <div v-for="ronda in rondas" :key="ronda.idRonda" class="accordion-item">
           <h2 class="accordion-header" :id="`heading-${ronda.idRonda}`">
-            <button
-              class="accordion-button"
-              type="button"
-              data-bs-toggle="collapse"
-              :data-bs-target="`#collapse-${ronda.idRonda}`"
-              aria-expanded="true"
-              :aria-controls="`collapse-${ronda.idRonda}`"
-            >
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" :data-bs-target="`#collapse-${ronda.idRonda}`" aria-expanded="true" :aria-controls="`collapse-${ronda.idRonda}`">
               {{ `Ronda ${ronda.idRonda} - ${ronda.descripcionModulo}` }}
             </button>
           </h2>
-          <div
-            :id="`collapse-${ronda.idRonda}`"
-            class="accordion-collapse collapse"
-            :class="{ show: filtroRonda == 0 || filtroRonda == ronda.idRonda }"
-            :aria-labelledby="`heading-${ronda.idRonda}`"
-            data-bs-parent="#accordionRondas"
-          >
+          <div :id="`collapse-${ronda.idRonda}`" class="accordion-collapse collapse" :class="{ show: filtroRonda == 0 || filtroRonda == ronda.idRonda }" :aria-labelledby="`heading-${ronda.idRonda}`" data-bs-parent="#accordionRondas">
             <div class="accordion-body">
               <div class="row g-3">
                 <!-- Cards de charlas dentro de cada ronda -->
-                <div
-                  class="col-md-4 mb-4"
-                  v-for="charla in charlasPorRonda(ronda.idRonda)"
-                  :key="charla.idCharla"
-                >
+                <div class="col-md-4 mb-4" v-for="charla in charlasPorRonda(ronda.idRonda)" :key="charla.idCharla">
                   <div class="card">
-                    <div
-                      v-if="charla.estadoCharla"
-                      :class="estadoClass(charla.estadoCharla)"
-                      class="estado-btn"
-                    >
+                    <div v-if="charla.estadoCharla" :class="estadoClass(charla.estadoCharla)" class="estado-btn">
                       {{ charla.estadoCharla }}
                     </div>
-                    <img
-                      class="card-img-top"
-                      :src="
-                        charla.imagenCharla ||
-                        require('../assets/banner_default.jpg')
-                      "
-                      @error="onImageError($event)"
-                      alt="Imagen de Charla"
-                    />
+                    <img class="card-img-top" :src="charla.imagenCharla || require('../assets/banner_default.jpg')" @error="onImageError($event)" alt="Imagen de Charla" />
                     <div class="card-body">
                       <h5 class="card-title">{{ charla.titulo }}</h5>
                       <p class="card-text">{{ charla.descripcion }}</p>
                     </div>
                     <div class="card-footer">
-                      <small class="text-body-secondary"
-                        ><button class="btn btn-primary" @click="mostrarDetalles(charla.idCharla)">Ver detalles</button></small
-                      >
-                    </div>
-                    <div v-if="charla.mostrarDetalles" class="card-footer">
-                      <p>
-                        <strong>Fecha Propuesta:</strong>
-                        {{ charla.fechaPropuesta }}
-                      </p>
-                      <p><strong>Usuario:</strong> {{ charla.usuario }}</p>
-                      <p><strong>Curso:</strong> {{ charla.nombreCurso }}</p>
+                      <small class="text-body-secondary">
+                        <button class="btn btn-primary" @click="abrirModal(charla)">Ver detalles</button>
+                      </small>
                     </div>
                   </div>
                 </div>
                 <!-- Mensaje si no hay charlas -->
-                <div
-                  v-if="charlasPorRonda(ronda.idRonda).length === 0"
-                  class="text-center text-muted"
-                >
+                <div v-if="charlasPorRonda(ronda.idRonda).length === 0" class="text-center text-muted">
                   No hay charlas disponibles para esta ronda.
                 </div>
               </div>
@@ -128,9 +62,31 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal para mostrar detalles -->
+    <div v-if="mostrarModal" class="modal fade show" tabindex="-1" role="dialog" style="display: block; background: rgba(0, 0, 0, 0.5);">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ charlaSeleccionada.titulo }}</h5>
+            <button type="button" class="btn-close" aria-label="Close" @click="cerrarModal"></button>
+          </div>
+          <div class="modal-body">
+            <img :src="charlaSeleccionada.imagenCharla || require('../assets/banner_default.jpg')" alt="Imagen de Charla" class="img-fluid mb-3" />
+            <p><strong>Descripción:</strong> {{ charlaSeleccionada.descripcion }}</p>
+            <p><strong>Fecha Propuesta:</strong> {{ charlaSeleccionada.fechaPropuesta }}</p>
+            <p><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
+            <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" @click="cerrarModal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-  
+
   <script>
 import CharlasService from "@/services/CharlasService";
 const serviceCharlas = new CharlasService();
@@ -146,9 +102,19 @@ export default {
       charlasFiltradas: [],
       estadosDisponibles: [],
       rolActual: "ALUMNO",
+      mostrarModal: false,
+      charlaSeleccionada: null
     };
   },
   methods: {
+    abrirModal(charla) {
+      this.charlaSeleccionada = charla;
+      this.mostrarModal = true;
+    },
+    cerrarModal() {
+      this.mostrarModal = false;
+      this.charlaSeleccionada = null;
+    },
     cargarRondas() {
       serviceCharlas
         .getRondas()
@@ -190,11 +156,9 @@ export default {
         (charla) => charla.idRonda === idRonda
       );
     },
+    //Para una página de detalles
     mostrarDetalles(idCharla) {
-      const charla = this.charlas.find((c) => c.idCharla === idCharla);
-      if (charla) {
-        charla.mostrarDetalles = !charla.mostrarDetalles;
-      }
+      this.$router.push({ name: 'DetallesCharla', params: { id: idCharla } });
     },
     estadoClass(estado) {
       switch (estado) {
