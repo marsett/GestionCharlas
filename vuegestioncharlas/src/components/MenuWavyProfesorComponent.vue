@@ -54,10 +54,20 @@
           class="dropdown-menu dropdown-menu-end"
           aria-labelledby="dropdownProfile"
         >
+          <li class="d-flex justify-content-center">
+            <hr
+              class="dropdown-divider"
+              style="
+                width: 175px;
+                border: 0.1px solid #3d3d3d;
+                margin-bottom: 15px;
+              "
+            />
+          </li>
           <!-- Si no es móvil, mostrar Mi Perfil -->
           <li v-if="!isMobile">
-            <a class="dropdown-item" href="/perfilprofesor">
-              <i class="fa-solid fa-user"></i> Mi Perfil
+            <a class="dropdown-item pill-link" href="/perfilprofesor">
+              <i class="fas fa-user"></i> Mi Perfil
             </a>
           </li>
           <!-- Si es móvil, incluir los ítems Home y Charlas en el desplegable -->
@@ -66,7 +76,7 @@
             :key="`dropdown-${index}`"
           >
             <a
-              class="dropdown-item"
+              class="dropdown-item pill-link"
               :href="item.link"
               @click="setActive(index)"
             >
@@ -74,7 +84,7 @@
             </a>
           </li>
           <li>
-            <a class="dropdown-item" href="#" @click.prevent="logout">
+            <a class="dropdown-item pill-link" href="#" @click.prevent="logout">
               <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </a>
           </li>
@@ -109,7 +119,7 @@ export default {
         {
           name: "Mi Perfil",
           link: "/perfilprofesor",
-          icon: "fa-solid fa-user",
+          icon: "fas fa-user",
         },
       ],
       isMobile: false, // Bandera para detectar dispositivos móviles
@@ -191,9 +201,47 @@ export default {
   font-family: "Montserrat", serif;
   font-weight: 600;
   font-size: 16px;
-  z-index: 1050; /* Establece un z-index alto para asegurar que se muestra sobre otros elementos */
   position: absolute;
+  text-align: center;
+  width: 100%;
+  /* Igualar el ancho del contenedor */
+  border: none;
+  /* Eliminar bordes predeterminados de Bootstrap */
+  padding: 0;
+  /* Eliminar espacio extra interno */
+  background-color: #749d78;
+  /* Mismo fondo que en hovered */
+  border: 2px solid #3d3d3d;
+  border-top: none;
 }
+
+.pill-link {
+  display: inline-block; /* Ajusta el ancho al contenido del texto */
+  text-align: center; /* Centra el texto dentro de la píldora */
+  border-radius: 20px; /* Forma de píldora */
+  padding: 10px 15px; /* Espaciado interno */
+  width: 95%; /* Para el ancho de las pildoritas */
+  background-color: #f8f9fa; /* Fondo similar a btn-light */
+  color: #212529; /* Color del texto */
+  text-decoration: none; /* Elimina el subrayado */
+  font-family: "Montserrat", serif; /* Fuente consistente */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Animación */
+  margin-bottom: 10px; /* Separación entre píldoras */
+}
+
+/* Hover y focus */
+.pill-link:hover,
+.pill-link:focus {
+  background-color: #e2e6ea; /* Fondo más oscuro al pasar el cursor */
+  color: #212529; /* Mantén el color del texto */
+}
+
+/* Estado activo */
+.pill-link:active {
+  background-color: #ced4da; /* Fondo más oscuro al hacer clic */
+  color: #212529;
+}
+
 /* Contenedor principal del nav */
 .nav {
   position: relative;
@@ -247,16 +295,12 @@ export default {
   font-weight: semibold;
   text-decoration: none;
 }
+
 .dropdown-toggle {
-  padding: 5px 20px 5px 20px;
+  padding: 5px 20px 5px 20px !important;
 }
 
-.dropdown-menu {
-  width: 100%; /* Igualar el ancho del contenedor */
-  border: none; /* Eliminar bordes predeterminados de Bootstrap */
-  padding: 0; /* Eliminar espacio extra interno */
-  background-color: #527c58; /* Mismo fondo que en hovered */
-}
+
 .dropdown-item {
   border: none; /* Sin bordes entre elementos */
   color: #3d3d3d; /* Color del texto */
@@ -264,18 +308,35 @@ export default {
   font-family: "Montserrat", serif;
   font-size: 16px;
 }
+
 .profile-container .dropdown-item:hover,
 .profile-container .dropdown-item:active {
   background-color: white; /* Fondo al hacer hover o clic */
   color: #3d3d3d; /* Texto blanco para mejor contraste */
   border-radius: 10px; /* Redondear bordes */
 }
-.profile-container .dropdown-toggle:hover,
-.profile-container .dropdown-toggle:active,
-.profile-container .dropdown-toggle[aria-expanded="true"] {
+
+.profile-container .dropdown-toggle:hover {
   background-color: rgba(82, 124, 88, 60%);
   color: #3d3d3d;
   border-radius: 10px; /* Redondear bordes */
+}
+
+.profile-container .dropdown-toggle:active,
+.profile-container .dropdown-toggle[aria-expanded="true"] {
+  background-color: #749d78;
+  /* Fondo del dropdown */
+  color: white;
+  /* Color del texto en el estado activo */
+  border-radius: 10px;
+  /* Redondear bordes */
+}
+
+.profile-container .dropdown-toggle[aria-expanded="true"] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border: 2px solid #3d3d3d;
+  border-bottom: none;
 }
 
 /* Estado hover */
@@ -291,6 +352,7 @@ export default {
   font-size: 20px;
   color: #3d3d3d;
 }
+
 .nav-link {
   font-family: "Montserrat", serif;
   font-optical-sizing: auto;
@@ -307,11 +369,16 @@ export default {
   display: flex;
   align-items: center; /* Alinea verticalmente imagen y texto */
   gap: 10px; /* Espaciado entre la imagen y el nombre */
-  z-index: 1060;
 }
 
-.profile-container .dropdown-toggle {
+.profile-container  {
   z-index: 1060; /* Añade z-index aquí para asegurar que el botón también esté encima */
+}
+
+/* Cuando el dropdown está abierto (menú desplegable) */
+.profile-container .dropdown-menu {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 /* Círculo para la imagen de perfil */
