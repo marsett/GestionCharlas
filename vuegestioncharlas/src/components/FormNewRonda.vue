@@ -20,7 +20,7 @@
                         <div class="row row-cols-1 row-cols-md-2 gy-4 text-black text-start">
                             <!-- Fecha de Presentación -->
                             <div class="col">
-                                <label for="fechaPresentacion" class="form-label mb-3">Fecha de Presentación: <span class="text-danger">*</span></label>
+                                <label for="fechaPresentacion" class="form-label mb-3">Fecha de presentación: <span class="text-danger">*</span></label>
                                 <input
                                 type="date"
                                 id="fechaPresentacion"
@@ -33,7 +33,7 @@
                             </div>
                             <!-- Fecha de Cierre -->
                             <div class="col">
-                                <label for="fechaCierre" class="form-label mb-3">Fecha de Cierre: <span class="text-danger">*</span></label>
+                                <label for="fechaCierre" class="form-label mb-3">Fecha de cierre: <span class="text-danger">*</span></label>
                                 <input
                                 type="date"
                                 id="fechaCierre"
@@ -46,7 +46,7 @@
                             </div>
                             <!-- Fecha Límite de Votación -->
                             <div class="col">
-                                <label for="fechaLimiteVotacion" class="form-label mb-3">Fecha Límite de Votación: <span class="text-danger">*</span></label>
+                                <label for="fechaLimiteVotacion" class="form-label mb-3">Fecha límite de votación: <span class="text-danger">*</span></label>
                                 <input
                                 type="date"
                                 id="fechaLimiteVotacion"
@@ -72,7 +72,7 @@
                             </div>
                             <!-- Descripción del Módulo -->
                             <div class="col-12 w-100">
-                                <label for="descripcionModulo" class="form-label mb-3">Descripción del Módulo: <span class="text-danger">*</span></label>
+                                <label for="descripcionModulo" class="form-label mb-3">Nombre del módulo: <span class="text-danger">*</span></label>
                                 <input
                                 type="text"
                                 id="descripcionModulo"
