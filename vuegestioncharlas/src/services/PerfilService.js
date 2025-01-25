@@ -99,7 +99,7 @@ export default class PerfilService {
                 });
         });
     }
-      getRondasProfesor() {
+    getRondasProfesor() {
         return axios.get(Global.urlBase + "api/Profesor/RondasProfesor", {
             headers: { Authorization: Cookies.get("bearer_token") },
         }).then(response => response.data);

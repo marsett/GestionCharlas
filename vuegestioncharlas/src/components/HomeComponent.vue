@@ -176,8 +176,86 @@
         </div>
       </div>
 
-
     <div class="container my-5" v-if="role == 1 && !cargando">
+      <h1 class="fw-bold">Bienvenido, {{ nombre }} !</h1>
+      <div class="row mt-lg-4 mt-2 pt-3">
+        <!-- Columna izquierda: Presentaciones -->
+        <div class="col-md-5">
+          <h2 class="mb-4 fw-semibold">Próximas charlas:</h2>
+          <div class="list-group">
+            <!-- <div class="list-group-item d-flex align-items-center" v-for="(evento, index) in presentacionesPendientes" 
+            :key="index">
+              <span 
+                class="badge rounded-circle me-3 p-3"
+                style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
+              >{{ new Date(evento.fechaPresentacion).getDate() }}</span>
+              <span>{{ evento.descripcionModulo }}</span>
+              <small class="text-muted ms-3">
+                {{ formatoMes(evento.fechaPresentacion) }}
+              </small>
+            </div> -->
+
+            <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
+            <div 
+              class="list-group-item d-flex align-items-center" 
+              v-for="(evento, index) in (mostrarTodos ? presentacionesPendientes : presentacionesPendientes.slice(0, 4))" 
+              :key="index"
+            >
+              <span 
+                class="badge rounded-circle me-3 p-3"
+                style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
+              >{{ new Date(evento.fechaPresentacion).getDate() }}</span>
+              <span>{{ evento.descripcionModulo }}</span>
+              <small class="text-muted ms-3">
+                {{ formatoMes(evento.fechaPresentacion) }}
+              </small>
+            </div>
+
+            <!-- Botón "Ver más" o "Ver menos" -->
+            <div v-if="presentacionesPendientes.length > 4" class="text-end mt-1">
+              <button 
+                class="btn btn-primary" 
+                @click="toggleMostrarTodos"
+              >
+                {{ mostrarTodos ? 'Ver menos' : 'Ver más' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna derecha: Formulario (simulado con un cuadrado de color) -->
+        <div class="col-md-7 ps-md-5 pt-3 d-flex justify-content-center align-items-center">
+          <div 
+            class="border rounded-4 p-4" 
+            style="width: 100%; height: 100%; max-height: 282px; background-color: #a0a0a0;">
+            
+            <!-- Contenedor interno -->
+            <div 
+              class="text-center text-muted h-100 d-flex flex-column justify-content-center align-items-center p-4" 
+              style="background-color: #e0e0e0; border-radius: 15px;">
+
+              <!-- Mensaje -->
+              <p class="mb-4 fw-semibold h5 px-5 mx-3">
+                ¡Crea una nueva ronda para que tus alumnos puedan proponer sus charlas!
+              </p>
+
+              <!-- Botón -->
+              <!-- <button class="btn btn-mover px-4 py-2" style="border-radius: 10px; font-size: 1rem;">
+                Crear nueva ronda
+              </button> -->
+              <FormNewRonda @evaluarRondas="actualizarContenido"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <br><br><br><br><br>
+      <br><br><br><br><br>
+      <br><br><br><br><br>
+
       <h2 class="text-center mb-4 fw-bold">{{ curso }}</h2>
 
       <!-- Fila de métricas clave -->
@@ -242,6 +320,7 @@ import FormNewCharla from './FormNewCharla.vue';
 
 import { Chart, CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend } from 'chart.js';
 import FormVotacion from './FormVotacion.vue';
+import FormNewRonda from './FormNewRonda.vue';
 
 // Registrar las escalas, elementos, y otros componentes
 Chart.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend);
@@ -255,6 +334,7 @@ export default {
     FullCalendar,
     FormNewCharla,
     FormVotacion,
+    FormNewRonda,
   },
   data() {
     return {
@@ -274,12 +354,15 @@ export default {
       puedeSubirCharla: false, 
       puedeVotar: false, 
       rondas: [],
+      rondasProfe: [],
+      presentacionesPendientes:[],
       totalCharlasPropuestas: 0,
       totalCharlasAceptadas: 0, 
       charlasPendientes: 0,
       usuariosSinCharla: 0, 
       progresoGeneral: 0, 
       cargando: false,
+      mostrarTodos: false,
     };
   },
   mounted() {
@@ -495,7 +578,7 @@ export default {
 
     evaluarAlumnos(){
       this.cargando = true;
-      servicePerf.getAlumnosCursoProfesor()
+      servicePerf.getAlumnosCursoActivoProfesor()
       .then(response => {
         this.curso = response[0].curso.nombre;
         const data = response[0].alumnos;
@@ -566,7 +649,32 @@ export default {
 
         this.cargando = false; 
 
-        this.mostrarDiagrama(barData, maxCharlas);
+        servicePerf.getRondasProfesor()
+        .then(rondas => {
+          // Obtenemos la fecha actual
+          const fechaActual = new Date();
+
+          // Filtramos las rondas con fecha de presentación futura
+          this.presentacionesPendientes = rondas
+          .filter(ronda => new Date(ronda.fechaPresentacion) > fechaActual) 
+          .map(({ idRonda, fechaPresentacion, descripcionModulo }) => ({
+            idRonda,
+            fechaPresentacion,
+            descripcionModulo
+          }))
+          .sort((a, b) => new Date(a.fechaPresentacion) - new Date(b.fechaPresentacion)); 
+
+          this.rondasProfe = rondas; // Si necesitas todas las rondas, mantenlas aquí también
+
+          barData
+          maxCharlas
+
+          // this.mostrarDiagrama(barData, maxCharlas);
+        })
+        .catch(error => {
+          console.error('Error al obtener las rondas de un profesor:', error);
+          this.cargando = false;
+        });
       })
       .catch(error => {
         console.error('Error al obtener los alumnos de un profesor:', error);
@@ -621,6 +729,11 @@ export default {
           }
       });
     },
+
+    toggleMostrarTodos() {
+      this.mostrarTodos = !this.mostrarTodos;
+    },
+
     watch: {
       'calendarOptions.events': {
         handler(newEvents) {
