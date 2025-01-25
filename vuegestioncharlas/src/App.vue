@@ -1,13 +1,13 @@
 <template>
   <MenuWavyComponent v-if="isLoggedIn && userRole === 'ALUMNO'" />
-  <MenuComponentProfesor v-if="isLoggedIn && userRole === 'PROFESOR'" />
+  <MenuWavyProfesorComponent v-if="isLoggedIn && userRole === 'PROFESOR'" />
   <MenuComponentAdmin v-if="isLoggedIn && userRole === 'ADMINISTRADOR'" />
   <router-view></router-view>
 </template>
 
 <script>
 import Cookies from "cookies-js";
-import MenuComponentProfesor from "./components/MenuComponentProfesor.vue";
+import MenuWavyProfesorComponent from "./components/MenuWavyProfesorComponent.vue";
 import MenuComponentAdmin from "./components/MenuComponentAdmin.vue";
 import MenuWavyComponent from "./components/MenuWavyComponent.vue";
 
@@ -15,7 +15,7 @@ export default {
   name: "App",
   components: {
     MenuWavyComponent,
-    MenuComponentProfesor,
+    MenuWavyProfesorComponent,
     MenuComponentAdmin,
 
   },
