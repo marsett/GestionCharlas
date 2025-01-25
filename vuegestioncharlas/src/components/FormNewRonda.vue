@@ -11,7 +11,7 @@
                 <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="votarModalLabel">Crear ronda</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="cierraFormRonda"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Formulario de voto -->
@@ -191,10 +191,6 @@ export default {
             serviceCharlas.setRonda(rondaFormateada)
             .then(response => {
                 console.log('Charlas cargadas:', response);
-                Swal.fire({
-                    icon: "success",
-                    title: "Ronda creada exitosamente!"
-                });
                 this.form = {
                     fechaPresentacion: '',
                     fechaCierre: '',
@@ -203,6 +199,8 @@ export default {
                     fechaLimiteVotacion: ''
                 };
                 this.isLoading = false;
+                document.getElementById('cierraFormRonda').click();
+                this.$emit('evaluarRondas');
             })
             .catch(error => {
                 this.isLoading = false;
@@ -214,11 +212,6 @@ export default {
                 console.error('Error al crear la ronda profesor:', error);
             });
         },
-
-        actualizarRondas() {
-            // Emite el evento 'evaluarRondas' con los datos necesarios
-            this.$emit('evaluarRondas');
-        }
     }
 }
 </script>

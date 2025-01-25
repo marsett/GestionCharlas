@@ -183,18 +183,6 @@
         <div class="col-md-5">
           <h2 class="mb-4 fw-semibold">Próximas charlas:</h2>
           <div class="list-group">
-            <!-- <div class="list-group-item d-flex align-items-center" v-for="(evento, index) in presentacionesPendientes" 
-            :key="index">
-              <span 
-                class="badge rounded-circle me-3 p-3"
-                style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
-              >{{ new Date(evento.fechaPresentacion).getDate() }}</span>
-              <span>{{ evento.descripcionModulo }}</span>
-              <small class="text-muted ms-3">
-                {{ formatoMes(evento.fechaPresentacion) }}
-              </small>
-            </div> -->
-
             <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
             <div 
               class="list-group-item d-flex align-items-center" 
@@ -248,6 +236,14 @@
           </div>
         </div>
       </div>
+
+      <!-- <hr class="my-5 py-3"/> -->
+
+      <h2 class="mt-5 pt-3 fw-semibold">Estadísticas:</h2>
+      <p class="mb-4 small"><b>Nota:</b> pulsa sobre los botones para generar los gráficos a tiempo real.</p>
+      <button class="btn btn-mover me-2">Rondas</button>
+      <button class="btn btn-mover me-2">Alumnos</button>
+      
 
 
 
@@ -573,7 +569,7 @@ export default {
 
 
     actualizarContenido() {
-      this.evaluarRondas();
+      this.evaluarAlumnos();
     },
 
     evaluarAlumnos(){

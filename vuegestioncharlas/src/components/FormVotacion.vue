@@ -44,8 +44,6 @@
                                     </template>
                                 </select>
                             </div>
-
-
                         </div>
 
                         <!-- Botón para votar -->
