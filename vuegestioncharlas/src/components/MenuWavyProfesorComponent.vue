@@ -175,10 +175,14 @@ export default {
     position: static;
   }
   .profile-container[data-v-6a70ff07] {
-    right: 0px;
+    right: 10px;
   }
   .logo_tajamar[data-v-6a70ff07] {
     width: 120px;
+  }
+  .profile-circle[data-v-6a70ff07] {
+    width: 60px;
+    height: 60px;
   }
 }
 
