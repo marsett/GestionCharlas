@@ -229,4 +229,26 @@ export default class CharlasService {
             });
         });
     }
+
+    getDetallesCharla(idCharla){
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/charlas/'+ idCharla;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los detalles de la charla: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
 }
