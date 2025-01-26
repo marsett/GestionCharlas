@@ -180,7 +180,7 @@
       <h1 class="fw-bold">Bienvenido, {{ nombre }} !</h1>
       <div class="row mt-lg-4 mt-2 pt-3">
         <!-- Columna izquierda: Presentaciones -->
-        <div class="col-md-5">
+        <div class="col-12 col-lg-5 mb-4 mb-lg-0">
           <h2 class="mb-4 fw-semibold">Próximas charlas:</h2>
           <div class="list-group">
             <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
@@ -212,7 +212,7 @@
         </div>
 
         <!-- Columna derecha: Formulario (simulado con un cuadrado de color) -->
-        <div class="col-md-7 ps-md-5 pt-3 d-flex justify-content-center align-items-center">
+        <div class="col-12 col-lg-7 ps-lg-5 pt-3 d-flex justify-content-center align-items-center">
           <div 
             class="border rounded-4 p-4" 
             style="width: 100%; height: 100%; max-height: 282px; background-color: #a0a0a0;">
@@ -223,7 +223,7 @@
               style="background-color: #e0e0e0; border-radius: 15px;">
 
               <!-- Mensaje -->
-              <p class="mb-4 fw-semibold h5 px-5 mx-3">
+              <p class="mb-4 fw-semibold h5 px-2 px-lg-5 mx-3">
                 ¡Crea una nueva ronda para que tus alumnos puedan proponer sus charlas!
               </p>
 
