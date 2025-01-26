@@ -1187,12 +1187,12 @@ export default {
     width: 100%;
     height: 460px; 
     overflow-x: auto; 
+    overflow-y: hidden;
   }
 
   .grafico-responsive {
     width: 100%;
     min-width: 550px; 
-    /* overflow-x: auto;  */
   }
 
   #chart {
