@@ -144,8 +144,8 @@
           </div>
           
           <div class="mb-4 ps-lg-2 col-12 col-lg-4">
-            <h2 class="mb-4 pt-0 espacio-150">Presentaciones</h2>
-            <div class="list-group">
+            <h2 class="mb-3 pb-2 pt-0 espacio-150">Presentaciones</h2>
+            <div class="list-group pt-1">
               <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
               <div 
                 class="list-group-item d-flex align-items-center" 
@@ -330,12 +330,6 @@ export default {
       rondas: [],
       rondasProfe: [],
       presentacionesPendientes:[],
-      cursoAlumnos: [],
-      totalCharlasPropuestas: 0,
-      totalCharlasAceptadas: 0, 
-      charlasPendientes: 0,
-      usuariosSinCharla: 0, 
-      progresoGeneral: 0, 
       cargando: false,
       loadChart: false,
       mostrarTodos: false,
@@ -1042,11 +1036,16 @@ export default {
   }
 
   ::v-deep(button.fc-today-button.fc-button.fc-button-primary) {
-    background-color: #6a8d92;
-    border-color: #6a8d92;
+    background-color: #40685c;
+    border-color: #40685c;
     color: white;
   }
 
+  ::v-deep(button.fc-today-button.fc-button.fc-button-primary:hover:not(:disabled)) {
+    background-color: #578e73;
+    border-color: #578e73;
+    color: white;
+  }
 
   ::v-deep(.fc-prev-button.fc-button.fc-button-primary){
     background-color: #40685c;
@@ -1145,7 +1144,7 @@ export default {
 
   @media (min-width: 992px) {
     .espacio-150 {
-      margin-top: 150px;
+      margin-top: 149px;
     }
   } 
 
