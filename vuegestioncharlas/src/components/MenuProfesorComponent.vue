@@ -98,7 +98,6 @@ export default {
       isMobile: window.innerWidth <= 991, // Detecta si es móvil inicialmente
       navItems: [
         { name: "Home", link: "/", icon: "fa-solid fa-house" },
-        { name: "Crear ronda", link: "/", icon: "fa-solid fa-calendar-plus" },
         { name: "Charlas", link: "/charlas", icon: "fa-solid fa-comments" },
       ], // Elementos del menú
     };
