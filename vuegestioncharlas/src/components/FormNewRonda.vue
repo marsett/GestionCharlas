@@ -6,12 +6,12 @@
         </button>
   
         <!-- Modal para crear ronda -->
-        <div class="modal fade" id="votarModal" tabindex="-1" aria-labelledby="votarModalLabel" aria-hidden="true">
+        <div class="modal fade" id="votarModal" tabindex="-1" aria-labelledby="votarModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="votarModalLabel">Crear ronda</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="cierraFormRonda"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="cierraFormRonda" @click="resetForm()"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Formulario de voto -->
@@ -211,6 +211,16 @@ export default {
                 });
                 console.error('Error al crear la ronda profesor:', error);
             });
+        },
+
+        resetForm() {
+            this.form = {
+                fechaPresentacion: '',
+                fechaCierre: '',
+                duracion: 0,
+                descripcionModulo: '',
+                fechaLimiteVotacion: ''
+            };
         },
     }
 }

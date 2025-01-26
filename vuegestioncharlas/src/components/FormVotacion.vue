@@ -6,12 +6,12 @@
         </button>
   
         <!-- Modal para votar charla -->
-        <div class="modal fade" id="votarModal" tabindex="-1" aria-labelledby="votarModalLabel" aria-hidden="true">
+        <div class="modal fade" id="votarModal" tabindex="-1" aria-labelledby="votarModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="votarModalLabel">Votar Charla</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" @click="clearForm()"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Formulario de voto -->
@@ -47,7 +47,6 @@
                         </div>
 
                         <!-- Botón para votar -->
-                        <button type="reset" class="btn btn-secondary mt-3 me-1" @click="clearForm()">Cancelar</button>
                         <button type="submit" class="btn btn-primary mt-3 ms-1" @click="submitVote()">Votar</button>
                     </form>
                 </div>
