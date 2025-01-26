@@ -297,6 +297,7 @@ export default {
   /* Mismo fondo que en hovered */
   border: 2px solid #3d3d3d;
   border-top: none;
+  border-radius: 10px;
 }
 
 .dropdown-item {
