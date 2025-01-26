@@ -875,7 +875,7 @@ export default {
     background: linear-gradient(
       to top,
       hsla(128, 21%, 57%, 0.5) 0%,   
-      #FDFAFA 68%    
+      #FDFAFA 60%    
     );
     border-radius: 18px;
     color: inherit;
