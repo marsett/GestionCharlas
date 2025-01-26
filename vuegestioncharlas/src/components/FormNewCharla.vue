@@ -61,9 +61,9 @@
                                 <input 
                                     type="range" 
                                     class="form-range" 
-                                    min="5" 
+                                    min="1" 
                                     :max="maxTiempo" 
-                                    step="5" 
+                                    step="1" 
                                     id="tiempo" 
                                     v-model="form.tiempo" 
                                     required 
@@ -293,6 +293,4 @@ export default {
     .form-range:active::-moz-range-thumb {
         box-shadow: 0 0 10px 3px rgba(40, 167, 69, 0.5); /* Sombra verde intensa al mover */
     }
-
-
 </style>
