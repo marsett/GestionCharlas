@@ -176,7 +176,7 @@
         </div>
       </div>
 
-    <div class="container my-5" v-if="role == 1 && !cargando">
+    <div class="container my-5 pb-4" v-if="role == 1 && !cargando">
       <h1 class="fw-bold">Bienvenido, {{ nombre }} !</h1>
       <div class="row mt-lg-4 mt-2 pt-3">
         <!-- Columna izquierda: Presentaciones -->
@@ -241,66 +241,41 @@
 
       <h2 class="mt-5 pt-3 fw-semibold">Estadísticas:</h2>
       <p class="mb-4 small"><b>Nota:</b> pulsa sobre los botones para generar los gráficos a tiempo real.</p>
-      <button class="btn btn-mover me-2">Rondas</button>
-      <button class="btn btn-mover me-2">Alumnos</button>
-      
 
-
-
-
-      <br><br><br><br><br>
-      <br><br><br><br><br>
-      <br><br><br><br><br>
-
-      <h2 class="text-center mb-4 fw-bold">{{ curso }}</h2>
-
-      <!-- Fila de métricas clave -->
-      <div class="row mt-5 mb-5">
-        <!-- Total de Charlas Propuestas -->
-        <div class="col-md-3 mb-3">
-          <div class="card bg-primary text-white">
-            <div class="card-body text-center">
-              <h5>Charlas propuestas</h5>
-              <h3>{{ totalCharlasPropuestas }}</h3>
-            </div>
-          </div>
-        </div>
-        <!-- Charlas Pendientes -->
-        <div class="col-md-3 mb-3">
-          <div class="card bg-warning text-dark">
-            <div class="card-body text-center">
-              <h5>Charlas pendientes</h5>
-              <h3>{{ charlasPendientes }}</h3>
-            </div>
-          </div>
-        </div>
-        <!-- Total de Charlas Aceptadas -->
-        <div class="col-md-3 mb-3">
-          <div class="card bg-success text-white">
-            <div class="card-body text-center">
-              <h5>Charlas aceptadas</h5>
-              <h3>{{ totalCharlasAceptadas }}</h3>
-            </div>
-          </div>
-        </div>
-        <!-- Usuarios Sin Subir Charla -->
-        <div class="col-md-3 mb-3">
-          <div class="card bg-danger text-white">
-            <div class="card-body text-center">
-              <h5>Alumnos sin charla</h5>
-              <h3>{{ usuariosSinCharla }}</h3>
-            </div>
-          </div>
-        </div>
+      <!-- Botones para mostrar gráficos -->
+      <div class="button-container mb-4">
+        <button class="btn btn-mover me-2" @click="mostrarGrafico('rondas')">Rondas</button>
+        <button class="btn btn-mover me-2" @click="mostrarGrafico('alumnos')">Alumnos</button>
+        <button 
+          v-if="graficoSeleccionado" 
+          class="btn btn-secondary" 
+          @click="limpiarGrafico()"
+        >
+          Limpiar
+        </button>
       </div>
-
-      <!-- Gráfico de barras -->
-      <div class="mt-5 mb-5" >
-        <canvas id="barChart"></canvas>
+      
+      <!-- Contenedor del gráfico -->
+      <div class="grafico-container">
+        <template v-if="graficoSeleccionado">
+          <div class="position-relative" style="width: 100%; height: 400px;">
+            <!-- Spinner que se superpone al gráfico -->
+            <div v-if="loadChart" class="d-flex justify-content-center align-items-center position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+            
+            <!-- Aquí se mostraría el gráfico -->
+            <canvas id="chart" style="width: 100%; height: 400px;"></canvas>
+          </div>
+        </template>
+        <p v-else class="text-muted mensaje-vacio">
+          Selecciona una opción para ver el gráfico
+        </p>
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -314,12 +289,12 @@ import CharlasService from '@/services/CharlasService';
 import FormNewCharla from './FormNewCharla.vue';
 
 
-import { Chart, CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend } from 'chart.js';
+import { Chart, CategoryScale, LinearScale, DoughnutController, ArcElement, LineController, LineElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
 import FormVotacion from './FormVotacion.vue';
 import FormNewRonda from './FormNewRonda.vue';
 
 // Registrar las escalas, elementos, y otros componentes
-Chart.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend);
+Chart.register(CategoryScale, LinearScale, LineController, LineElement, DoughnutController, ArcElement, Title, Tooltip, Legend, PointElement);
 
 const servicePerf = new PerfilService();
 const serviceChar = new CharlasService();
@@ -352,13 +327,17 @@ export default {
       rondas: [],
       rondasProfe: [],
       presentacionesPendientes:[],
+      cursoAlumnos: [],
       totalCharlasPropuestas: 0,
       totalCharlasAceptadas: 0, 
       charlasPendientes: 0,
       usuariosSinCharla: 0, 
       progresoGeneral: 0, 
       cargando: false,
+      loadChart: false,
       mostrarTodos: false,
+      graficoSeleccionado: null,
+      chartInstance: null,
     };
   },
   mounted() {
@@ -390,8 +369,6 @@ export default {
         month: 'long',
         year: 'numeric'
       });
-
-      // console.log('Eventos:', this.calendarOptions.events);  // Verifica los eventos disponibles
 
       // Filtrar eventos que coinciden con la fecha seleccionada
       let eventList = "";
@@ -473,8 +450,6 @@ export default {
               const fechaPresentacion = new Date(ronda.fechaPresentacion + 'Z');
 
               const fechaCierreDia = new Date(fechaCierre.getFullYear(), fechaCierre.getMonth(), fechaCierre.getDate());
-              // const fechaLimiteVotacionDia = new Date(fechaLimiteVotacion.getFullYear(), fechaLimiteVotacion.getMonth(), fechaLimiteVotacion.getDate());
-              // const fechaPresentacionDia = new Date(fechaPresentacion.getFullYear(), fechaPresentacion.getMonth(), fechaPresentacion.getDate());
 
               // Comprobar si la ronda está abierta para solicitar charlas
               if (ahora < fechaCierreDia) {
@@ -567,167 +542,292 @@ export default {
       return new Date(fecha).toLocaleDateString('es-ES', opciones).replace(/^./, letra => letra.toUpperCase());
     },
 
-
     actualizarContenido() {
       this.evaluarAlumnos();
     },
 
     evaluarAlumnos(){
       this.cargando = true;
-      servicePerf.getAlumnosCursoActivoProfesor()
-      .then(response => {
-        this.curso = response[0].curso.nombre;
-        const data = response[0].alumnos;
+      servicePerf.getRondasProfesor()
+      .then(rondas => {
+        // Obtenemos la fecha actual
+        const fechaActual = new Date();
 
-        // Verifica si hay alumnos
-        if (!data || data.length === 0) {
-          console.error('No hay alumnos en la respuesta');
-          return;
-        }
+        // Filtramos las rondas con fecha de presentación futura
+        this.presentacionesPendientes = rondas
+        .filter(ronda => new Date(ronda.fechaPresentacion) > fechaActual) 
+        .map(({ idRonda, fechaPresentacion, descripcionModulo }) => ({
+          idRonda,
+          fechaPresentacion,
+          descripcionModulo
+        }))
+        .sort((a, b) => new Date(a.fechaPresentacion) - new Date(b.fechaPresentacion)); 
 
-        // Filtrar solo alumnos y extraer los datos relevantes
-        const alumnos = data
-                        .filter(entry => entry.alumno.role === "ALUMNO" && entry.alumno.estadoUsuario == true)
-                        .map(entry => ({
-                          nombre: entry.alumno.usuario,
-                          charlasPropuestas: entry.charlasPropuestas || 0,
-                          charlasAceptadas: entry.charlasAceptadas || 0,
-                        }));
-
-        // Extraemos la información de los alumnos
-        const labels = alumnos.map(alumno => alumno.nombre);
-        const propuestas = alumnos.map(alumno => alumno.charlasPropuestas);
-        const aceptadas = alumnos.map(alumno => alumno.charlasAceptadas);
-
-        // Encontrar el valor máximo entre charlas propuestas y aceptadas.
-        const maxCharlasPropuestas = Math.max(...propuestas);
-        const maxCharlasAceptadas = Math.max(...aceptadas);
-
-        // El valor máximo para la escala Y será el máximo entre ambos más 1.
-        const maxCharlas = Math.max(maxCharlasPropuestas, maxCharlasAceptadas) + 1;
-
-        // Configurar los datos para el gráfico
-        const barData = {
-          labels: labels, // Las etiquetas del gráfico
-          datasets: [
-            {
-              label: 'Charlas Propuestas',
-              data: propuestas, // Los datos para las charlas propuestas
-              backgroundColor: 'rgba(102, 179, 255, 0.2)', // Color de fondo para las barras
-              borderColor: 'rgba(102, 179, 255, 1)', // Color del borde
-              borderWidth: 1, // Ancho del borde
-            },
-            {
-              label: 'Charlas Aceptadas',
-              data: aceptadas, // Los datos para las charlas aceptadas
-              backgroundColor: 'rgba(113, 214, 125, 0.2)', 
-              borderColor: 'rgba(113, 214, 125, 1)', 
-              borderWidth: 1, 
-            }
-          ]
-        };
-
-        // Total de charlas propuestas y aceptadas
-        const totalCharlasPropuestas = propuestas.reduce((sum, propuestas) => sum + propuestas, 0);
-        const totalCharlasAceptadas = aceptadas.reduce((sum, aceptadas) => sum + aceptadas, 0);
-
-        // Charlas pendientes (propuestas - aceptadas)
-        const charlasPendientes = totalCharlasPropuestas - totalCharlasAceptadas;
-
-        // Usuarios que no han subido su charla
-        const usuariosSinCharla = alumnos.filter(alumno => alumno.charlasPropuestas === 0 && alumno.charlasAceptadas === 0).length;
-
-        // Asignamos los valores calculados a las variables de data()
-        this.totalCharlasPropuestas = totalCharlasPropuestas;
-        this.totalCharlasAceptadas = totalCharlasAceptadas;
-        this.charlasPendientes = charlasPendientes;
-        this.usuariosSinCharla = usuariosSinCharla;
-
-        this.cargando = false; 
-
-        servicePerf.getRondasProfesor()
-        .then(rondas => {
-          // Obtenemos la fecha actual
-          const fechaActual = new Date();
-
-          // Filtramos las rondas con fecha de presentación futura
-          this.presentacionesPendientes = rondas
-          .filter(ronda => new Date(ronda.fechaPresentacion) > fechaActual) 
-          .map(({ idRonda, fechaPresentacion, descripcionModulo }) => ({
-            idRonda,
-            fechaPresentacion,
-            descripcionModulo
-          }))
-          .sort((a, b) => new Date(a.fechaPresentacion) - new Date(b.fechaPresentacion)); 
-
-          this.rondasProfe = rondas; // Si necesitas todas las rondas, mantenlas aquí también
-
-          barData
-          maxCharlas
-
-          // this.mostrarDiagrama(barData, maxCharlas);
-        })
-        .catch(error => {
-          console.error('Error al obtener las rondas de un profesor:', error);
-          this.cargando = false;
-        });
+        this.rondasProfe = rondas;
+        this.cargando = false;
       })
       .catch(error => {
-        console.error('Error al obtener los alumnos de un profesor:', error);
+        console.error('Error al obtener las rondas de un profesor:', error);
         this.cargando = false;
-      });
-    },
-
-    mostrarDiagrama(barData, maxCharlas){
-      // Espera a que el DOM se actualice antes de intentar obtener el canvas
-      this.$nextTick(() => {
-        const ctx = document.getElementById('barChart').getContext('2d');
-          if (ctx) {
-            const diagrama  = new Chart(ctx, {
-                type: 'bar', // Tipo de gráfico
-                data: barData, // Datos del gráfico
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false, // Para que el gráfico se adapte al tamaño del contenedor
-                  plugins: {
-                    legend: {
-                        position: 'top', // Posición de la leyenda
-                    },
-                    tooltip: {
-                        enabled: true, // Habilitar tooltips
-                    }
-                  },
-                  scales: {
-                    x: {
-                      beginAtZero: true, // Asegurarse de que el eje X comience en cero
-                      tickRotation: 45, // Rotar las etiquetas para que se vean bien
-                      ticks: {
-                        maxRotation: 90,
-                        minRotation: 45
-                      },
-                      categoryPercentage: 0.8, // Controla el ancho de las barras en relación con el espacio disponible
-                      barPercentage: 0.9, // Ajusta el porcentaje de la barra
-                    },
-                    y: {
-                      beginAtZero: true, // Asegurarse de que el eje Y comience en cero
-                      max: maxCharlas,
-                      ticks: {
-                        stepSize: 1 // Ajusta el tamaño de cada paso en el eje Y
-                      }
-                    }
-                  }
-                }
-            });
-
-            diagrama;
-          } else {
-            console.error("Error: No se pudo obtener el contexto del gráfico");
-          }
       });
     },
 
     toggleMostrarTodos() {
       this.mostrarTodos = !this.mostrarTodos;
+    },
+
+    mostrarGrafico(tipo) {
+      this.graficoSeleccionado = tipo;
+
+      // Generar el gráfico correspondiente (placeholder para el código real)
+      if (tipo === "rondas") {
+        this.generarGraficoDoughnut();
+      } else if (tipo === "alumnos") {
+        this.generarGraficoLineal();
+      }
+    },
+
+    generarGraficoLineal() {
+      this.limpiarCanvas();
+      this.loadChart = true;
+
+      servicePerf.getAlumnosCursoActivoProfesor()
+        .then(response => {
+          const data = response[0]?.alumnos || [];
+
+          // Verifica si hay alumnos
+          if (!data || data.length === 0) {
+            console.error('No hay alumnos en la respuesta');
+            this.cargando = false;
+            return;
+          }
+
+          // Filtrar solo alumnos válidos y extraer los datos relevantes
+          const alumnos = data.filter(entry => entry.alumno.role === "ALUMNO" && entry.alumno.estadoUsuario === true)
+                              .map(entry => ({
+                                id: entry.alumno.idUsuario,
+                                nombre: entry.alumno.usuario,
+                                charlasPropuestas: entry.charlasPropuestas || 0,
+                                charlasAceptadas: entry.charlasAceptadas || 0,
+                              }));
+
+          // Preparar los datos para el gráfico de líneas
+          const labels = alumnos.map(alumno => alumno.nombre);
+          const propuestas = alumnos.map(alumno => alumno.charlasPropuestas);
+          const aceptadas = alumnos.map(alumno => alumno.charlasAceptadas);
+
+          // Encontrar el valor máximo entre charlas propuestas y aceptadas.
+          const maxCharlasPropuestas = Math.max(...propuestas);
+          const maxCharlasAceptadas = Math.max(...aceptadas);
+
+          // El valor máximo para la escala Y será el máximo entre ambos más 1.
+          const maxCharlas = Math.max(maxCharlasPropuestas, maxCharlasAceptadas) + 1;
+
+          // Configurar los datos para el gráfico de líneas
+          const lineData = {
+            labels: labels, 
+            datasets: [
+              {
+                label: 'Charlas Propuestas',
+                data: propuestas, 
+                fill: false, 
+                borderColor: 'rgba(255, 99, 132, 1)', 
+                tension: 0.1,
+              },
+              {
+                label: 'Charlas Aceptadas',
+                data: aceptadas, 
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)', 
+                tension: 0.1,
+              }
+            ]
+          };
+
+          // Mostrar el gráfico de tipo lineal en un canvas
+          this.$nextTick(() => {
+            const ctx = document.getElementById('chart').getContext('2d');
+            if (ctx) {
+              this.chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: lineData,
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    y: {
+                      beginAtZero: true, 
+                      max: maxCharlas, 
+                    }
+                  },
+                  plugins: {
+                    legend: {
+                      position: 'top', 
+                    },
+                    tooltip: {
+                      enabled: true,
+                    },
+                  },
+                },
+              });
+            } else {
+              console.error("Error: No se pudo obtener el contexto del gráfico lineal.");
+              this.loadChart = false;
+            }
+          });
+
+          this.loadChart = false; 
+        })
+        .catch(error => {
+          console.error('Error al obtener los alumnos de un profesor:', error);
+          this.loadChart = false;
+        });
+    },
+
+    generarGraficoDoughnut() {
+      this.limpiarCanvas();
+      this.loadChart = true;
+
+      servicePerf.getAlumnosCursoActivoProfesor()
+        .then(response => {
+          const data = response[0]?.alumnos || [];
+
+          // Verifica si hay alumnos
+          if (!data || data.length === 0) {
+            console.error('No hay alumnos en la respuesta');
+            this.cargando = false;
+            return;
+          }
+
+          // Filtrar solo alumnos válidos y extraer los datos relevantes
+          const alumnos = data.filter(entry => entry.alumno.role === "ALUMNO" && entry.alumno.estadoUsuario === true)
+                              .map(entry => ({
+                                id: entry.alumno.idUsuario,
+                                nombre: entry.alumno.usuario,
+                                charlas: entry.charlas || [], // Lista de charlas del alumno
+                              }));
+
+          // Crear un mapa para contar el número de charlas por ronda
+          const charlasPorRonda = {};
+
+          this.rondasProfe.forEach(ronda => {
+            const { idRonda, descripcionModulo } = ronda;
+
+            // Inicializa el contador de charlas para cada ronda
+            if (!charlasPorRonda[idRonda]) {
+              charlasPorRonda[idRonda] = {
+                descripcion: descripcionModulo,
+                count: 0,
+              };
+            }
+
+            // Sumar las charlas asociadas a esta ronda
+            alumnos.forEach(alumno => {
+              const charlasRonda = alumno.charlas.filter(charla => charla.idRonda === idRonda);
+              charlasPorRonda[idRonda].count += charlasRonda.length;
+            });
+          });
+
+          // Preparar los datos para el gráfico de doughnut
+          const labels = Object.values(charlasPorRonda).map(r => r.descripcion || `Ronda ${r.idRonda}`);
+          const dataDoughnut = Object.values(charlasPorRonda).map(r => r.count);
+
+          const doughnutData = {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Número de Charlas',
+                data: dataDoughnut,
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.5)',  // 1
+                  'rgba(54, 162, 235, 0.5)',  // 2
+                  'rgba(255, 206, 86, 0.5)',  // 3
+                  'rgba(75, 192, 192, 0.5)',  // 4
+                  'rgba(153, 102, 255, 0.5)',  // 5
+                  'rgba(255, 159, 64, 0.5)',  // 6
+                  'rgba(255, 99, 71, 0.5)',   // 7
+                  'rgba(0, 255, 127, 0.5)',   // 8
+                  'rgba(255, 165, 0, 0.5)',   // 9
+                  'rgba(238, 130, 238, 0.5)', // 10
+                  'rgba(255, 20, 147, 0.5)',  // 11
+                  'rgba(0, 0, 255, 0.5)',     // 12
+                  'rgba(255, 0, 255, 0.5)',   // 13
+                  'rgba(34, 193, 195, 0.5)',  // 14
+                  'rgba(253, 187, 45, 0.5)'   // 15
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',  // 1
+                  'rgba(54, 162, 235, 1)',  // 2
+                  'rgba(255, 206, 86, 1)',  // 3
+                  'rgba(75, 192, 192, 1)',  // 4
+                  'rgba(153, 102, 255, 1)',  // 5
+                  'rgba(255, 159, 64, 1)',  // 6
+                  'rgba(255, 99, 71, 1)',   // 7
+                  'rgba(0, 255, 127, 1)',   // 8
+                  'rgba(255, 165, 0, 1)',   // 9
+                  'rgba(238, 130, 238, 1)', // 10
+                  'rgba(255, 20, 147, 1)',  // 11
+                  'rgba(0, 0, 255, 1)',     // 12
+                  'rgba(255, 0, 255, 1)',   // 13
+                  'rgba(34, 193, 195, 1)',  // 14
+                  'rgba(253, 187, 45, 1)'   // 15
+                ],
+                borderWidth: 1,
+              },
+            ],
+          };
+
+          // Mostrar el gráfico de tipo doughnut en un canvas
+          this.$nextTick(() => {
+            const ctx = document.getElementById('chart').getContext('2d');
+            if (ctx) {
+              this.chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: doughnutData,
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: 'top', // Posición de la leyenda
+                    },
+                    tooltip: {
+                      enabled: true, // Habilitar tooltips
+                    },
+                  },
+                },
+              });
+            } else {
+              console.error("Error: No se pudo obtener el contexto del gráfico doughnut.");
+              this.loadChart = false;
+            }
+          });
+
+          this.loadChart = false;
+        })
+        .catch(error => {
+          console.error('Error al obtener los alumnos de un profesor:', error);
+          this.loadChart = false;
+        });
+    },
+
+    limpiarCanvas() {
+      // Verifica si ya existe una instancia del gráfico
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+
+      // Obtén el canvas por su ID
+      const canvas = document.getElementById('chart');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      } 
+    },
+
+    limpiarGrafico() {
+      this.graficoSeleccionado = null;
+      this.limpiarCanvas();
     },
 
     watch: {
@@ -1019,6 +1119,26 @@ export default {
       margin-top: 150px;
     }
   } 
+
+  /* Contenedor gris para el gráfico */
+  .grafico-container {
+    background-color: #f4f4f4; /* Fondo gris */
+    border: 2px solid #e0e0e0; /* Borde claro */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 20px; /* Espaciado interno */
+    min-height: 300px; /* Altura mínima */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Estilo del mensaje vacío */
+  .mensaje-vacio {
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-align: center;
+    color: #6c757d;
+  }
 
   ::v-deep(){
     

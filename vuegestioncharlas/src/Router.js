@@ -11,6 +11,7 @@ import CharlasAlumnoComponent from './components/CharlasAlumnoComponent.vue';
 import AdminGestionUsuariosComponent from "@/components/AdminGestionUsuariosComponent";
 import NotFoundComponent from "./components/NotFoundComponent.vue";
 import AlumnosCursoProfesorComponent from "@/components/AlumnosCursoProfesorComponent";
+import CharlasDetalleComponent from "@/components/CharlasDetalleComponent";
 
 const routes = [
     {
@@ -76,6 +77,19 @@ const routes = [
     {
         path: '/charlas',
         component: CharlasComponent,
+        beforeEnter: (to, from, next) => {
+            const token = Cookies.get('bearer_token');
+            if (token) {
+                next();
+            } else {
+                next('/login');
+            }
+        }
+    },
+    {
+        path: '/detallescharla/:id',
+        name: 'DetallesCharla',
+        component: CharlasDetalleComponent,
         beforeEnter: (to, from, next) => {
             const token = Cookies.get('bearer_token');
             if (token) {
