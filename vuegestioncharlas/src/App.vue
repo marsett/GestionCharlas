@@ -1,23 +1,22 @@
 <template>
-  <MenuWavyComponent v-if="isLoggedIn && userRole === 'ALUMNO'" />
-  <MenuWavyProfesorComponent v-if="isLoggedIn && userRole === 'PROFESOR'" />
-  <MenuComponentAdmin v-if="isLoggedIn && userRole === 'ADMINISTRADOR'" />
+  <MenuAlumnoComponent v-if="isLoggedIn && userRole === 'ALUMNO'" />
+  <MenuProfesorComponent v-if="isLoggedIn && userRole === 'PROFESOR'" />
+  <MenuAdminComponent v-if="isLoggedIn && userRole === 'ADMINISTRADOR'" />
   <router-view></router-view>
 </template>
 
 <script>
 import Cookies from "cookies-js";
-import MenuWavyProfesorComponent from "./components/MenuWavyProfesorComponent.vue";
-import MenuComponentAdmin from "./components/MenuComponentAdmin.vue";
-import MenuWavyComponent from "./components/MenuWavyComponent.vue";
+import MenuProfesorComponent from "./components/MenuProfesorComponent.vue";
+import MenuAdminComponent from "./components/MenuAdminComponent.vue";
+import MenuAlumnoComponent from "./components/MenuAlumnoComponent.vue";
 
 export default {
   name: "App",
   components: {
-    MenuWavyComponent,
-    MenuWavyProfesorComponent,
-    MenuComponentAdmin,
-
+    MenuAlumnoComponent,
+    MenuProfesorComponent,
+    MenuAdminComponent,
   },
   data() {
     return {

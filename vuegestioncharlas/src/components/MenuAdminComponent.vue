@@ -14,7 +14,7 @@
       <ul class="nav nav-custom justify-content-center m-0">
         <li
           class="nav-item"
-          v-for="(item, index) in navItems"
+          v-for="(item, index) in filteredNavItems"
           :key="index"
           :class="{ active: activeIndex === index || isActiveRoute(item) }"
         >
@@ -62,7 +62,14 @@
             />
           </li>
 
-          <li><a class="dropdown-item pill-link" href="/perfilalumno"><i class="fas fa-user"></i> Mi Perfil</a></li>
+          <!-- Ítems móviles -->
+  <li v-for="(item, index) in dropdownNavItems" :key="'mobile-' + index">
+    <a class="dropdown-item pill-link" :href="item.link">
+      <i :class="item.icon"></i> {{ item.name }}
+    </a>
+  </li>
+
+          <!-- <li><a class="dropdown-item pill-link" href="/perfilalumno"><i class="fas fa-user"></i> Mi Perfil</a></li> -->
 
           <li>
             <a class="dropdown-item pill-link" href="#" @click.prevent="logout">
@@ -81,28 +88,40 @@ import Cookies from "cookies-js";
 import Swal from "sweetalert2";
 const servicePerf = new PerfilService();
 export default {
+  name: "MenuAdminComponent",
   data() {
     return {
       nombre: "",
-      activeIndex: null, // Indice del enlace activo
-      hoveredIndex: null, // Indice del enlace con hover
+      imagen: "",
+      activeIndex: null, // Índice del enlace activo
+      hoveredIndex: null, // Índice del enlace con hover
+      isMobile: window.innerWidth <= 991, // Detecta si es móvil inicialmente
       navItems: [
-        { name: "Home", link: "/", icon: "fa-solid fa-house" },
-        { name: "Charlas", link: "/charlas", icon: "fa-solid fa-comments" },
-      ], // Elementos del menú con enlaces
+        { name: "Gestión usuarios", link: "/gestionusuarios", icon: "fa-solid fa-user-group" },
+      ], // Elementos del menú
     };
+  },
+  computed: {
+    filteredNavItems() {
+    // Muestra los elementos solo si no es móvil
+    return this.isMobile ? [] : this.navItems;
+  },
+  dropdownNavItems() {
+    // Muestra los elementos solo si es móvil
+    return this.isMobile ? this.navItems : [];
+  },
   },
   methods: {
     setActive(index) {
-      this.activeIndex = index; // Establecer el índice activo
+      this.activeIndex = index; // Define el índice activo
     },
     isActiveRoute(item) {
-      return this.$route.path === item.link; // Verifica si la ruta actual es la del enlace
+      return this.$route.path === item.link; // Verifica si la ruta actual coincide con el enlace
     },
     logout() {
       Swal.fire({
         title: "¿Quieres cerrar la sesión?",
-        text: "Una vez cerrada, para volver a acceder al contenido, necesitarás iniciar sesión de nuevo.",
+        text: "Una vez cerrada, necesitarás iniciar sesión de nuevo.",
         icon: "question",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -116,6 +135,9 @@ export default {
         }
       });
     },
+    updateIsMobile() {
+      this.isMobile = window.innerWidth <= 991; // Actualiza el estado
+    },
   },
   mounted() {
     servicePerf
@@ -123,16 +145,43 @@ export default {
       .then((response) => {
         this.nombre = response.usuario.nombre;
         this.imagen = response.usuario.imagen;
-        this.role = response.usuario.idRole;
       })
       .catch((error) => {
         console.error("Error al obtener los datos de usuario:", error);
       });
+    window.addEventListener("resize", this.updateIsMobile); // Detecta cambios de tamaño
+  },
+  beforeUnmount() {
+    window.removeEventListener("resize", this.updateIsMobile); // Limpia los eventos
   },
 };
+
 </script>
 
 <style scoped>
+@media (max-width: 350px) {
+  .logo-container[data-v-0449755d] {
+    left: 0px;
+  }
+  .profile-container[data-v-0449755d] {
+    right: 0px;
+  }
+}
+@media (max-width: 475px) {
+  .logo_tajamar {
+    content: url('../assets/icono.png'); /* Cambia la imagen aquí */
+  }
+}
+@media (max-width: 991px) {
+  .nav-custom {
+    display: none !important; /* Oculta los links centrados */
+  }
+
+  .profile-container .dropdown-menu {
+    text-align: center;
+  }
+}
+
 .dropdown-menu {
   min-width: 150px;
   font-family: "Montserrat", serif;
@@ -324,6 +373,7 @@ export default {
   /* Alinea verticalmente imagen y texto */
   gap: 10px;
   /* Espaciado entre la imagen y el nombre */
+  z-index: 1060;
 }
 
 /* Círculo para la imagen de perfil */
