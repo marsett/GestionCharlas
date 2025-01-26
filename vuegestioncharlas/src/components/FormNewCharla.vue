@@ -11,7 +11,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Registrar charla</h1>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" @click="clearForm()"></button>
                 </div>
                 <div class="modal-body text-start">
                     <!-- Formulario -->
@@ -77,7 +77,6 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="clearForm()" id="cancelarFormNew">Cancelar</button>
                     <button type="submit" class="btn btn-primary" form="formCharla" @click.prevent="submitCharla">Subir</button>
                 </div>
             </div>

@@ -100,7 +100,7 @@
       <hr class="my-4 py-2">
 
       <div class="row mt-3 mb-4 pt-0">
-        <div class="mb-4 col-lg-8">
+        <div class="mb-3 mb-md-4 col-lg-8">
           <h1 class="mb-4 mt-2 pt-0 fw-semibold">Calendario</h1>
             <!-- Guía de colores -->
             <div>
@@ -143,35 +143,57 @@
             </div>
           </div>
           
-          <div class="mb-4 ps-lg-3 col-12 col-lg-4">
+          <div class="mb-4 ps-lg-2 col-12 col-lg-4">
             <h2 class="mb-4 pt-0 espacio-150">Presentaciones</h2>
-            <ul class="list-group mt-4">
-              <!-- Iterar sobre las fechas de eventos tipo "purple" -->
+            <!-- <ul class="list-group mt-4">
               <li 
                 class="list-group-item"
                 v-for="(evento, index) in eventosPresentaciones" 
                 :key="index"
               >
-                <!-- Contenedor alineado horizontalmente -->
                 <div class="d-flex align-items-center flex-nowrap w-100">
-                  <!-- Badge para el día -->
                   <span 
                     class="badge rounded-circle me-3" 
                     style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
                   >
                     {{ new Date(evento.date).getDate() }}
                   </span>
-                  <!-- Título del evento -->
                   <span class="flex-grow-1 text-truncate">
                     {{ evento.title }}
                   </span>
-                  <!-- Fecha del mes -->
                   <small class="text-muted ms-3">
                     {{ formatoMes(evento.date) }}
                   </small>
                 </div>
               </li>
-            </ul>
+            </ul> -->
+            <div class="list-group">
+              <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
+              <div 
+                class="list-group-item d-flex align-items-center" 
+                v-for="(evento, index) in (mostrarTodos ? eventosPresentaciones : eventosPresentaciones.slice(0, 5))" 
+                :key="index"
+              >
+                <span 
+                  class="badge rounded-circle me-3 p-3"
+                  style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
+                >{{ new Date(evento.date).getDate() }}</span>
+                <span>{{ evento.title }}</span>
+                <small class="text-muted ms-3">
+                  {{ formatoMes(evento.date) }}
+                </small>
+              </div>
+
+              <!-- Botón "Ver más" o "Ver menos" -->
+              <div v-if="eventosPresentaciones.length > 5" class="text-end mt-1">
+                <button 
+                  class="btn btn-primary" 
+                  @click="toggleMostrarTodos"
+                >
+                  {{ mostrarTodos ? 'Ver menos' : 'Ver más' }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -239,15 +261,15 @@
 
       <!-- <hr class="my-5 py-3"/> -->
 
-      <h2 class="mt-5 pt-3 fw-semibold">Estadísticas:</h2>
-      <p class="mb-4 small"><b>Nota:</b> pulsa sobre los botones para generar los gráficos a tiempo real.</p>
+      <h2 class="mt-5 pt-3 mb-3 fw-semibold">Estadísticas:</h2>
+      <!-- <p class="mb-4 small"><b>Nota:</b> pulsa sobre los botones para generar los gráficos a tiempo real.</p> -->
 
       <!-- Botones para mostrar gráficos -->
-      <div class="button-container mb-4">
+      <div class="button-container mb-3">
         <button class="btn btn-mover me-2" @click="mostrarGrafico('rondas')">Rondas</button>
         <button class="btn btn-mover me-2" @click="mostrarGrafico('alumnos')">Alumnos</button>
         <button 
-          v-if="graficoSeleccionado" 
+          v-if="graficoSeleccionado && !loadChart" 
           class="btn btn-secondary" 
           @click="limpiarGrafico()"
         >
@@ -258,7 +280,7 @@
       <!-- Contenedor del gráfico -->
       <div class="grafico-container">
         <template v-if="graficoSeleccionado">
-          <div class="position-relative" style="width: 100%; height: 400px;">
+          <div class="position-relative" style="width: 100%; height: 460px;">
             <!-- Spinner que se superpone al gráfico -->
             <div v-if="loadChart" class="d-flex justify-content-center align-items-center position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
               <div class="spinner-border text-primary" role="status">
@@ -267,7 +289,7 @@
             </div>
             
             <!-- Aquí se mostraría el gráfico -->
-            <canvas id="chart" style="width: 100%; height: 400px;"></canvas>
+            <canvas id="chart" style="width: 100%; height: 460px;"></canvas>
           </div>
         </template>
         <p v-else class="text-muted mensaje-vacio">
@@ -661,6 +683,19 @@ export default {
                     }
                   },
                   plugins: {
+                    title: {
+                      display: true,
+                      text: 'Alumnos', 
+                      font: {
+                        size: 20, 
+                        weight: 'bold', 
+                        family: 'Arial', 
+                      },
+                      padding: {
+                        top: 10,
+                        bottom: 20,
+                      }
+                    },
                     legend: {
                       position: 'top', 
                     },
@@ -788,6 +823,19 @@ export default {
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: {
+                    title: {
+                      display: true,
+                      text: 'Rondas', 
+                      font: {
+                        size: 20, 
+                        weight: 'bold', 
+                        family: 'Arial', 
+                      },
+                      padding: {
+                        top: 10,
+                        bottom: 20,
+                      }
+                    },
                     legend: {
                       position: 'top', // Posición de la leyenda
                     },
@@ -1139,33 +1187,4 @@ export default {
     text-align: center;
     color: #6c757d;
   }
-
-  ::v-deep(){
-    
-  }
-  ::v-deep(){
-    
-  }
-  ::v-deep(){
-    
-  }
-  ::v-deep(){
-    
-  }
-  ::v-deep(){
-    
-  }
-  ::v-deep(){
-    
-  }
-  ::v-deep(){
-    
-  }
-  ::v-deep(){
-    
-  }
-  ::v-deep(){
-    
-  }
-
 </style>
