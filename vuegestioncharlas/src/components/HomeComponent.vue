@@ -145,28 +145,6 @@
           
           <div class="mb-4 ps-lg-2 col-12 col-lg-4">
             <h2 class="mb-4 pt-0 espacio-150">Presentaciones</h2>
-            <!-- <ul class="list-group mt-4">
-              <li 
-                class="list-group-item"
-                v-for="(evento, index) in eventosPresentaciones" 
-                :key="index"
-              >
-                <div class="d-flex align-items-center flex-nowrap w-100">
-                  <span 
-                    class="badge rounded-circle me-3" 
-                    style=" color: white; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;"
-                  >
-                    {{ new Date(evento.date).getDate() }}
-                  </span>
-                  <span class="flex-grow-1 text-truncate">
-                    {{ evento.title }}
-                  </span>
-                  <small class="text-muted ms-3">
-                    {{ formatoMes(evento.date) }}
-                  </small>
-                </div>
-              </li>
-            </ul> -->
             <div class="list-group">
               <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
               <div 
@@ -202,7 +180,7 @@
       <h1 class="fw-bold">Bienvenido, {{ nombre }} !</h1>
       <div class="row mt-lg-4 mt-2 pt-3">
         <!-- Columna izquierda: Presentaciones -->
-        <div class="col-12 col-lg-5 mb-4 mb-lg-0">
+        <div class="col-12 col-lg-6 mb-4 mb-lg-0 pe-lg-4">
           <h2 class="mb-4 fw-semibold">Próximas charlas:</h2>
           <div class="list-group">
             <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
@@ -234,7 +212,7 @@
         </div>
 
         <!-- Columna derecha: Formulario (simulado con un cuadrado de color) -->
-        <div class="col-12 col-lg-7 ps-lg-5 pt-3 d-flex justify-content-center align-items-center">
+        <div class="col-12 col-lg-6 ps-lg-4 pt-3 d-flex justify-content-center align-items-center">
           <div 
             class="border rounded-4 p-4" 
             style="width: 100%; height: 100%; max-height: 282px; background-color: #a0a0a0;">
@@ -280,17 +258,20 @@
       <!-- Contenedor del gráfico -->
       <div class="grafico-container">
         <template v-if="graficoSeleccionado">
-          <div class="position-relative" style="width: 100%; height: 460px;">
-            <!-- Spinner que se superpone al gráfico -->
-            <div v-if="loadChart" class="d-flex justify-content-center align-items-center position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-              </div>
-            </div>
+          <div class="grafico-wrapper">
             
-            <!-- Aquí se mostraría el gráfico -->
-            <canvas id="chart" style="width: 100%; height: 460px;"></canvas>
+          <!-- Spinner que se superpone al gráfico -->
+          <div v-if="loadChart" class="spinner-container">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
           </div>
+          
+          <!-- Contenedor para gráfico -->
+          <div class="grafico-responsive">
+            <canvas id="chart"></canvas>
+          </div>
+        </div>
         </template>
         <p v-else class="text-muted mensaje-vacio">
           Selecciona una opción para ver el gráfico
@@ -1168,7 +1149,26 @@ export default {
     }
   } 
 
-  /* Contenedor gris para el gráfico */
+  .mensaje-vacio {
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-align: center;
+    color: #6c757d;
+  }
+
+  .spinner-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100; /* Asegura que el spinner quede encima del gráfico */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
   .grafico-container {
     background-color: #f4f4f4; /* Fondo gris */
     border: 2px solid #e0e0e0; /* Borde claro */
@@ -1178,13 +1178,43 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
   }
 
-  /* Estilo del mensaje vacío */
-  .mensaje-vacio {
-    font-size: 1.2rem;
-    font-weight: 500;
-    text-align: center;
-    color: #6c757d;
+  .grafico-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 460px; 
+    overflow-x: auto; 
+  }
+
+  .grafico-responsive {
+    width: 100%;
+    min-width: 550px; 
+    /* overflow-x: auto;  */
+  }
+
+  #chart {
+    width: 100% !important;
+    height: 460px; 
+  }
+
+  @media (max-width: 768px) {
+    #chart {
+      height: auto; 
+      min-height: 460px;
+    }
+
+    .grafico-responsive, .grafico-wrapper {
+      height: auto; 
+      min-height: 200px; 
+    }
+
+    .spinner-container {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
 </style>
