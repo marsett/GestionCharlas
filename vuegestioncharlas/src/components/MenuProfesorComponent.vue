@@ -18,17 +18,17 @@
           :key="index"
           :class="{ active: activeIndex === index || isActiveRoute(item) }"
         >
-          <a
+          <router-link
             class="nav-link"
             :class="{ hovered: hoveredIndex === index || isActiveRoute(item) }"
             @mouseenter="hoveredIndex = index"
             @mouseleave="hoveredIndex = null"
             @click="setActive(index)"
-            :href="item.link"
+            :to="item.link"
           >
             <i :class="item.icon"></i>
             {{ item.name }}
-          </a>
+          </router-link>
         </li>
       </ul>
 
