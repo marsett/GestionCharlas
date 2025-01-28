@@ -182,7 +182,7 @@
               </p>
             </div>
 
-            <!-- Sección de Comentarios -->
+            <!-- Sección de Comentarios // Sofi -->
             <div v-if="mostrarComentarios" class="custom-background">
               <p><strong>Cuadro de texto comentario:</strong></p>
               <ul>
