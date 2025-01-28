@@ -212,10 +212,10 @@
         </div>
 
         <!-- Columna derecha: Formulario (simulado con un cuadrado de color) -->
-        <div class="col-12 col-lg-6 ps-lg-4 pt-3 d-flex justify-content-center align-items-center">
+        <div class="col-12 col-lg-6 ps-lg-4 pt-0 pb-1 d-flex justify-content-center align-items-center">
           <div 
             class="border rounded-4 p-4" 
-            style="width: 100%; height: 100%; max-height: 282px; background-color: #a0a0a0;">
+            style="width: 100%; height: 100%; max-height: 285px; background-color: #a0a0a0;">
             
             <!-- Contenedor interno -->
             <div 
@@ -223,8 +223,8 @@
               style="background-color: #e0e0e0; border-radius: 15px;">
 
               <!-- Mensaje -->
-              <p class="mb-4 fw-semibold h5 px-2 px-lg-5 mx-3">
-                ¡Crea una nueva ronda para que tus alumnos puedan proponer sus charlas!
+              <p class="mb-2 fw-semibold h5 px-2 px-lg-5 mx-3">
+                Crea una ronda para que puedan proponer sus charlas, o actualiza los estados de las ya propuestas.
               </p>
 
               <!-- Botón -->
@@ -232,6 +232,7 @@
                 Crear nueva ronda
               </button> -->
               <FormNewRonda @evaluarRondas="actualizarContenido"/>
+              <UpdateEstadoCharlas/>
             </div>
           </div>
         </div>
@@ -295,6 +296,7 @@ import FormNewCharla from './FormNewCharla.vue';
 import { Chart, CategoryScale, LinearScale, DoughnutController, ArcElement, LineController, LineElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
 import FormVotacion from './FormVotacion.vue';
 import FormNewRonda from './FormNewRonda.vue';
+import UpdateEstadoCharlas from './UpdateEstadoCharlas.vue';
 
 // Registrar las escalas, elementos, y otros componentes
 Chart.register(CategoryScale, LinearScale, LineController, LineElement, DoughnutController, ArcElement, Title, Tooltip, Legend, PointElement);
@@ -309,6 +311,7 @@ export default {
     FormNewCharla,
     FormVotacion,
     FormNewRonda,
+    UpdateEstadoCharlas
   },
   data() {
     return {
