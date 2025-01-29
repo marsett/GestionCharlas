@@ -10,6 +10,7 @@
           style="
             margin-left: auto;
             margin-bottom: auto;
+            margin-top: 0px;
             background-color: #314b78;
           "
           @click="mostrarDetalles"
