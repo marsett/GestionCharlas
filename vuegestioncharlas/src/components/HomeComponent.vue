@@ -451,6 +451,8 @@ export default {
           // Obtener los votos del alumno
           serviceChar.getVotosAlumno()
           .then(votosAlumno => {
+            let lanzarMensaje = false;
+            let rondasPromises = []; // Array para almacenar las promesas de las rondas
             
             this.rondas.forEach(ronda => {
               const fechaCierre = new Date(ronda.fechaCierre + 'Z'); // Agregar "Z" al final para interpretar como UTC
@@ -517,27 +519,37 @@ export default {
 
               // Verificar si la fecha actual está entre fechaLimiteVotacion y fechaPresentacion
               if (ahora >= fechaLimiteVotacion && ahora <= fechaPresentacion) {
-                serviceChar.getCharlasRonda(ronda.idRonda)
-                .then(charlasRonda => {
-                  // Filtrar las charlas aceptadas (idEstadoCharla == 2)
-                  const charlasAceptadas = charlasRonda.filter(charla => charla.idEstadoCharla === 2);
-                  if (charlasAceptadas.length > 0) {
-                    Swal.fire({
-                      title: `Ronda: ${ronda.descripcionModulo}`,
-                      text: 'Las charlas de esta ronda ya han sido aceptadas. Revisa si estás entre los seleccionados.',
-                      icon: 'info',
-                      confirmButtonText: 'Ir a charlas',
-                      cancelButtonText: 'Okay',
-                      showCancelButton: true, 
-                      preConfirm: () => {
-                        this.$router.push('/charlas'); 
-                      },
-                      reverseButtons: false  
-                    });
-                  }
-                })
-                .catch(error => {
-                  console.error('Error al obtener las charlas de la ronda:', error);
+                // Agregar la promesa a un array para esperar que todas se resuelvan
+                rondasPromises.push(
+                  serviceChar.getCharlasRonda(ronda.idRonda)
+                    .then(charlasRonda => {
+                      // Filtrar las charlas aceptadas (idEstadoCharla == 2)
+                      const charlasAceptadas = charlasRonda.filter(charla => charla.idEstadoCharla === 2);
+                      if (charlasAceptadas.length > 0) {
+                        lanzarMensaje = true;
+                      }
+                    })
+                    .catch(error => {
+                      console.error('Error al obtener las charlas de la ronda:', error);
+                    })
+                );
+              }
+            });
+
+            // Esperamos a que todas las promesas se resuelvan antes de proceder
+            Promise.all(rondasPromises).then(() => {
+              if (lanzarMensaje && this.$route.path === "/") {
+                Swal.fire({
+                  title: `Charlas aceptadas`,
+                  text: 'Las charlas de esta ronda ya han sido aceptadas. Revisa si estás entre los seleccionados.',
+                  icon: 'info',
+                  confirmButtonText: 'Ir a charlas',
+                  cancelButtonText: 'Okay',
+                  showCancelButton: true, 
+                  preConfirm: () => {
+                    this.$router.push('/charlas');
+                  },
+                  reverseButtons: false  
                 });
               }
             });
