@@ -15,8 +15,7 @@
       <div class="row row-cols-1 row-cols-md-2 mb-3 mt-4 pt-4">
         <!-- Card para ronda abierta -->
         <div class="col mb-3">
-          <div class="custom-card" :class="{'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
-
+          <div class="custom-card active-card">
             <!-- Sección superior con forma de pestaña -->
             <div class="card-header">
               <div class="tab-header" :class="{'active-tab': isRondaAbierta, 'inactive-tab': !isRondaAbierta}">
@@ -52,7 +51,7 @@
 
         <!-- Card para votación activa (activa o no activa) -->
         <div class="col mb-3">
-          <div class="custom-card border-0" :class="{'card': true, 'inactive-card': !isVotacionActiva, 'active-card': isVotacionActiva}">
+          <div class="custom-card border-0 active-card">
             
             <!-- Sección superior con forma de pestaña -->
             <div class="card-header border-0">
@@ -919,15 +918,9 @@ export default {
 
 <style scoped>
   .container{
-    /* background-color: #FDFAFA!important; */
     padding:55px 20px 0px 20px;
     margin-top: 0px !important;
     margin-bottom: 30px !important;
-    /* background: linear-gradient(
-      to top,
-      hsla(128, 21%, 57%, 0.5) 0%,   
-      #FDFAFA 60%    
-    ); */
     border-radius: 18px;
     color: inherit;
   }
