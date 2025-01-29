@@ -46,16 +46,16 @@ export default {
                 }
 
                 // Paso 2: Obtener los alumnos que no han tenido charlas aceptadas
-                const alumnos = await this.servicePerf.getAlumnosCursoActivoProfesor();
+                const alumnos = await this.servicePerf.getAlumnosActivoProfesor();
 
                 // Filtramos a los alumnos que no tienen charlas aceptadas
-                const alumnosSinCharlasAceptadas = alumnos[0].alumnos.filter(alumno => alumno.charlasAceptadas === 0)
-                                                                    .map(alumno => ({
-                                                                        idUsuario: alumno.alumno.idUsuario,
-                                                                        nombre: alumno.alumno.usuario,
-                                                                        email: alumno.alumno.email,
-                                                                        charlasTotales: alumno.charlasTotales
-                                                                    }));
+                const alumnosSinCharlasAceptadas = alumnos.filter(alumno => alumno.charlasAceptadas === 0)
+                                                            .map(alumno => ({
+                                                                idUsuario: alumno.alumno.idUsuario,
+                                                                nombre: alumno.alumno.usuario,
+                                                                email: alumno.alumno.email,
+                                                                charlasTotales: alumno.charlasTotales
+                                                            }));
 
                 // Paso 3: Procesar cada ronda activa
                 for (const ronda of rondasActivas) {
