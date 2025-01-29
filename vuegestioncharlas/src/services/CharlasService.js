@@ -285,4 +285,89 @@ export default class CharlasService {
             });
         });
     }
+
+    getCharlasComentarios(idCharla) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/charlas/${idCharla}`;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener las charlas: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    deleteComentario(idComentario) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/comentarios/${idComentario}`;
+            const token = Cookies.get('bearer_token');
+            
+            axios.delete(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, 
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al eliminar el comentario: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    setComentario(form) {
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/comentarios';
+            const token = Cookies.get('bearer_token');
+            
+            // Crear un nuevo objeto para el comentario con la fecha y hora actual en formato español
+            const fechaActual = new Date();
+            // Esto dará una fecha como "23/01/2025 12:30:00"
+    
+            const json = JSON.stringify({
+                idComentario: 0,  // Aquí el id se asignará automáticamente en la base de datos
+                idCharla: form.idCharla,
+                idUsuario: form.idUsuario,
+                contenido: form.contenido,
+                fecha: fechaActual,  // Fecha formateada en formato español con hora
+            });
+            console.log(json)
+        
+            // Realizar la solicitud POST para crear el comentario
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data); // Respuesta con el comentario creado
+            })
+            .catch(error => {
+                console.error("Error al crear el comentario:", error.response ? error.response.data : error);
+                reject(error); // Si hubo un error, lo rechazamos
+            });
+        });
+    }
 }
