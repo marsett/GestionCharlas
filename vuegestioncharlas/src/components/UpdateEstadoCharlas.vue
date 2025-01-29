@@ -123,7 +123,7 @@ export default {
                 }
 
                 Swal.fire({
-                    position: "top-end",
+                    position: "center",
                     icon: "success",
                     title: "Estados actualizados",
                     showConfirmButton: false,
