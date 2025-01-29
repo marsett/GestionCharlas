@@ -183,23 +183,35 @@
             </div>
 
             <!-- Sección de Comentarios // Sofi -->
-            <div v-if="mostrarComentarios" class="custom-background">
-              <p><strong>Cuadro de texto comentario:</strong></p>
-              <ul>
-                <li
-                  v-for="(comentario, index) in charlaSeleccionada.comentarios"
-                  :key="index"
-                >
-                  {{ comentario }}
-                </li>
-              </ul>
-              <p>Comentarios:</p>
+            <div v-if="mostrarComentarios">
+    <div v-if="comentarios.length > 0" class="custom-background">
+
+      <!-- Contenedor con scroll si hay más de dos comentarios -->
+      <ul class="comment-list">
+        <li v-for="comentario in comentarios" :key="comentario.idComentario" class="comment-item">
+          <div class="comment-header">
+            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="avatar" class="avatar" />
+            <div>
+              <p class="username">{{ comentario.usuario }}</p>
+              <p class="timestamp">{{ comentario.fecha }}</p>
             </div>
           </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" @click="cerrarModal">
-              Cerrar
-            </button>
+          <p class="comment-text">{{ comentario.contenido }}</p>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Si no hay comentarios -->
+    <div v-else>
+      <p class="no-comments">No hay comentarios aún.</p>
+    </div>
+
+    <!-- Formulario para agregar un nuevo comentario -->
+    <div class="comment-form">
+      <textarea v-model="newComment" class="form-control" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
+      <button class="btn custom-button mt-2" @click="addComment">Agregar comentario</button>
+    </div>
+</div>
           </div>
         </div>
       </div>
@@ -209,7 +221,10 @@
 
 <script>
 import CharlasService from "@/services/CharlasService";
+import Swal from "sweetalert2";
 const serviceCharlas = new CharlasService();
+import moment from 'moment';
+import 'moment/locale/es';
 
 export default {
   name: "CharlasComponent",
@@ -217,6 +232,8 @@ export default {
     return {
       charlas: [],
       rondas: [],
+      comentarios: [],
+      newComment: "",
       filtroRonda: 0,
       filtroEstado: "",
       charlasFiltradas: [],
@@ -232,6 +249,7 @@ export default {
     abrirModal(charla) {
       this.charlaSeleccionada = charla;
       this.mostrarModal = true;
+      this.cargarComentarios(charla.idCharla);
     },
     cerrarModal() {
       this.mostrarModal = false;
@@ -299,6 +317,70 @@ export default {
     onImageError(event) {
       event.target.src = require("../assets/banner_default.jpg");
     },
+    //Para la carga y creacion de comentarios
+    cargarComentarios(idCharla) {
+  serviceCharlas
+    .getCharlasComentarios(idCharla)
+    .then((response) => {
+      // Formatear las fechas de los comentarios al cargar
+      this.comentarios = response.comentarios.map(comentario => {
+        comentario.fecha = moment(comentario.fecha).locale('es').format('DD/MM/YYYY HH:mm');
+        return comentario;
+      });
+    })
+    .catch((error) => {
+      console.error("Error al cargar los comentarios:", error);
+      Swal.fire("Error", "No se pudieron cargar los comentarios.", "error");
+    });
+},
+
+    // Método para agregar un nuevo comentario
+    addComment() {
+  // Si el comentario está vacío, no hacer nada
+  if (!this.newComment.trim()) {
+    return;
+  }
+
+  // Crear la fecha en formato español usando Moment.js
+  const fechaActual = moment().locale('es').format('DD/MM/YYYY HH:mm'); // Formato: 23/01/2025 12:30
+
+  const comentario = {
+    idCharla: this.charlaSeleccionada.idCharla, // Usamos el id de la charla seleccionada
+    idUsuario: 13, // Suponiendo que el ID de usuario es fijo para este ejemplo
+    contenido: this.newComment, // Contenido del comentario
+    fecha: fechaActual, // Fecha formateada en el formato deseado
+  };
+
+  this.isLoading = true; // Establecer el estado de carga mientras se crea el comentario
+
+  serviceCharlas
+    .setComentario(comentario)
+    .then((response) => {
+      console.log("Comentario creado:", response);
+      Swal.fire({
+        icon: "success",
+        title: "Comentario agregado exitosamente!",
+      });
+
+      // Limpiar el campo de texto
+      this.newComment = "";
+
+      // Recargar los comentarios de la charla
+      this.cargarComentarios(this.charlaSeleccionada.idCharla);
+
+      this.isLoading = false;
+    })
+    .catch((error) => {
+      this.isLoading = false;
+      Swal.fire({
+        icon: "error",
+        title: "Error al agregar comentario",
+        text: "No se pudo agregar el comentario. Revisa los datos enviados.",
+      });
+      console.error("Error al agregar el comentario:", error);
+    });
+},
+
   },
   mounted() {
     this.cargarRondas();
@@ -410,14 +492,117 @@ export default {
   font-family: "Montserrat", serif; /* Fuente consistente */
   font-weight: 600; /* Peso del texto */
 }
-
+/* Estilo para la sección de comentarios */
 .custom-background {
-  background-color: #E6E6E6;
-  padding: 15px;
+  background-color: #f8f9fa; /* Fondo suave, similar a las tarjetas */
+  padding: 20px;
   border-radius: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil para destacar */
+  margin-top: 20px;
 }
 
 .custom-descripcion {
   font-size: 16px;
+  color: #333;
+  line-height: 1.6;
 }
+.comment-list {
+  max-height: 200px; /* Ajusta la altura según sea necesario */
+  overflow-y: auto; /* Activar scroll vertical */
+  padding-right: 10px; /* Espacio a la derecha para evitar que el scroll se superponga */
+}
+
+.comment-item {
+  background-color: #f8f9fa;
+  padding: 15px;
+  margin-bottom: 15px;
+  list-style-type: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.comment-item:hover {
+  transform: translateY(-5px);
+}
+
+.no-comments {
+  font-size: 16px;
+  color: #888;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 15px;
+  border: 2px solid #888; /* Espacio entre la imagen y el texto */
+}
+
+.username {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333; /* Color más oscuro para el nombre */
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.comment-text {
+  font-size: 14px;
+  color: #555;
+  margin-top: 10px;
+}
+
+.no-comments {
+  font-size: 16px;
+  color: #888;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Estilo para el formulario de agregar comentario */
+.comment-form {
+  margin-top: 20px;
+}
+
+.comment-form textarea {
+  width: 100%;
+  resize: none;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  color: #333;
+  background-color: #f1f1f1;
+  margin-bottom: 10px;
+}
+
+.comment-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #527c58; /* Fondo del botón acorde con los otros botones */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.comment-form button:hover {
+  background-color: #406b45; /* Fondo más oscuro al hacer hover */
+}
+
 </style>
