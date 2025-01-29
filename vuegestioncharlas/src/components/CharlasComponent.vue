@@ -13,7 +13,7 @@
             v-model="filtroRonda"
             @change="filtrarCharlas"
           >
-            <option value="0" selected>Todas las rondas</option>
+            <option value='0' selected>Todas las rondas</option>
             <option
               v-for="ronda in rondas"
               :key="ronda.idRonda"
@@ -46,7 +46,7 @@
       </div>
 
       <!-- Collapses de rondas -->
-      <div class="accordion mt-4" id="accordionRondas">
+      <div class="accordion mt-4 accordion-flush" id="accordionRondas">
         <div
           v-for="ronda in rondas"
           :key="ronda.idRonda"
@@ -58,7 +58,7 @@
               type="button"
               data-bs-toggle="collapse"
               :data-bs-target="`#collapse-${ronda.idRonda}`"
-              aria-expanded="true"
+              :aria-expanded="false"
               :aria-controls="`collapse-${ronda.idRonda}`"
             >
               {{ `Ronda ${ronda.idRonda} - ${ronda.descripcionModulo}` }}
@@ -67,7 +67,7 @@
           <div
             :id="`collapse-${ronda.idRonda}`"
             class="accordion-collapse collapse"
-            :class="{ show: filtroRonda == 0 || filtroRonda == ronda.idRonda }"
+            :class="{ show: esRondaActiva(ronda) || filtroRonda == 0 || filtroRonda == ronda.idRonda}"
             :aria-labelledby="`heading-${ronda.idRonda}`"
             data-bs-parent="#accordionRondas"
           >
@@ -299,7 +299,13 @@ export default {
     onImageError(event) {
       event.target.src = require("../assets/banner_default.jpg");
     },
-  },
+    esRondaActiva(ronda)
+    {
+      const fechaActual = new DataTransfer();
+      const fechaPropuesta = new Date(ronda.fechaPropuesta);
+      const fechaCierre = new Date(ronda.fechaCierre);
+      return fechaActual >= fechaPropuesta && fechaActual <= fechaCierre;
+  }},
   mounted() {
     this.cargarRondas();
   },
