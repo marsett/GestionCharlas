@@ -8,12 +8,14 @@
 
 <script>
 import CharlasService from "@/services/CharlasService";
+import PerfilService from "@/services/PerfilService";
 import Swal from 'sweetalert2';
 
 export default {
     data() {
         return {
             serviceChar: new CharlasService(),
+            servicePerf: new PerfilService(),
             cargando: false,
         };
     },
@@ -43,7 +45,19 @@ export default {
                     return; 
                 }
 
-                // Paso 2: Procesar cada ronda activa
+                // Paso 2: Obtener los alumnos que no han tenido charlas aceptadas
+                const alumnos = await this.servicePerf.getAlumnosCursoActivoProfesor();
+
+                // Filtramos a los alumnos que no tienen charlas aceptadas
+                const alumnosSinCharlasAceptadas = alumnos[0].alumnos.filter(alumno => alumno.charlasAceptadas === 0)
+                                                                    .map(alumno => ({
+                                                                        idUsuario: alumno.alumno.idUsuario,
+                                                                        nombre: alumno.alumno.usuario,
+                                                                        email: alumno.alumno.email,
+                                                                        charlasTotales: alumno.charlasTotales
+                                                                    }));
+
+                // Paso 3: Procesar cada ronda activa
                 for (const ronda of rondasActivas) {
                     const idRonda = ronda.idRonda;
                     let duracionDisponible = ronda.duracion;
@@ -53,19 +67,31 @@ export default {
                     const votos = votosData.votos; 
 
                     // Obtener las charlas más votadas
-                    const charlasMasVotadas = votos
-                        .sort((a, b) => b.votos - a.votos) // Ordenar de mayor a menor por cantidad
-                        .slice(0, 4) // Tomar las 3 o 4 más votadas
-                        .map((charla) => charla.idCharla); // Extraer solo los idCharla
+                    const charlasMasVotadas = votos.sort((a, b) => b.votos - a.votos) // Ordenar de mayor a menor por cantidad
+                                                   .slice(0, 5); // Tomar las 5 más votadas
 
-                    // Paso 3: Obtener charlas de la ronda
+                    // Ordenar por prioridad: dar primero a las charlas de alumnos sin charlas aceptadas
+                    charlasMasVotadas.sort((a, b) => {
+                        if (b.votos === a.votos) {
+                            // Si los votos son iguales, damos prioridad a los alumnos sin charlas aceptadas
+                            const esAAlumnoSinCharlas = alumnosSinCharlasAceptadas.includes(a.idUsuario) ? 1 : 0;
+                            const esBAlumnoSinCharlas = alumnosSinCharlasAceptadas.includes(b.idUsuario) ? 1 : 0;
+
+                            return esBAlumnoSinCharlas - esAAlumnoSinCharlas;
+                        } else {
+                            // Si no hay empate en votos, no se hace nada y se mantiene el orden por votos
+                            return b.votos - a.votos;
+                        } 
+                    });
+
+                    // Paso 4: Obtener charlas de la ronda
                     const charlas = await this.serviceChar.getCharlasRonda(idRonda);
 
                     // Seleccionar charlas más votadas que entren en el tiempo disponible
                     const charlasSeleccionadas = [];
 
-                    for (const idCharla of charlasMasVotadas) {
-                        const charla = charlas.find((c) => c.idCharla === idCharla);
+                    for (const charlaData  of charlasMasVotadas) {
+                        const charla = charlas.find((c) => c.idCharla === charlaData.idCharla);
 
                         // Si la charla existe y su duración no excede la duración disponible
                         if (charla) {
@@ -83,14 +109,14 @@ export default {
                     if (charlasSeleccionadas.length === 0) {
                         Swal.fire({
                             icon: 'warning',
-                            title: 'No se seleccionaron charlas',
+                            title: 'No se actualizaron charlas',
                             text: 'No hay charlas que cumplan con la duración disponible para ser actualizadas.',
                             confirmButtonText: 'Aceptar'
                         });
                         return; 
                     }
 
-                    // Paso 4: Actualizar estado de las charlas seleccionadas
+                    // Paso 5: Actualizar estado de las charlas seleccionadas
                     for (const charla of charlasSeleccionadas) {
                         await this.serviceChar.updateEstadoCharla(charla.idCharla, charla.idEstadoCharla);
                     }

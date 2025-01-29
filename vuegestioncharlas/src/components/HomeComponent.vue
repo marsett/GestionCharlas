@@ -39,13 +39,14 @@
 
               <!-- Botón o formulario -->
               <button 
-                class="btn" :class="isRondaAbierta && puedeSubirCharla ? 'btn-primary' : 'btn-secondary text-black'"
+                class="btn mt-2" :class="isRondaAbierta && puedeSubirCharla ? 'btn-primary' : 'btn-secondary text-white'"
                 :disabled="!isRondaAbierta || !puedeSubirCharla"
                 v-if="!isRondaAbierta || !puedeSubirCharla"
               >
                 Subir charla
               </button>
               <FormNewCharla @evaluarRondas="actualizarContenido" v-else />
+              <!-- <FormNewCharla @evaluarRondas="actualizarContenido" /> -->
             </div>
           </div>
         </div>
@@ -74,24 +75,27 @@
                   No hay votaciones activas en este momento.
                 </span>
               </p>
-              
-              <!-- Botón para ir a charlas -->
-              <button 
-                class="btn btn-mover me-1"
-                @click="$router.push('/charlas')"
-              >
-                Ir a charlas
-              </button>
 
-              <!-- Botón charlas o formulario -->
-              <button 
-                class="btn ms-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-whiite'"
-                :disabled="!isVotacionActiva || !puedeVotar"
-                v-if="!isVotacionActiva || !puedeVotar"
-              >
-                Votar charla
-              </button>
-              <FormVotacion @evaluarRondas="actualizarContenido"  v-else />
+              <!-- Contenedor de los botones -->
+              <div class="d-flex justify-content-center mt-2">
+                <!-- Botón para ir a charlas -->
+                <button 
+                  class="btn btn-mover me-1 mt-2"
+                  @click="$router.push('/charlas')"
+                >
+                  Ir a charlas
+                </button>
+
+                <!-- Botón charlas o formulario -->
+                <button 
+                  class="btn ms-2 mt-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-whiite'"
+                  :disabled="!isVotacionActiva || !puedeVotar"
+                  v-if="!isVotacionActiva || !puedeVotar"
+                >
+                  Votar charla
+                </button>
+                <FormVotacion @evaluarRondas="actualizarContenido"  v-else />
+              </div>
             </div> 
           </div>
         </div>
@@ -183,6 +187,11 @@
         <div class="col-12 col-lg-6 mb-4 mb-lg-0 pe-lg-4">
           <h2 class="mb-4 fw-semibold">Próximas charlas:</h2>
           <div class="list-group">
+            <!-- Verificar si hay presentaciones pendientes -->
+            <div v-if="presentacionesPendientes.length == 0" class="alert alert-secondary">
+              <span>No hay charlas programadas en este momento.</span>
+            </div>
+
             <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
             <div 
               class="list-group-item d-flex align-items-center" 
@@ -212,7 +221,10 @@
         </div>
 
         <!-- Columna derecha: Formulario (simulado con un cuadrado de color) -->
-        <div class="col-12 col-lg-6 ps-lg-4 pt-0 pb-1 d-flex justify-content-center align-items-center">
+        <div 
+          class="col-12 col-lg-6 ps-lg-4 pt-0 pb-1 d-flex justify-content-center align-items-center"
+          :class="presentacionesPendientes.length > 4 ? 'mt-md-0' : 'mt-md-5 pt-2'"
+        >
           <div 
             class="border rounded-4 p-4" 
             style="width: 100%; height: 100%; max-height: 285px; background-color: #a0a0a0;">
@@ -223,14 +235,10 @@
               style="background-color: #e0e0e0; border-radius: 15px;">
 
               <!-- Mensaje -->
-              <p class="mb-2 fw-semibold h5 px-2 px-lg-5 mx-3">
-                Crea una ronda para que puedan proponer sus charlas, o actualiza los estados de las ya propuestas.
+              <p class="mb-2 fw-semibold h5 px-2 px-lg-5 mx-1 mx-lg-3">
+                Crea rondas o actualiza el estado de las charlas de propuestas.
               </p>
 
-              <!-- Botón -->
-              <!-- <button class="btn btn-mover px-4 py-2" style="border-radius: 10px; font-size: 1rem;">
-                Crear nueva ronda
-              </button> -->
               <FormNewRonda @evaluarRondas="actualizarContenido"/>
               <UpdateEstadoCharlas/>
             </div>
@@ -507,6 +515,31 @@ export default {
                 this.eventosPresentaciones.sort((a, b) => new Date(a.date) - new Date(b.date));
               }
 
+              // Verificar si la fecha actual está entre fechaLimiteVotacion y fechaPresentacion
+              if (ahora >= fechaLimiteVotacion && ahora <= fechaPresentacion) {
+                serviceChar.getCharlasRonda(ronda.idRonda)
+                .then(charlasRonda => {
+                  // Filtrar las charlas aceptadas (idEstadoCharla == 2)
+                  const charlasAceptadas = charlasRonda.filter(charla => charla.idEstadoCharla === 2);
+                  if (charlasAceptadas.length > 0) {
+                    Swal.fire({
+                      title: `Ronda: ${ronda.descripcionModulo}`,
+                      text: 'Las charlas de esta ronda ya han sido aceptadas. Revisa si estás entre los seleccionados.',
+                      icon: 'info',
+                      confirmButtonText: 'Ir a charlas',
+                      cancelButtonText: 'Okay',
+                      showCancelButton: true, 
+                      preConfirm: () => {
+                        this.$router.push('/charlas'); 
+                      },
+                      reverseButtons: false  
+                    });
+                  }
+                })
+                .catch(error => {
+                  console.error('Error al obtener las charlas de la ronda:', error);
+                });
+              }
             });
 
             // Actualizar variables de estado
@@ -960,11 +993,20 @@ export default {
     background-color: #F5ECD5; 
   }
 
-  .card-body {
+  div.card-body {
     padding: 20px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
     border: 2px solid #e2dbc787; 
+    min-height: 175px;
+    display: flex;
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important; 
+  }
+
+  div.card-body:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2) !important; /* Sombra más fuerte al hacer hover */
   }
 
   .card-title {
@@ -978,6 +1020,10 @@ export default {
     font-size: 17px;
     color: #555; 
     margin-bottom: 16px;
+  }
+
+  .btn {
+    height: 35px;
   }
 
   ::v-deep(.btn-primary) {
@@ -1031,11 +1077,6 @@ export default {
 
   ::v-deep(.btn-secondary:active) {
     background-color: #577478 !important;
-  }
-
-  ::v-deep(.btn.ms-2.btn-secondary.text-white){
-    background-color: #6a8d92 !important; 
-    opacity: 1;
   }
 
   ::v-deep(button.fc-today-button.fc-button.fc-button-primary) {
@@ -1129,7 +1170,6 @@ export default {
     align-items: center; /* Centra verticalmente */
     justify-content: space-between; /* Espacia los elementos */
   }
-
 
   .badge {
     background-color: #314B78;
