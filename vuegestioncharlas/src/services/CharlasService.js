@@ -25,6 +25,23 @@ export default class CharlasService {
         });
     }
 
+    getVotosRonda(idRonda) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/votos/votosronda/${idRonda}`;
+            const token = Cookies.get('bearer_token');
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => {
+                console.error("Error al obtener los votos de la ronda:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
     getCharlasAlumno(){
         return new Promise((resolve, reject) => {
             const endpoint = 'api/charlas/charlasalumno';
@@ -108,6 +125,23 @@ export default class CharlasService {
             })
             .catch(error => {
                 console.error("Error al obtener las charlas de una ronda: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    updateEstadoCharla(idCharla, idEstadoCharla) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/Profesor/UpdateEstadoCharla/${idCharla}/${idEstadoCharla}`;
+            const token = Cookies.get('bearer_token');
+            axios.put(Global.urlBase + endpoint, {}, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => {
+                console.error("Error al actualizar el estado de la charla:", error.response ? error.response.data : error);
                 reject(error);
             });
         });

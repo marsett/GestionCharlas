@@ -102,8 +102,8 @@ const service = new AuthService();
 export default {
   data() {
     return {
-      userName: "amanda.crespo",
-      password: "Am123456",
+      userName: "",
+      password: "",
       isLoading: false,
       passwordVisible: false,
     };

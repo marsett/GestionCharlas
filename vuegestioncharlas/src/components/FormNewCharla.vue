@@ -11,7 +11,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">Registrar charla</h1>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" @click="clearForm()"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="cancelarFormNew" @click="clearForm()"></button>
                 </div>
                 <div class="modal-body text-start">
                     <!-- Formulario -->
@@ -30,7 +30,6 @@
                         <!-- Fecha Propuesta -->
                         <div class="col-md-6">
                             <label for="fechaPropuesta" class="form-label">Fecha propuesta: <span class="text-danger">*</span></label>
-                            <!-- <input type="datetime-local" class="form-control" id="fechaPropuesta" v-model="form.fechaPropuesta" required> -->
                             <input
                                 type="date"
                                 class="form-control"
