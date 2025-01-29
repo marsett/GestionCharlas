@@ -1,7 +1,7 @@
 <template>
     <div class="d-inline">
         <!-- Botón para abrir el modal -->
-        <button type="button" class="btn btn-primary ms-1" data-bs-toggle="modal" data-bs-target="#votarModal">
+        <button type="button" class="btn btn-primary ms-1 mt-2" data-bs-toggle="modal" data-bs-target="#votarModal">
             Votar Charla
         </button>
   

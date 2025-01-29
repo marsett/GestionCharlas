@@ -5,8 +5,6 @@
     <!-- Ícono de retroceder -->
   </button>
   <div class="container my-4 p-4">
-
-
     <h2 class="mb-4 text-center" style="font-size: 42px; font-weight: 400px">
       Gestión de Alumnos
     </h2>
@@ -75,7 +73,6 @@ import Swal from "sweetalert2";
 
 export default {
   name: "AlumnosCursoProfesorComponent",
-  props: ["idCurso"],
   data() {
     return {
       alumnos: [],
@@ -177,12 +174,36 @@ export default {
     },
     async cargarAlumnos() {
       try {
-        this.seccionActiva = "alumnos";
+        const idCurso = this.$route.query.idCurso;
+        const activo = this.$route.query.activo === 'true';
+        console.log("idCurso:", idCurso);
         this.cargando = true;
         console.log("Cargando alumnos...");
-        const data = await this.perfilService.getAlumnosCursoProfesor();
-        console.log("Los alumnos son: ", data);
-        this.alumnos = data.length > 0 ? data[0].alumnos : [];
+
+        // const data = await this.perfilService.getAlumnosCursoProfesorEnAlumnos(
+        //   idCurso
+        // );
+        // console.log("Los alumnos son: ", data);
+
+        let data;
+        console.log("EL maldito ud: " + activo);
+        if (activo) {
+          // Si el curso está activo, se obtiene la lista de alumnos activos
+          data = await this.perfilService.getAlumnosCursoProfesorEnAlumnos(
+            idCurso
+          );
+          console.log("Los alumnos activos son: ", data);
+        } else {
+          // Si el curso está inactivo, se obtiene el historial de alumnos
+          data = await this.perfilService.getAlumnosCursoHistorialProfesor(
+            idCurso
+          );
+          console.log("Los alumnos del historial son: ", data);
+        }
+
+        // Verifica que hay alumn
+        this.alumnos = data.alumnos; // Asignamos los alumnos del primer curso encontrado
+        console.log("Alumnos cargados correctamente: ", this.alumnos);
       } catch (error) {
         console.error("Error al cargar los alumnos:", error);
         alert("No se pudieron cargar los alumnos.");
@@ -190,6 +211,7 @@ export default {
         this.cargando = false;
       }
     },
+
     volverAtras() {
       this.$router.go(-1); // Esto hace que el navegador vuelva a la página anterior
     },
@@ -228,7 +250,6 @@ export default {
 .container {
   background-color: #d9d9d9;
   border-radius: 16px;
-  
 }
 
 .card-container {
@@ -242,11 +263,10 @@ export default {
   .container {
     width: auto;
     padding: 16px;
-  margin-right: 20px;
-  margin-left: 20px;
+    margin-right: 20px;
+    margin-left: 20px;
   }
 }
-
 
 .card-usuario {
   width: 100%;

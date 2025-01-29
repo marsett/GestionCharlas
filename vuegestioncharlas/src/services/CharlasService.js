@@ -25,6 +25,23 @@ export default class CharlasService {
         });
     }
 
+    getVotosRonda(idRonda) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/votos/votosronda/${idRonda}`;
+            const token = Cookies.get('bearer_token');
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => {
+                console.error("Error al obtener los votos de la ronda:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
     getCharlasAlumno(){
         return new Promise((resolve, reject) => {
             const endpoint = 'api/charlas/charlasalumno';
@@ -113,6 +130,23 @@ export default class CharlasService {
         });
     }
 
+    updateEstadoCharla(idCharla, idEstadoCharla) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/Profesor/UpdateEstadoCharla/${idCharla}/${idEstadoCharla}`;
+            const token = Cookies.get('bearer_token');
+            axios.put(Global.urlBase + endpoint, {}, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => {
+                console.error("Error al actualizar el estado de la charla:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
     setCharla(form){
         return new Promise((resolve, reject) => {
             const endpoint = 'api/charlas';
@@ -143,6 +177,38 @@ export default class CharlasService {
             })
             .catch(error => {
                 console.error("Error al crear el usuario:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    setRecurso(form) {
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/recursos';
+            const token = Cookies.get('bearer_token');
+            const json = JSON.stringify({
+                idRecurso: 0,
+                idCharla: form.idCharla,  // Se asigna después de crear la charla
+                url: form.url,
+                nombre: form.nombre,
+                descripcion: form.descripcion
+            });
+
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token,
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al crear el recurso:", error.response ? error.response.data : error);
                 reject(error);
             });
         });
@@ -248,6 +314,91 @@ export default class CharlasService {
             .catch(error => {
                 console.error("Error al obtener los detalles de la charla: ", error.response ? error.response.data : error);
                 reject(error);
+            });
+        });
+    }
+
+    getCharlasComentarios(idCharla) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/charlas/${idCharla}`;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener las charlas: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    deleteComentario(idComentario) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/comentarios/${idComentario}`;
+            const token = Cookies.get('bearer_token');
+            
+            axios.delete(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, 
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al eliminar el comentario: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    setComentario(form) {
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/comentarios';
+            const token = Cookies.get('bearer_token');
+            
+            // Crear un nuevo objeto para el comentario con la fecha y hora actual en formato español
+            const fechaActual = new Date();
+            // Esto dará una fecha como "23/01/2025 12:30:00"
+    
+            const json = JSON.stringify({
+                idComentario: 0,  // Aquí el id se asignará automáticamente en la base de datos
+                idCharla: form.idCharla,
+                idUsuario: form.idUsuario,
+                contenido: form.contenido,
+                fecha: fechaActual,  // Fecha formateada en formato español con hora
+            });
+            console.log(json)
+        
+            // Realizar la solicitud POST para crear el comentario
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data); // Respuesta con el comentario creado
+            })
+            .catch(error => {
+                console.error("Error al crear el comentario:", error.response ? error.response.data : error);
+                reject(error); // Si hubo un error, lo rechazamos
             });
         });
     }

@@ -39,7 +39,7 @@
 
               <!-- Botón o formulario -->
               <button 
-                class="btn" :class="isRondaAbierta && puedeSubirCharla ? 'btn-primary' : 'btn-secondary text-black'"
+                class="btn mt-2" :class="isRondaAbierta && puedeSubirCharla ? 'btn-primary' : 'btn-secondary text-white'"
                 :disabled="!isRondaAbierta || !puedeSubirCharla"
                 v-if="!isRondaAbierta || !puedeSubirCharla"
               >
@@ -74,24 +74,27 @@
                   No hay votaciones activas en este momento.
                 </span>
               </p>
-              
-              <!-- Botón para ir a charlas -->
-              <button 
-                class="btn btn-mover me-1"
-                @click="$router.push('/charlas')"
-              >
-                Ir a charlas
-              </button>
 
-              <!-- Botón charlas o formulario -->
-              <button 
-                class="btn ms-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-whiite'"
-                :disabled="!isVotacionActiva || !puedeVotar"
-                v-if="!isVotacionActiva || !puedeVotar"
-              >
-                Votar charla
-              </button>
-              <FormVotacion @evaluarRondas="actualizarContenido"  v-else />
+              <!-- Contenedor de los botones -->
+              <div class="d-flex justify-content-center mt-2">
+                <!-- Botón para ir a charlas -->
+                <button 
+                  class="btn btn-mover me-1 mt-2"
+                  @click="$router.push('/charlas')"
+                >
+                  Ir a charlas
+                </button>
+
+                <!-- Botón charlas o formulario -->
+                <button 
+                  class="btn ms-2 mt-2" :class="isVotacionActiva && puedeVotar ? 'btn-primary' : 'btn-secondary text-whiite'"
+                  :disabled="!isVotacionActiva || !puedeVotar"
+                  v-if="!isVotacionActiva || !puedeVotar"
+                >
+                  Votar charla
+                </button>
+                <FormVotacion @evaluarRondas="actualizarContenido"  v-else />
+              </div>
             </div> 
           </div>
         </div>
@@ -101,7 +104,7 @@
 
       <div class="row mt-3 mb-4 pt-0">
         <div class="mb-3 mb-md-4 col-lg-8">
-          <h1 class="mb-4 mt-2 pt-0 fw-semibold">Calendario</h1>
+          <h1 class="mb-4 mt-2 pt-0 fw-light">Calendario</h1>
             <!-- Guía de colores -->
             <div>
               <div class="row">
@@ -183,6 +186,11 @@
         <div class="col-12 col-lg-6 mb-4 mb-lg-0 pe-lg-4">
           <h2 class="mb-4 fw-semibold">Próximas charlas:</h2>
           <div class="list-group">
+            <!-- Verificar si hay presentaciones pendientes -->
+            <div v-if="presentacionesPendientes.length == 0" class="alert alert-secondary">
+              <span>No hay charlas programadas en este momento.</span>
+            </div>
+
             <!-- Mostrar solo los primeros cinco eventos si no se ha hecho clic en "Ver más" -->
             <div 
               class="list-group-item d-flex align-items-center" 
@@ -212,10 +220,13 @@
         </div>
 
         <!-- Columna derecha: Formulario (simulado con un cuadrado de color) -->
-        <div class="col-12 col-lg-6 ps-lg-4 pt-3 d-flex justify-content-center align-items-center">
+        <div 
+          class="col-12 col-lg-6 ps-lg-4 pt-0 pb-1 d-flex justify-content-center align-items-center"
+          :class="presentacionesPendientes.length > 4 ? 'mt-md-0' : 'mt-md-5 pt-2'"
+        >
           <div 
             class="border rounded-4 p-4" 
-            style="width: 100%; height: 100%; max-height: 282px; background-color: #a0a0a0;">
+            style="width: 100%; height: 100%; max-height: 285px; background-color: #a0a0a0;">
             
             <!-- Contenedor interno -->
             <div 
@@ -223,15 +234,12 @@
               style="background-color: #e0e0e0; border-radius: 15px;">
 
               <!-- Mensaje -->
-              <p class="mb-4 fw-semibold h5 px-2 px-lg-5 mx-3">
-                ¡Crea una nueva ronda para que tus alumnos puedan proponer sus charlas!
+              <p class="mb-2 fw-semibold h5 px-2 px-lg-5 mx-1 mx-lg-3">
+                Crea rondas o actualiza el estado de las charlas de propuestas.
               </p>
 
-              <!-- Botón -->
-              <!-- <button class="btn btn-mover px-4 py-2" style="border-radius: 10px; font-size: 1rem;">
-                Crear nueva ronda
-              </button> -->
-              <FormNewRonda @evaluarRondas="actualizarContenido"/>
+              <FormNewRonda @evaluarRondas="actualizarContenidoProfe"/>
+              <UpdateEstadoCharlas/>
             </div>
           </div>
         </div>
@@ -295,6 +303,7 @@ import FormNewCharla from './FormNewCharla.vue';
 import { Chart, CategoryScale, LinearScale, DoughnutController, ArcElement, LineController, LineElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
 import FormVotacion from './FormVotacion.vue';
 import FormNewRonda from './FormNewRonda.vue';
+import UpdateEstadoCharlas from './UpdateEstadoCharlas.vue';
 
 // Registrar las escalas, elementos, y otros componentes
 Chart.register(CategoryScale, LinearScale, LineController, LineElement, DoughnutController, ArcElement, Title, Tooltip, Legend, PointElement);
@@ -309,6 +318,7 @@ export default {
     FormNewCharla,
     FormVotacion,
     FormNewRonda,
+    UpdateEstadoCharlas
   },
   data() {
     return {
@@ -440,6 +450,8 @@ export default {
           // Obtener los votos del alumno
           serviceChar.getVotosAlumno()
           .then(votosAlumno => {
+            let lanzarMensaje = false;
+            let rondasPromises = []; // Array para almacenar las promesas de las rondas
             
             this.rondas.forEach(ronda => {
               const fechaCierre = new Date(ronda.fechaCierre + 'Z'); // Agregar "Z" al final para interpretar como UTC
@@ -504,6 +516,41 @@ export default {
                 this.eventosPresentaciones.sort((a, b) => new Date(a.date) - new Date(b.date));
               }
 
+              // Verificar si la fecha actual está entre fechaLimiteVotacion y fechaPresentacion
+              if (ahora >= fechaLimiteVotacion && ahora <= fechaPresentacion) {
+                // Agregar la promesa a un array para esperar que todas se resuelvan
+                rondasPromises.push(
+                  serviceChar.getCharlasRonda(ronda.idRonda)
+                    .then(charlasRonda => {
+                      // Filtrar las charlas aceptadas (idEstadoCharla == 2)
+                      const charlasAceptadas = charlasRonda.filter(charla => charla.idEstadoCharla === 2);
+                      if (charlasAceptadas.length > 0) {
+                        lanzarMensaje = true;
+                      }
+                    })
+                    .catch(error => {
+                      console.error('Error al obtener las charlas de la ronda:', error);
+                    })
+                );
+              }
+            });
+
+            // Esperamos a que todas las promesas se resuelvan antes de proceder
+            Promise.all(rondasPromises).then(() => {
+              if (lanzarMensaje && this.$route.path === "/") {
+                Swal.fire({
+                  title: `Charlas aceptadas`,
+                  text: 'Se han aceptado nuevas charlas en una de las rondas. Revisa si estás entre los seleccionados.',
+                  icon: 'info',
+                  confirmButtonText: 'Ir a charlas',
+                  cancelButtonText: 'Vale',
+                  showCancelButton: true, 
+                  preConfirm: () => {
+                    this.$router.push('/charlas');
+                  },
+                  reverseButtons: false  
+                });
+              }
             });
 
             // Actualizar variables de estado
@@ -539,8 +586,12 @@ export default {
       return new Date(fecha).toLocaleDateString('es-ES', opciones).replace(/^./, letra => letra.toUpperCase());
     },
 
-    actualizarContenido() {
+    actualizarContenidoProfe() {
       this.evaluarAlumnos();
+    },
+
+    actualizarContenido() {
+      this.evaluarRondas();
     },
 
     evaluarAlumnos(){
@@ -588,9 +639,9 @@ export default {
       this.limpiarCanvas();
       this.loadChart = true;
 
-      servicePerf.getAlumnosCursoActivoProfesor()
+      servicePerf.getAlumnosActivoProfesor()
         .then(response => {
-          const data = response[0]?.alumnos || [];
+          const data = response;
 
           // Verifica si hay alumnos
           if (!data || data.length === 0) {
@@ -698,9 +749,9 @@ export default {
       this.limpiarCanvas();
       this.loadChart = true;
 
-      servicePerf.getAlumnosCursoActivoProfesor()
+      servicePerf.getAlumnosActivoProfesor()
         .then(response => {
-          const data = response[0]?.alumnos || [];
+          const data = response;
 
           // Verifica si hay alumnos
           if (!data || data.length === 0) {
@@ -872,11 +923,11 @@ export default {
     padding:55px 20px 0px 20px;
     margin-top: 0px !important;
     margin-bottom: 30px !important;
-    background: linear-gradient(
+    /* background: linear-gradient(
       to top,
       hsla(128, 21%, 57%, 0.5) 0%,   
       #FDFAFA 60%    
-    );
+    ); */
     border-radius: 18px;
     color: inherit;
   }
@@ -957,11 +1008,20 @@ export default {
     background-color: #F5ECD5; 
   }
 
-  .card-body {
+  div.card-body {
     padding: 20px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
     border: 2px solid #e2dbc787; 
+    min-height: 175px;
+    display: flex;
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important; 
+  }
+
+  div.card-body:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2) !important; /* Sombra más fuerte al hacer hover */
   }
 
   .card-title {
@@ -975,6 +1035,10 @@ export default {
     font-size: 17px;
     color: #555; 
     margin-bottom: 16px;
+  }
+
+  .btn {
+    height: 35px;
   }
 
   ::v-deep(.btn-primary) {
@@ -1028,11 +1092,6 @@ export default {
 
   ::v-deep(.btn-secondary:active) {
     background-color: #577478 !important;
-  }
-
-  ::v-deep(.btn.ms-2.btn-secondary.text-white){
-    background-color: #6a8d92 !important; 
-    opacity: 1;
   }
 
   ::v-deep(button.fc-today-button.fc-button.fc-button-primary) {
@@ -1089,10 +1148,11 @@ export default {
 
   ::v-deep(.fc-scrollgrid.fc-scrollgrid-liquid){
     background-color: white;
+    padding-bottom: 3px;
   }
-  
+
   ::v-deep(.fc-daygrid-day-frame.fc-scrollgrid-sync-inner){
-    min-height: 100px;
+    min-height: 95px;
   }
 
   ::v-deep(.fc-col-header-cell.fc-day){
@@ -1126,7 +1186,6 @@ export default {
     align-items: center; /* Centra verticalmente */
     justify-content: space-between; /* Espacia los elementos */
   }
-
 
   .badge {
     background-color: #314B78;
