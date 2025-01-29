@@ -544,7 +544,7 @@ export default {
                   text: 'Las charlas de esta ronda ya han sido aceptadas. Revisa si estás entre los seleccionados.',
                   icon: 'info',
                   confirmButtonText: 'Ir a charlas',
-                  cancelButtonText: 'Okay',
+                  cancelButtonText: 'Vale',
                   showCancelButton: true, 
                   preConfirm: () => {
                     this.$router.push('/charlas');
@@ -636,9 +636,9 @@ export default {
       this.limpiarCanvas();
       this.loadChart = true;
 
-      servicePerf.getAlumnosCursoActivoProfesor()
+      servicePerf.getAlumnosActivoProfesor()
         .then(response => {
-          const data = response[0]?.alumnos || [];
+          const data = response;
 
           // Verifica si hay alumnos
           if (!data || data.length === 0) {
@@ -746,9 +746,9 @@ export default {
       this.limpiarCanvas();
       this.loadChart = true;
 
-      servicePerf.getAlumnosCursoActivoProfesor()
+      servicePerf.getAlumnosActivoProfesor()
         .then(response => {
-          const data = response[0]?.alumnos || [];
+          const data = response;
 
           // Verifica si hay alumnos
           if (!data || data.length === 0) {

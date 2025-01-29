@@ -100,6 +100,7 @@ export default class PerfilService {
                 });
         });
     }
+    
     getRondasProfesor() {
         return axios.get(Global.urlBase + "api/Profesor/RondasProfesor", {
             headers: { Authorization: Cookies.get("bearer_token") },
@@ -208,20 +209,40 @@ export default class PerfilService {
                     Authorization: token,
                 },
             })
-                .then(response => {
-                    // Filtrar el curso específico y devolver solo sus datos
-                    const cursoFiltrado = response.data.find(curso => curso.curso.idCurso === idCurso);
-                    console.log("Curso filtrado: ", cursoFiltrado);
-                    if (cursoFiltrado) {
-                        resolve(cursoFiltrado); // Devuelve el curso con sus alumnos
-                    } else {
-                        resolve(null); // Si no se encuentra el curso
-                    }
-                })
-                .catch(error => {
-                    console.error("Error al obtener los alumnos de un profesor:", error.response ? error.response.data : error);
-                    reject(error);
-                });
+            .then(response => {
+                // Filtrar el curso específico y devolver solo sus datos
+                const cursoFiltrado = response.data.find(curso => curso.curso.idCurso === idCurso);
+                console.log("Curso filtrado: ", cursoFiltrado);
+                if (cursoFiltrado) {
+                    resolve(cursoFiltrado); // Devuelve el curso con sus alumnos
+                } else {
+                    resolve(null); // Si no se encuentra el curso
+                }
+            })
+            .catch(error => {
+                console.error("Error al obtener los alumnos de un profesor:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    getAlumnosActivoProfesor(idCurso) {
+        return new Promise((resolve, reject) => {
+            const endpoint = "api/Profesor/AlumnosCursoActivoProfesor";
+            const token = Cookies.get('bearer_token');
+            console.log("Id del curso: " + idCurso);
+            axios.get(Global.urlBase + endpoint, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => {
+                resolve(response.data[0].alumnos);
+            })
+            .catch(error => {
+                console.error("Error al obtener los alumnos de un profesor:", error.response ? error.response.data : error);
+                reject(error);
+            });
         });
     }
 
