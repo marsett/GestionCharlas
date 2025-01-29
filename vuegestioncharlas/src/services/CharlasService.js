@@ -182,6 +182,38 @@ export default class CharlasService {
         });
     }
 
+    setRecurso(form) {
+        return new Promise((resolve, reject) => {
+            const endpoint = 'api/recursos';
+            const token = Cookies.get('bearer_token');
+            const json = JSON.stringify({
+                idRecurso: 0,
+                idCharla: form.idCharla,  // Se asigna después de crear la charla
+                url: form.url,
+                nombre: form.nombre,
+                descripcion: form.descripcion
+            });
+
+            axios.post(
+                Global.urlBase + endpoint,
+                json,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token,
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al crear el recurso:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
     setRonda(form){
         return new Promise((resolve, reject) => {
             const token = Cookies.get('bearer_token');

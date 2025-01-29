@@ -48,8 +48,13 @@ export default {
 <style>
 body{
   background-color: #FDFAFA!important;
+  background: linear-gradient(
+    to top,
+    hsla(128, 21%, 57%, 0.5) 0%,   
+    #FDFAFA 60%    
+  );
+  min-height: 100vh;
 }
-
 .swal2-confirm.swal2-styled {
   background-color: #578e73 !important;
 }

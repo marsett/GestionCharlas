@@ -46,7 +46,6 @@
                 Subir charla
               </button>
               <FormNewCharla @evaluarRondas="actualizarContenido" v-else />
-              <!-- <FormNewCharla @evaluarRondas="actualizarContenido" /> -->
             </div>
           </div>
         </div>
@@ -105,7 +104,7 @@
 
       <div class="row mt-3 mb-4 pt-0">
         <div class="mb-3 mb-md-4 col-lg-8">
-          <h1 class="mb-4 mt-2 pt-0 fw-semibold">Calendario</h1>
+          <h1 class="mb-4 mt-2 pt-0 fw-light">Calendario</h1>
             <!-- Guía de colores -->
             <div>
               <div class="row">
@@ -239,7 +238,7 @@
                 Crea rondas o actualiza el estado de las charlas de propuestas.
               </p>
 
-              <FormNewRonda @evaluarRondas="actualizarContenido"/>
+              <FormNewRonda @evaluarRondas="actualizarContenidoProfe"/>
               <UpdateEstadoCharlas/>
             </div>
           </div>
@@ -541,7 +540,7 @@ export default {
               if (lanzarMensaje && this.$route.path === "/") {
                 Swal.fire({
                   title: `Charlas aceptadas`,
-                  text: 'Las charlas de esta ronda ya han sido aceptadas. Revisa si estás entre los seleccionados.',
+                  text: 'Se han aceptado nuevas charlas en una de las rondas. Revisa si estás entre los seleccionados.',
                   icon: 'info',
                   confirmButtonText: 'Ir a charlas',
                   cancelButtonText: 'Vale',
@@ -587,8 +586,12 @@ export default {
       return new Date(fecha).toLocaleDateString('es-ES', opciones).replace(/^./, letra => letra.toUpperCase());
     },
 
-    actualizarContenido() {
+    actualizarContenidoProfe() {
       this.evaluarAlumnos();
+    },
+
+    actualizarContenido() {
+      this.evaluarRondas();
     },
 
     evaluarAlumnos(){
@@ -920,11 +923,11 @@ export default {
     padding:55px 20px 0px 20px;
     margin-top: 0px !important;
     margin-bottom: 30px !important;
-    background: linear-gradient(
+    /* background: linear-gradient(
       to top,
       hsla(128, 21%, 57%, 0.5) 0%,   
       #FDFAFA 60%    
-    );
+    ); */
     border-radius: 18px;
     color: inherit;
   }
@@ -1145,10 +1148,11 @@ export default {
 
   ::v-deep(.fc-scrollgrid.fc-scrollgrid-liquid){
     background-color: white;
+    padding-bottom: 3px;
   }
-  
+
   ::v-deep(.fc-daygrid-day-frame.fc-scrollgrid-sync-inner){
-    min-height: 100px;
+    min-height: 95px;
   }
 
   ::v-deep(.fc-col-header-cell.fc-day){
