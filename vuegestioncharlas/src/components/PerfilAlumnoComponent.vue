@@ -1,7 +1,7 @@
 <template>
   <div class="container my-3 my-md-5" v-if="usuario">
     <div class="profile-card">
-      <div class="profile-header" style="background-color: #7787bd; height: 200px;">
+      <div class="profile-header" style="background-color: #a0a0a0; height: 200px;">
         <div class="profile-info text-center">
         </div>
       </div>
