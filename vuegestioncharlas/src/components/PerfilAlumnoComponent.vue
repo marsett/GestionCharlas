@@ -27,7 +27,6 @@
           </div>
         </div>
       </div>
-
       <hr />
       <CharlasAlumnoComponent :usuario="usuario" />
     </div>
@@ -502,7 +501,7 @@ export default {
   }
 }
 button {
-  background: #7787bd;
+  background: #314b78;
   color: #fff;
   border: none;
   position: relative;
@@ -515,7 +514,12 @@ button {
 
 button:hover {
   background: #fff;
-  color: #512399;
+  color: #41619a;
+}
+
+button:active {
+  background: #fff;
+  color: #41619a;
 }
 
 button:after {

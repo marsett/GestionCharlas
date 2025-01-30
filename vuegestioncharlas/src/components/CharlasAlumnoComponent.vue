@@ -1,17 +1,11 @@
 <template>
   <div class="container mt-5">
-    <div v-if="charlas.length === 0" class="card text-center shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title text-primary">Sin charlas disponibles</h5>
-        <p class="card-text">
-          Actualmente no tienes charlas registradas. Cuando se añadan charlas,
-          podrás visualizarlas aquí.
-        </p>
-        <button @click="volverPaginaAnterior" class="btn btn-secondary mt-3">
-          Volver a la página anterior
-        </button>
+    <div v-if="charlas.length === 0" class="d-flex justify-content-center align-items-center" style="height: 200px;">
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Cargando...</span>
       </div>
     </div>
+
 
     <div v-else>
       <div class="chats">
@@ -48,13 +42,13 @@
           <div class="card-footer text-center">
             <button
               @click="mostrarDetalles(charla.charla)"
-              class="btn custom-button"
+              class="btn custom-button me-1"
             >
-              Ver Detalle
+              Ver Detalles
             </button>
             <button
               @click="editarCharla(charla.charla)"
-              class="btn custom-button"
+              class="btn custom-button ms-1"
             >
               Editar
             </button>
@@ -479,7 +473,7 @@ export default {
 .chats {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 20px;
   margin-top: -30px;
 }
