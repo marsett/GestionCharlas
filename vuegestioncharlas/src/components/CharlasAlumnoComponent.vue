@@ -4,7 +4,8 @@
       <div class="card-body">
         <h5 class="card-title text-primary">Sin charlas disponibles</h5>
         <p class="card-text">
-          Actualmente no tienes charlas registradas. Cuando se añadan charlas, podrás visualizarlas aquí.
+          Actualmente no tienes charlas registradas. Cuando se añadan charlas,
+          podrás visualizarlas aquí.
         </p>
         <button @click="volverPaginaAnterior" class="btn btn-secondary mt-3">
           Volver a la página anterior
@@ -14,19 +15,25 @@
 
     <div v-else>
       <div class="chats">
-        <div v-for="charla in charlas" :key="charla.charla.idCharla" class="card custom-card">
+        <div
+          v-for="charla in charlas"
+          :key="charla.charla.idCharla"
+          class="card custom-card"
+        >
           <!-- Imagen de la charla -->
           <div class="card-img-container">
-            <img 
-              :src="charla.charla.imagenCharla || defaultImage" 
-              alt="Imagen charla" 
-              class="card-img" 
+            <img
+              :src="charla.charla.imagenCharla || defaultImage"
+              alt="Imagen charla"
+              class="card-img"
               @error="onImageError"
             />
             <!-- Estado de la charla (si lo hay) -->
-            <div v-if="charla.charla.estadoCharla" 
-                 :class="estadoClass(charla.charla.estadoCharla)" 
-                 class="estado-btn">
+            <div
+              v-if="charla.charla.estadoCharla"
+              :class="estadoClass(charla.charla.estadoCharla)"
+              class="estado-btn"
+            >
               {{ charla.charla.estadoCharla }}
             </div>
           </div>
@@ -39,10 +46,17 @@
 
           <!-- Botón Detalle -->
           <div class="card-footer text-center">
-            <button 
-              @click="mostrarDetalles(charla.charla)" 
-              class="btn custom-button">
+            <button
+              @click="mostrarDetalles(charla.charla)"
+              class="btn custom-button"
+            >
               Ver Detalle
+            </button>
+            <button
+              @click="editarCharla(charla.charla)"
+              class="btn custom-button"
+            >
+              Editar
             </button>
           </div>
         </div>
@@ -50,33 +64,55 @@
     </div>
 
     <!-- Modal para mostrar los detalles de la charla -->
-    <div v-if="modalVisible" class="modal fade show" tabindex="-1" role="dialog" style="display: block; background: rgba(0, 0, 0, 0.8)">
+    <div
+      v-if="modalVisible"
+      class="modal fade show"
+      tabindex="-1"
+      role="dialog"
+      style="display: block; background: rgba(0, 0, 0, 0.8)"
+    >
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ charlaSeleccionada.titulo }}</h5>
-            <button type="button" class="btn-close" aria-label="Close" @click="cerrarModal"></button>
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Close"
+              @click="cerrarModal"
+            ></button>
           </div>
           <div class="modal-body">
-            <p><strong>Fecha Propuesta:</strong> {{ charlaSeleccionada.fechaPropuesta }}</p>
+            <p>
+              <strong>Fecha Propuesta:</strong>
+              {{ charlaSeleccionada.fechaPropuesta }}
+            </p>
             <p><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
-            <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
+            <p>
+              <strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}
+            </p>
 
             <!-- Botones para cambiar entre Descripción y Comentarios -->
             <div class="d-flex custom-buttons-container">
               <button
                 class="custom-button"
-                @click="mostrarDescripcion = !mostrarDescripcion; mostrarComentarios = false;" 
-                :class="{'active': mostrarDescripcion}"         
+                @click="
+                  mostrarDescripcion = !mostrarDescripcion;
+                  mostrarComentarios = false;
+                "
+                :class="{ active: mostrarDescripcion }"
               >
                 <i class="fa-solid fa-circle-info iconos"></i>
                 Descripción
               </button>
               <button
                 class="custom-button"
-                @click="mostrarDescripcion = false; mostrarComentarios = !mostrarComentarios"
-                :class="{'active': mostrarComentarios}"
+                @click="
+                  mostrarDescripcion = false;
+                  mostrarComentarios = !mostrarComentarios;
+                "
+                :class="{ active: mostrarComentarios }"
               >
                 <i class="fa-solid fa-comments iconos"></i>
                 Comentarios
@@ -86,43 +122,59 @@
             <hr v-if="mostrarDescripcion || mostrarComentarios" />
 
             <!-- Sección de Descripción -->
-            <div v-if="mostrarDescripcion" class="custom-background custom-descripcion">
+            <div
+              v-if="mostrarDescripcion"
+              class="custom-background custom-descripcion"
+            >
               <p>
                 {{ charlaSeleccionada.descripcion }}
               </p>
             </div>
 
-             <!-- Sección de Comentarios // Sofi -->
+            <!-- Sección de Comentarios // Sofi -->
             <div v-if="mostrarComentarios">
-    <div v-if="comentarios.length > 0" class="custom-background">
+              <div v-if="comentarios.length > 0" class="custom-background">
+                <!-- Contenedor con scroll si hay más de dos comentarios -->
+                <ul class="comment-list">
+                  <li
+                    v-for="comentario in comentarios"
+                    :key="comentario.idComentario"
+                    class="comment-item"
+                  >
+                    <div class="comment-header">
+                      <img
+                        src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
+                        alt="avatar"
+                        class="avatar"
+                      />
+                      <div>
+                        <p class="username">{{ comentario.usuario }}</p>
+                        <p class="timestamp">{{ comentario.fecha }}</p>
+                      </div>
+                    </div>
+                    <p class="comment-text">{{ comentario.contenido }}</p>
+                  </li>
+                </ul>
+              </div>
 
-      <!-- Contenedor con scroll si hay más de dos comentarios -->
-      <ul class="comment-list">
-        <li v-for="comentario in comentarios" :key="comentario.idComentario" class="comment-item">
-          <div class="comment-header">
-            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="avatar" class="avatar" />
-            <div>
-              <p class="username">{{ comentario.usuario }}</p>
-              <p class="timestamp">{{ comentario.fecha }}</p>
+              <!-- Si no hay comentarios -->
+              <div v-else>
+                <p class="no-comments">No hay comentarios aún.</p>
+              </div>
+
+              <!-- Formulario para agregar un nuevo comentario -->
+              <div class="comment-form">
+                <textarea
+                  v-model="newComment"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Escribe tu comentario aquí..."
+                ></textarea>
+                <button class="btn custom-button mt-2" @click="addComment">
+                  Agregar comentario
+                </button>
+              </div>
             </div>
-          </div>
-          <p class="comment-text">{{ comentario.contenido }}</p>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Si no hay comentarios -->
-    <div v-else>
-      <p class="no-comments">No hay comentarios aún.</p>
-    </div>
-
-    <!-- Formulario para agregar un nuevo comentario -->
-    <div class="comment-form">
-      <textarea v-model="newComment" class="form-control" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
-      <button class="btn custom-button mt-2" @click="addComment">Agregar comentario</button>
-    </div>
-</div>
-
           </div>
         </div>
       </div>
@@ -135,8 +187,8 @@ import PerfilService from "@/services/PerfilService";
 import CharlasService from "@/services/CharlasService";
 const serviceCharlas = new CharlasService();
 import Swal from "sweetalert2";
-import moment from 'moment';
-import 'moment/locale/es';
+import moment from "moment";
+import "moment/locale/es";
 
 export default {
   name: "CharlasAlumnoComponent",
@@ -148,8 +200,9 @@ export default {
       mostrarDescripcion: true, // Mostrar descripción por defecto
       mostrarComentarios: false, // Mostrar comentarios inicialmente
       comentarios: [],
-      newComment: '',
-      defaultImage: 'https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg'
+      newComment: "",
+      defaultImage:
+        "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg",
     };
   },
   methods: {
@@ -191,14 +244,59 @@ export default {
       }
     },
 
+    editarCharla(charla) {
+      Swal.fire({
+        title: "Editar Charla",
+        html: `
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <input id="swal-titulo" class="swal2-input" placeholder="Título" value="${charla.titulo}" style="width: 90%;">
+        <textarea id="swaldescripcion" class="swal2-textarea" placeholder="Descripción" style="width: 90%; height: 120px;">${charla.descripcion}</textarea>
+        <input id="swal-tiempo" type="number" class="swal2-input" placeholder="Tiempo (minutos)" value="${charla.tiempo}" style="width: 90%;">
+        <input id="swal-fecha" type="datetime-local" class="swal2-input" value="${charla.fechaPropuesta}" style="width: 90%;">
+        <input id="swal-imagen" class="swal2-input" placeholder="URL Imagen" value="${charla.imagenCharla}" style="width: 90%;">
+      </div>
+    `,
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        preConfirm: () => {
+          return {
+            idCharla: charla.idCharla,
+            titulo: document.getElementById("swal-titulo").value,
+            descripcion: document.getElementById("swaldescripcion").value,
+            tiempo: parseInt(document.getElementById("swal-tiempo").value),
+            fechaPropuesta: document.getElementById("swal-fecha").value,
+            idUsuario: charla.idUsuario,
+            idEstadoCharla: charla.idEstadoCharla,
+            idRonda: charla.idRonda,
+            imagenCharla: document.getElementById("swal-imagen").value,
+          };
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          serviceCharlas
+            .editarCharla(result.value)
+            .then(() => {
+              Swal.fire("Éxito", "Charla actualizada correctamente", "success");
+              this.cargarCharlas();
+            })
+            .catch(() => {
+              Swal.fire("Error", "No se pudo actualizar la charla", "error");
+            });
+        }
+      });
+    },
+
     // Carga los comentarios de una charla
     cargarComentarios(idCharla) {
       serviceCharlas
         .getCharlasComentarios(idCharla)
         .then((response) => {
           // Formatear las fechas de los comentarios al cargar
-          this.comentarios = response.comentarios.map(comentario => {
-            comentario.fecha = moment(comentario.fecha).locale('es').format('DD/MM/YYYY HH:mm');
+          this.comentarios = response.comentarios.map((comentario) => {
+            comentario.fecha = moment(comentario.fecha)
+              .locale("es")
+              .format("DD/MM/YYYY HH:mm");
             return comentario;
           });
         })
@@ -214,7 +312,7 @@ export default {
         return;
       }
 
-      const fechaActual = moment().locale('es').format('DD/MM/YYYY HH:mm');
+      const fechaActual = moment().locale("es").format("DD/MM/YYYY HH:mm");
       const comentario = {
         idCharla: this.charlaSeleccionada.idCharla,
         idUsuario: 13,
@@ -247,7 +345,7 @@ export default {
     mostrarDetalles(charla) {
       this.charlaSeleccionada = charla;
       this.modalVisible = true;
-      this.cargarComentarios(charla.idCharla); 
+      this.cargarComentarios(charla.idCharla);
     },
 
     // Cierra el modal
@@ -391,19 +489,18 @@ export default {
   border-radius: 10px;
 }
 .modal-title {
-  font-family: "Montserrat", serif; 
-  font-weight: 600; 
+  font-family: "Montserrat", serif;
+  font-weight: 600;
 }
 
 .modal-header {
-  background-color: #7CA982;
+  background-color: #7ca982;
   border-bottom: 1px solid #ddd;
 }
 
 .modal-body {
   background-color: #fff;
 }
-
 
 /* Estilos Responsivos */
 @media (max-width: 768px) {
@@ -556,5 +653,4 @@ export default {
     font-size: 11px;
   }
 }
-
 </style>

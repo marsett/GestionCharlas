@@ -1,44 +1,60 @@
 <template>
   <div class="container mt-5" v-if="usuario">
     <div class="profile-card">
-      <div class="profile-header" style="background-color: #7787bd; height: 200px;">
-        <div class="profile-info text-center">
-
-        </div>
+      <div
+        class="profile-header"
+        style="background-color: #7787bd; height: 200px"
+      >
+        <div class="profile-info text-center"></div>
       </div>
 
       <div class="profile-content row align-items-center position-relative">
-        
-        <div class="col-12 col-md-3 d-flex justify-content-center mb-3 mb-md-0"> <!-- Cambié col-md-4 por col-md-3 -->
-          <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image" @click="triggerFileInput"/>
+        <div class="col-12 col-md-3 d-flex justify-content-center mb-3 mb-md-0">
+          <!-- Cambié col-md-4 por col-md-3 -->
+          <img
+            :src="usuario.imagen"
+            alt="Foto de perfil"
+            class="profile-image"
+            @click="triggerFileInput"
+          />
           <i class="fa fa-pencil edit-icon" @click="triggerFileInput"></i>
-        <input
-          type="file"
-          ref="fileInput"
-          accept="image/*"
-          style="display: none"
-          @change="handleFileChange"
-        />
-        <button
-            class="button-detalle"
-            @click="mostrarDetalles"
-          >
+          <input
+            type="file"
+            ref="fileInput"
+            accept="image/*"
+            style="display: none"
+            @change="handleFileChange"
+          />
+          <button class="button-detalle" @click="mostrarDetalles">
             Detalles
           </button>
-
         </div>
         <div class="col-12 col-md-9 mt-3 pt-3">
-          <h1 class="name text-center text-md-start">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
-          <p class="bio text-center text-md-start">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
-          <div class="profile-buttons mt-3 d-flex justify-content-end flex-column flex-md-row">
-            <button class="btn btn-password me-2" @click="mostrarFormularioContrasena()">Editar Contraseña</button>
-            <button class="btn btn-activo" :class="{'active': usuario.estadoUsuario === 'Activo'}" @click="mostrarEstadoActivo">
-              {{ usuario.estadoUsuario === true ? 'Activo' : 'Inactivo' }}
+          <h1 class="name text-center text-md-start">
+            {{ usuario.nombre }} {{ usuario.apellidos }}
+          </h1>
+          <p class="bio text-center text-md-start">
+            {{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}
+          </p>
+          <div
+            class="profile-buttons mt-3 d-flex justify-content-end flex-column flex-md-row"
+          >
+            <button
+              class="btn btn-password me-2"
+              @click="mostrarFormularioContrasena()"
+            >
+              Editar Contraseña
+            </button>
+            <button
+              class="btn btn-activo"
+              :class="{ active: usuario.estadoUsuario === 'Activo' }"
+              @click="mostrarEstadoActivo"
+            >
+              {{ usuario.estadoUsuario === true ? "Activo" : "Inactivo" }}
             </button>
           </div>
         </div>
-    </div>
-    
+      </div>
 
       <hr />
       <CharlasAlumnoComponent :usuario="usuario" />
@@ -50,17 +66,15 @@
   </div>
 </template>
 
-
-
 <script>
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import PerfilService from "@/services/PerfilService";
 import CharlasAlumnoComponent from "@/components/CharlasAlumnoComponent";
 
 export default {
   name: "PerfilAlumnoComponent",
   components: {
-    CharlasAlumnoComponent
+    CharlasAlumnoComponent,
   },
   data() {
     return {
@@ -75,7 +89,11 @@ export default {
         this.usuario = data.usuario;
       } catch (error) {
         console.error("Error al cargar el perfil:", error);
-        Swal.fire('Error', 'No se pudo cargar la información del perfil.', 'error');
+        Swal.fire(
+          "Error",
+          "No se pudo cargar la información del perfil.",
+          "error"
+        );
       }
     },
     mostrarDetalles() {
@@ -95,7 +113,7 @@ export default {
         icon: "info", // Tipo de ícono (puedes cambiarlo por otro si lo deseas)
         confirmButtonText: "Cerrar", // Botón para cerrar el alert
       });
-},
+    },
 
     mostrarFormularioContrasena() {
       Swal.fire({
@@ -179,26 +197,24 @@ export default {
     },
 
     mostrarEstadoActivo() {
-  const estado = this.usuario.estadoUsuario; // Obtener el estado del usuario
+      const estado = this.usuario.estadoUsuario; // Obtener el estado del usuario
 
-  // Condicional para mostrar un mensaje según el estado
-  Swal.fire({
-    title: "Estado del Usuario",
-    text: `Este usuario está ${estado ? 'activo' : 'inactivo'}`, 
-    icon: estado ? "success" : "warning", 
-    confirmButtonText: "Aceptar"
-  });
-}
-
+      // Condicional para mostrar un mensaje según el estado
+      Swal.fire({
+        title: "Estado del Usuario",
+        text: `Este usuario está ${estado ? "activo" : "inactivo"}`,
+        icon: estado ? "success" : "warning",
+        confirmButtonText: "Aceptar",
+      });
+    },
   },
   created() {
     this.cargarPerfil();
-  }
+  },
 };
 </script>
 
 <style scoped>
-
 .profile-card {
   background-color: #e0e0e0;
   border-radius: 10px;
@@ -210,8 +226,8 @@ export default {
   height: 200px;
   border-radius: 10px 10px 0 0;
   display: flex;
-  justify-content: center; 
-  align-items: center;   
+  justify-content: center;
+  align-items: center;
 }
 
 .profile-info {
@@ -221,14 +237,13 @@ export default {
   height: 100%;
 }
 
-
 .profile-image {
   width: 250px;
   height: 250px;
-  border-radius: 20px; 
+  border-radius: 20px;
   border: 8px solid #e0e0e0;
   object-fit: cover;
-  border: 4px solid #314B78;
+  border: 4px solid #314b78;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: -200px;
   margin-right: -120px; /* Añadimos este margen */
@@ -238,7 +253,6 @@ export default {
   position: relative;
   display: inline-block;
 }
-
 
 .edit-icon {
   height: 10%;
@@ -260,26 +274,25 @@ export default {
 
 @media (max-width: 768px) {
   .edit-icon {
-  height: 10%;
-  position: relative;
-  top: -100px;
-  right: -5px;
-  font-size: 20px;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 10;
+    height: 10%;
+    position: relative;
+    top: -100px;
+    right: -5px;
+    font-size: 20px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+  }
 }
-}
-
 
 @media (max-width: 768px) {
   .profile-image {
     width: 200px;
     height: 200px;
-    border-radius: 20px; 
+    border-radius: 20px;
     border: 8px solid #e0e0e0;
     object-fit: cover;
     margin-top: -100px;
@@ -288,11 +301,10 @@ export default {
 
   .col-12.col-md-4 {
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
   }
 }
-
 
 .name {
   font-size: 24px;
@@ -309,9 +321,8 @@ export default {
   font-weight: bold;
   margin: 30px 0;
   text-align: center;
-   margin: 60px;
-   margin-top: -30px;
-
+  margin: 60px;
+  margin-top: -30px;
 }
 
 .profile-buttons {
@@ -327,14 +338,13 @@ export default {
   padding: 10px 15px;
 }
 
-
 @media (max-width: 768px) {
   .profile-buttons {
     flex-direction: row;
     justify-content: flex-end;
   }
-  }
-  .swal-popup-bootstrap {
+}
+.swal-popup-bootstrap {
   border-radius: 0px !important;
   width: 100% !important;
   max-width: 500px;
@@ -357,7 +367,8 @@ export default {
   margin-bottom: 10px;
 }
 
-.swal-confirm-btn, .swal-cancel-btn {
+.swal-confirm-btn,
+.swal-cancel-btn {
   width: 48%;
   font-size: 16px;
   padding: 12px 0;
@@ -365,7 +376,7 @@ export default {
 }
 
 .swal-confirm-btn {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
 }
@@ -390,10 +401,9 @@ export default {
   }
 }
 
-
 .button-detalle {
   position: absolute;
-  top: -180px;  /* Separación desde la parte superior */
+  top: -180px; /* Separación desde la parte superior */
   right: 40px; /* Separación desde la parte derecha */
   background-color: #5467a5;
   color: white;
@@ -401,7 +411,7 @@ export default {
   border-radius: 5px;
   font-size: 14px;
   cursor: pointer;
-  z-index: 10;  /* Asegura que esté encima de otros elementos */
+  z-index: 10; /* Asegura que esté encima de otros elementos */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   font-size: 1.2em;
 }
@@ -413,11 +423,11 @@ export default {
 @media (max-width: 768px) {
   .button-detalle {
     position: absolute;
-    top: -170px;  /* Ajuste para que esté un poco más cerca de la parte superior */
-    left: 50%;  /* Centra el botón horizontalmente */
-    transform: translateX(-50%);  /* Esto centra el botón */
+    top: -170px; /* Ajuste para que esté un poco más cerca de la parte superior */
+    left: 50%; /* Centra el botón horizontalmente */
+    transform: translateX(-50%); /* Esto centra el botón */
     font-size: 1em; /* Ajuste de tamaño de fuente para pantallas más pequeñas */
-    right: auto;  /* Elimina la propiedad right en pantallas pequeñas */
+    right: auto; /* Elimina la propiedad right en pantallas pequeñas */
   }
 }
 button {
@@ -438,7 +448,6 @@ button:hover {
   color: #512399;
 }
 
-
 button:after {
   right: inherit;
   top: inherit;
@@ -446,7 +455,8 @@ button:after {
   bottom: 0;
 }
 
-button:hover:before, button:hover:after {
+button:hover:before,
+button:hover:after {
   width: 100%;
   transition: 800ms ease all;
 }
@@ -457,5 +467,4 @@ button:hover:before, button:hover:after {
     font-size: 1em;
   }
 }
-
 </style>
