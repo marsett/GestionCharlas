@@ -153,65 +153,85 @@
             <p><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
             <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
-            <!-- Botones para cambiar entre Descripción y Comentarios -->
+            <!-- Botones para cambiar entre Descripción, Comentarios y Recursos -->
             <div class="d-flex custom-buttons-container">
               <button
                 class="custom-button"
-                @click="mostrarDescripcion = !mostrarDescripcion; mostrarComentarios = false;" 
+                @click="mostrarDescripcion = !mostrarDescripcion; mostrarComentarios = false; mostrarRecursos = false;" 
                 :class="{'active': mostrarDescripcion}"         
               >
-              <i class="fa-solid fa-circle-info iconos"></i>
+                <i class="fa-solid fa-circle-info iconos"></i>
                 Descripción
               </button>
               <button
                 class="custom-button"
-                @click="mostrarDescripcion = false; mostrarComentarios = !mostrarComentarios"
+                @click="mostrarDescripcion = false; mostrarComentarios = !mostrarComentarios; mostrarRecursos = false;"
                 :class="{'active': mostrarComentarios}"
               >
-              <i class="fa-solid fa-comments iconos"></i>
+                <i class="fa-solid fa-comments iconos"></i>
                 Comentarios
+              </button>
+              <button
+                class="custom-button"
+                @click="mostrarDescripcion = false; mostrarComentarios = false; mostrarRecursos = !mostrarRecursos"
+                :class="{'active': mostrarRecursos}"
+              >
+                <i class="fa-solid fa-book iconos"></i>
+                Recursos
               </button>
             </div>
 
-            <hr v-if="mostrarDescripcion || mostrarComentarios" />
-
+            <hr v-if="mostrarDescripcion || mostrarComentarios || mostrarRecursos" />
             <!-- Sección de Descripción -->
             <div v-if="mostrarDescripcion" class="custom-background custom-descripcion">
-              <p>
-                {{ charlaSeleccionada.descripcion }}
-              </p>
+              <p>{{ charlaSeleccionada.descripcion }}</p>
             </div>
 
-            <!-- Sección de Comentarios // Sofi -->
+            <!-- Sección de Comentarios -->
             <div v-if="mostrarComentarios">
-    <div v-if="comentarios.length > 0" class="custom-background">
-
-      <!-- Contenedor con scroll si hay más de dos comentarios -->
-      <ul class="comment-list">
-        <li v-for="comentario in comentarios" :key="comentario.idComentario" class="comment-item">
-          <div class="comment-header">
-            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="avatar" class="avatar" />
-            <div>
-              <p class="username">{{ comentario.usuario }}</p>
-              <p class="timestamp">{{ comentario.fecha }}</p>
+              <div v-if="comentarios.length > 0" class="custom-background">
+                <ul class="comment-list">
+                  <li v-for="comentario in comentarios" :key="comentario.idComentario" class="comment-item">
+                    <div class="comment-header">
+                      <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="avatar" class="avatar" />
+                      <div>
+                        <p class="username">{{ comentario.usuario }}</p>
+                        <p class="timestamp">{{ comentario.fecha }}</p>
+                      </div>
+                    </div>
+                    <hr/>
+                    <p class="comment-text">{{ comentario.contenido }}</p>
+                  </li>
+                </ul>
+              </div>
+              <div v-else>
+                <p class="no-comments">No hay comentarios aún.</p>
+              </div>
+              <div class="comment-form">
+                <textarea v-model="newComment" class="form-control" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
+                <button class="btn custom-button mt-2" @click="addComment">Agregar comentario</button>
+              </div>
             </div>
-          </div>
-          <p class="comment-text">{{ comentario.contenido }}</p>
-        </li>
-      </ul>
-    </div>
 
-    <!-- Si no hay comentarios -->
-    <div v-else>
-      <p class="no-comments">No hay comentarios aún.</p>
-    </div>
-
-    <!-- Formulario para agregar un nuevo comentario -->
-    <div class="comment-form">
-      <textarea v-model="newComment" class="form-control" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
-      <button class="btn custom-button mt-2" @click="addComment">Agregar comentario</button>
-    </div>
-</div>
+            <!-- Sección de Recursos -->
+            <div v-if="mostrarRecursos" class="custom-background">
+              <div v-if="recursos.length > 0">
+                <ul class="recurso-list">
+                  <li v-for="recurso in recursos" :key="recurso.idRecurso" class="recurso-item">
+                    <div class="recurso-header">
+                      <h6 class="recurso-title">{{ recurso.nombre }}</h6>
+                      <a :href="recurso.url" target="_blank" class="recurso-link">
+                        <i class="fa-solid fa-link"></i> Ver Recurso
+                      </a>
+                    </div>
+                    <p class="recurso-description">{{ recurso.descripcion }}</p>
+                  </li>
+                </ul>
+              </div>
+              <div v-else>
+                <p class="no-recursos">No hay recursos disponibles.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -238,10 +258,12 @@ export default {
       filtroEstado: "",
       charlasFiltradas: [],
       estadosDisponibles: [],
+      recursos: [], 
       rolActual: "ALUMNO",
       mostrarModal: false,
       charlaSeleccionada: null,
       mostrarDescripcion: false,
+      mostrarRecursos: false,
       mostrarComentarios: false
     };
   },
@@ -250,12 +272,14 @@ export default {
       this.charlaSeleccionada = charla;
       this.mostrarModal = true;
       this.cargarComentarios(charla.idCharla);
+      this.cargarRecursos(charla.idCharla);
     },
     cerrarModal() {
       this.mostrarModal = false;
       this.charlaSeleccionada = null;
       this.mostrarDescripcion = false;
       this.mostrarComentarios = false;
+      this.mostrarRecursos = false;
     },
     cargarRondas() {
       serviceCharlas
@@ -266,6 +290,18 @@ export default {
         })
         .catch((error) => {
           console.error("Error al cargar las rondas:", error);
+        });
+    },
+    cargarRecursos(idCharla) {
+      serviceCharlas
+        .getRecursosCharlas(idCharla)
+        .then((response) => {
+          this.recursos = response.recursos || []; 
+          console.log(response.recursos)
+        })
+        .catch((error) => {
+          console.error("Error al cargar los recursos:", error);
+          Swal.fire("Error", "No se pudieron cargar los recursos.", "error");
         });
     },
     cargarCharlas() {
@@ -507,24 +543,30 @@ export default {
   line-height: 1.6;
 }
 .comment-list {
-  max-height: 200px; /* Ajusta la altura según sea necesario */
+  max-height: 400px; /* Altura aumentada para mostrar más comentarios */
   overflow-y: auto; /* Activar scroll vertical */
   padding-right: 10px; /* Espacio a la derecha para evitar que el scroll se superponga */
+  background-color: #d1e7d7; /* Fondo verde claro */
+  border-radius: 10px; /* Bordes redondeados */
 }
 
+/* Estilo de cada comentario */
 .comment-item {
-  background-color: #f8f9fa;
+  background-color: #ffffff; /* Fondo blanco para los comentarios */
   padding: 15px;
   margin-bottom: 15px;
+  margin-top: 15px;
   list-style-type: none;
   border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más sutil */
   transition: transform 0.3s ease-in-out;
+  color: #333; /* Color del texto más oscuro para asegurar buena visibilidad */
 }
 
 .comment-item:hover {
-  transform: translateY(-5px);
+  background-color: #f1f1f1; /* Fondo más claro al pasar el mouse */
 }
+
 
 .no-comments {
   font-size: 16px;
@@ -603,6 +645,70 @@ export default {
 
 .comment-form button:hover {
   background-color: #406b45; /* Fondo más oscuro al hacer hover */
+}
+
+/* Estilo para la sección de recursos */
+
+.recurso-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.recurso-item {
+  background-color: #d1e7d7;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.recurso-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.recurso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recurso-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #527c58;
+  margin: 0;
+}
+
+.recurso-link {
+  font-size: 14px;
+  color: #527c58;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.recurso-link:hover {
+  text-decoration: underline;
+  color: #406b45;
+}
+
+.recurso-link i {
+  margin-right: 5px;
+}
+
+.recurso-description {
+  font-size: 14px;
+  color: #555;
+  margin-top: 10px;
+}
+
+.no-recursos {
+  font-size: 16px;
+  color: #888;
+  text-align: center;
+  margin-top: 10px;
 }
 
 </style>

@@ -402,38 +402,4 @@ export default class CharlasService {
             });
         });
     }
-
-    editarCharla(charlaActualizada) {
-        return new Promise((resolve, reject) => {
-            const endpoint = `api/Charlas`;
-            const token = Cookies.get('bearer_token');
-            axios.put(Global.urlBase + endpoint, charlaActualizada, {
-                headers: {
-                    Authorization: token,
-                },
-            })
-            .then(response => resolve(response.data))
-            .catch(error => {
-                console.error("Error al editar charla en el perfil alumno:", error.response ? error.response.data : error);
-                reject(error);
-            });
-        });
-    }
-
-    editarRecurso(recursoActualizado){
-        return new Promise((resolve, reject) => {
-            const endpoint = `api/Recursos`;
-            const token = Cookies.get('bearer_token');
-            axios.put(Global.urlBase + endpoint, recursoActualizado, {
-                headers: {
-                    Authorization: token,
-                },
-            })
-            .then(response => resolve(response.data))
-            .catch(error => {
-                console.error("Error al editar recurso en el perfil alumno:", error.response ? error.response.data : error);
-                reject(error);
-            });
-        });
-    }
 }
