@@ -61,6 +61,7 @@
                     <div class="card-body">
                       <h5 class="card-title">{{ charla.titulo }}</h5>
                       <p class="card-text">{{ charla.descripcion }}</p>
+                      <p class="card-text">Recursos: {{ charla.recursos }}</p>
                     </div>
                     <div class="card-footer">
                       <small class="text-body-secondary">
@@ -92,13 +93,14 @@
             <button type="button" class="btn-close" aria-label="Close" @click="cerrarModal"></button>
           </div>
           <div class="modal-body">
-            <p>
-              <strong>Fecha Propuesta:</strong>
+            <p class="timestamp"> 
+              <strong>Fecha Propuesta:</strong> 
               {{ charlaSeleccionada.fechaPropuesta }}
             </p>
             <p><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
             <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
+            <p><strong>Recursos adjuntados:</strong> {{ charlaSeleccionada.recursos }}</p>
             <!-- Botones para cambiar entre Descripción y Comentarios -->
             <div class="d-flex custom-buttons-container">
               <button class="custom-button"
@@ -177,6 +179,7 @@ export default {
       charlas: [],
       rondas: [],
       comentarios: [],
+      recursos: [],
       newComment: "",
       filtroRonda: 0,
       filtroEstado: "",
@@ -184,7 +187,7 @@ export default {
       estadosDisponibles: [],
       rolActual: "ALUMNO",
       mostrarModal: false,
-      charlaSeleccionada: null,
+      charlaSeleccionada: {},
       mostrarDescripcion: false,
       mostrarComentarios: false
     };
@@ -200,7 +203,7 @@ export default {
   },
   methods: {
     abrirModal(charla) {
-      this.charlaSeleccionada = charla;
+      this.getDetallesCompletos(charla.idCharla);
       this.mostrarModal = true;
       this.cargarComentarios(charla.idCharla);
     },
@@ -219,6 +222,16 @@ export default {
         })
         .catch((error) => {
           console.error("Error al cargar las rondas:", error);
+        });
+    },
+    getDetallesCompletos(idCharla) {
+      serviceCharlas
+        .getDetallesCharla(idCharla)
+        .then((data) => {
+          this.charlaSeleccionada = data;
+        })
+        .catch((error) => {
+          console.error("Error al obtener los detalles de la charla:", error);
         });
     },
     cargarCharlas() {
@@ -343,7 +356,12 @@ export default {
         return `${dias} días`;
       }
       else {
-        return `${horas}:${minutos}`;
+        if(horas > 10)
+          return `${horas} horas ${minutos} min`;
+        if (horas == 0)
+          return `${minutos} min`;
+        else
+          return `${horas} hora ${minutos} min`;
       }
     }
   },
