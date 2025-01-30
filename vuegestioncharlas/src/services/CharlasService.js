@@ -364,6 +364,28 @@ export default class CharlasService {
         });
     }
 
+    getComentarioUsuario(){
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/comentarios/comentariosusuario`;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener las charlas: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
     setComentario(form) {
         return new Promise((resolve, reject) => {
             const endpoint = 'api/comentarios';
