@@ -792,8 +792,9 @@ export default {
         // Evaluar el estado de la respuesta del servidor
         if (response.status === 200 || response.status === 201) {
           Swal.fire('Eliminado', 'La ronda ha sido eliminada con éxito', 'success');
-          this.evaluarAlumnos(); 
         } 
+        
+        this.evaluarAlumnos(); 
       } catch (error) {
         if (error.response) {
           // Manejar errores específicos
