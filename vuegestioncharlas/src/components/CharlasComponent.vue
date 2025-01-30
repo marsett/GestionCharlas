@@ -93,14 +93,22 @@
             <button type="button" class="btn-close" aria-label="Close" @click="cerrarModal"></button>
           </div>
           <div class="modal-body">
-            <p class="timestamp"> 
-              <strong>Fecha Propuesta:</strong> 
+            <p class="timestamp">
+              <strong>Fecha Propuesta:</strong>
               {{ charlaSeleccionada.fechaPropuesta }}
             </p>
             <p><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
             <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
-            <p><strong>Recursos adjuntados:</strong> {{ charlaSeleccionada.recursos }}</p>
+            <div v-if="recursos.length">
+              <ul>
+                <li v-for="(recurso, index) in recursos" :key="index" style="list-style-type: none;" class="custom-background">
+                  <p><strong>Recurso:</strong> {{ recurso.nombre }}</p>
+                  <p><strong>Descripción:</strong> {{ recurso.descripcion }}</p>
+                  <p><strong>URL:</strong> {{ recurso.url }}</p>
+                </li>
+              </ul>
+            </div>
             <!-- Botones para cambiar entre Descripción y Comentarios -->
             <div class="d-flex custom-buttons-container">
               <button class="custom-button"
@@ -179,7 +187,13 @@ export default {
       charlas: [],
       rondas: [],
       comentarios: [],
-      recursos: [],
+      recursos: [
+        {
+            descripcion: "",
+            url: "",
+            nombre: ""
+        }
+      ],
       newComment: "",
       filtroRonda: 0,
       filtroEstado: "",
@@ -203,10 +217,18 @@ export default {
   },
   methods: {
     abrirModal(charla) {
-      this.getDetallesCompletos(charla.idCharla);
+      this.charlaSeleccionada = charla;
+      this.detalles(charla.idCharla);
       this.mostrarModal = true;
       this.cargarComentarios(charla.idCharla);
     },
+    detalles(idCharla) {
+      serviceCharlas.getDetallesCharla(idCharla)
+        .then(response => {
+          this.recursos = response.recursos;
+        });
+    }
+    ,
     cerrarModal() {
       this.mostrarModal = false;
       this.charlaSeleccionada = null;
@@ -222,16 +244,6 @@ export default {
         })
         .catch((error) => {
           console.error("Error al cargar las rondas:", error);
-        });
-    },
-    getDetallesCompletos(idCharla) {
-      serviceCharlas
-        .getDetallesCharla(idCharla) // Llamamos al método que devuelve una promesa
-        .then((data) => {
-          this.charlaSeleccionada = data; // Guardamos los datos en la variable
-        })
-        .catch((error) => {
-          console.error("Error al obtener los detalles de la charla:", error);
         });
     },
     cargarCharlas() {
@@ -356,7 +368,7 @@ export default {
         return `${dias} días`;
       }
       else {
-        if(horas > 10)
+        if (horas > 10)
           return `${horas} horas ${minutos} min`;
         if (horas == 0)
           return `${minutos} min`;
@@ -627,7 +639,7 @@ export default {
   /* Fondo más oscuro al hacer hover */
 }
 
-.accordion-button::after{
-  margin-left: 28px!important;
+.accordion-button::after {
+  margin-left: 28px !important;
 }
 </style>

@@ -6,6 +6,7 @@
           <h2>{{ charla.titulo }}</h2>
           <p><strong>Descripción:</strong> {{ charla.descripcion }}</p>
           <p><strong>Estado:</strong> {{ charla.estadoCharla }}</p>
+          <p>{{ charla.recursos }}</p>
         </div>
         <div v-else>
           <p>Cargando los detalles de la charla...</p>
