@@ -436,4 +436,27 @@ export default class CharlasService {
             });
         });
     }
+
+    getRecursosCharlas(idCharla) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/charlas/${idCharla}`;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token,
+                    }
+                }
+            )
+            .then(response => {
+                console.log("Respuesta de la API para recursos:", response.data);
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los recursos: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
 }

@@ -29,9 +29,11 @@
               @error="onImageError"
             />
             <!-- Estado de la charla (si lo hay) -->
-            <div v-if="charla.charla.estadoCharla" 
-                 :class="estadoClass(charla.charla.estadoCharla)" 
-                 class="estado-btn">
+            <div
+              v-if="charla.charla.estadoCharla"
+              :class="estadoClass(charla.charla.estadoCharla)"
+              class="estado-btn"
+            >
               {{ charla.charla.estadoCharla }}
             </div>
           </div>
@@ -95,76 +97,136 @@
             <div class="d-flex custom-buttons-container">
               <button
                 class="custom-button"
-                @click="mostrarDescripcion = !mostrarDescripcion; mostrarComentarios = false;" 
-                :class="{'active': mostrarDescripcion}"         
+                @click="
+                  mostrarDescripcion = !mostrarDescripcion;
+                  mostrarComentarios = false;
+                  mostrarRecursos = false;
+                "
+                :class="{ active: mostrarDescripcion }"
               >
                 <i class="fa-solid fa-circle-info iconos"></i>
                 Descripción
               </button>
               <button
                 class="custom-button"
-                @click="mostrarDescripcion = false; mostrarComentarios = !mostrarComentarios"
-                :class="{'active': mostrarComentarios}"
+                @click="
+                  mostrarDescripcion = false;
+                  mostrarComentarios = !mostrarComentarios;
+                  mostrarRecursos = false;
+                "
+                :class="{ active: mostrarComentarios }"
               >
                 <i class="fa-solid fa-comments iconos"></i>
                 Comentarios
               </button>
               <button
                 class="custom-button"
-                @click="mostrarDescripcion = false; mostrarComentarios = false; mostrarRecursos = !mostrarRecursos"
-                :class="{'active': mostrarRecursos}"
+                @click="
+                  mostrarDescripcion = false;
+                  mostrarComentarios = false;
+                  mostrarRecursos = !mostrarRecursos;
+                "
+                :class="{ active: mostrarRecursos }"
               >
                 <i class="fa-solid fa-book iconos"></i>
                 Recursos
               </button>
             </div>
 
-            <hr v-if="mostrarDescripcion || mostrarComentarios || mostrarRecursos" />
+            <hr
+              v-if="mostrarDescripcion || mostrarComentarios || mostrarRecursos"
+            />
             <!-- Sección de Descripción -->
-            <div v-if="mostrarDescripcion" class="custom-background custom-descripcion">
-              <p>
-                {{ charlaSeleccionada.descripcion }}
-              </p>
+            <div
+              v-if="mostrarDescripcion"
+              class="custom-background custom-descripcion"
+            >
+              <p>{{ charlaSeleccionada.descripcion }}</p>
             </div>
 
-             <!-- Sección de Comentarios // Sofi -->
+            <!-- Sección de Comentarios -->
             <div v-if="mostrarComentarios">
-    <div v-if="comentarios.length > 0" class="custom-background">
-
-      <!-- Contenedor con scroll si hay más de dos comentarios -->
-      <ul class="comment-list">
-        <li v-for="comentario in comentarios" :key="comentario.idComentario" class="comment-item">
-          <div class="comment-header">
-            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="avatar" class="avatar" />
-            <div>
-              <p class="username">{{ comentario.usuario }}</p>
-              <p class="timestamp">{{ comentario.fecha }}</p>
+              <div v-if="comentarios.length > 0" class="custom-background">
+                <ul class="comment-list">
+                  <li
+                    v-for="comentario in comentarios"
+                    :key="comentario.idComentario"
+                    class="comment-item"
+                  >
+                    <div class="comment-header">
+                      <img
+                        src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
+                        alt="avatar"
+                        class="avatar"
+                      />
+                      <div>
+                        <p class="username">{{ comentario.usuario }}</p>
+                        <p class="timestamp">{{ comentario.fecha }}</p>
+                      </div>
+                    </div>
+                    <hr />
+                    <p class="comment-text">{{ comentario.contenido }}</p>
+                  </li>
+                </ul>
+              </div>
+              <div v-else>
+                <p class="no-comments">No hay comentarios aún.</p>
+              </div>
+              <div class="comment-form">
+                <textarea
+                  v-model="newComment"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Escribe tu comentario aquí..."
+                ></textarea>
+                <button class="btn custom-button mt-2" @click="addComment">
+                  Agregar comentario
+                </button>
+              </div>
             </div>
-          </div>
-          <p class="comment-text">{{ comentario.contenido }}</p>
-        </li>
-      </ul>
-    </div>
 
-    <!-- Si no hay comentarios -->
-    <div v-else>
-      <p class="no-comments">No hay comentarios aún.</p>
-    </div>
-
-    <!-- Formulario para agregar un nuevo comentario -->
-    <div class="comment-form">
-      <textarea v-model="newComment" class="form-control" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
-      <button class="btn custom-button mt-2" @click="addComment">Agregar comentario</button>
-    </div>
-</div>
-
+            <!-- Sección de Recursos -->
+            <div v-if="mostrarRecursos" class="custom-background">
+              <div v-if="recursos.length > 0">
+                <ul class="recurso-list">
+                  <li
+                    v-for="recurso in recursos"
+                    :key="recurso.idRecurso"
+                    class="recurso-item"
+                  >
+                    <div class="recurso-header">
+                      <h6 class="recurso-title">{{ recurso.nombre }}</h6>
+                      <a
+                        :href="recurso.url"
+                        target="_blank"
+                        class="recurso-link"
+                      >
+                        <i class="fa-solid fa-link"></i> Ver Recurso
+                      </a>
+                      <!-- Botón de editar -->
+                      <button
+                        @click="editarRecurso(recurso)"
+                        class="btn btn-lg"
+                        style="font-size: 1.5rem; padding: 0.75rem 1.25rem;"
+                      >
+                        <i class="fa-solid fa-edit"></i>
+                      </button>
+                    </div>
+                    <p class="recurso-description">{{ recurso.descripcion }}</p>
+                  </li>
+                </ul>
+              </div>
+              <div v-else>
+                <p class="no-recursos">No hay recursos disponibles.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
+ 
 <script>
 import PerfilService from "@/services/PerfilService";
 import CharlasService from "@/services/CharlasService";
@@ -180,11 +242,14 @@ export default {
       charlas: [],
       modalVisible: false,
       charlaSeleccionada: {},
-      mostrarDescripcion: true, 
-      mostrarComentarios: false, 
+      mostrarDescripcion: true,
+      mostrarComentarios: false,
       comentarios: [],
-      newComment: '',
-      defaultImage: 'https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg'
+      newComment: "",
+      recursos: [],
+      mostrarRecursos: false,
+      defaultImage:
+        "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg",
     };
   },
   methods: {
@@ -192,14 +257,55 @@ export default {
       serviceCharlas
         .getRecursosCharlas(idCharla)
         .then((response) => {
-          this.recursos = response.recursos || []; 
-          console.log(response.recursos)
+          this.recursos = response.recursos || [];
+          console.log(response.recursos);
         })
         .catch((error) => {
           console.error("Error al cargar los recursos:", error);
           Swal.fire("Error", "No se pudieron cargar los recursos.", "error");
         });
     },
+    editarRecurso(recurso) {
+      Swal.fire({
+        title: "Editar Recurso",
+        html: `
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <input id="swal-nombre" class="swal2-input" placeholder="Nombre" value="${recurso.nombre}" style="width: 90%;">
+        <textarea id="swal-descripcion" class="swal2-textarea" placeholder="Descripción" style="width: 90%; height: 120px;">${recurso.descripcion}</textarea>
+        <input id="swal-url" class="swal2-input" placeholder="URL" value="${recurso.url}" style="width: 90%;">
+      </div>
+    `,
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        preConfirm: () => {
+          return {
+            idRecurso: recurso.idRecurso, // Se mantiene el idRecurso
+            idCharla: recurso.idCharla, // Se mantiene el idCharla
+            nombre: document.getElementById("swal-nombre").value, // Nombre
+            descripcion: document.getElementById("swal-descripcion").value, // Descripción
+            url: document.getElementById("swal-url").value, // URL
+          };
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          serviceCharlas
+            .editarRecurso(result.value) // Pasa el objeto con la nueva estructura
+            .then(() => {
+              Swal.fire(
+                "Éxito",
+                "Recurso actualizado correctamente",
+                "success"
+              );
+              this.cargarRecursos(this.charlaSeleccionada.idCharla); // Recargar los recursos
+            })
+            .catch(() => {
+              Swal.fire("Error", "No se pudo actualizar el recurso", "error");
+            });
+        }
+      });
+    },
+
     // Formatea la fecha en formato local
     formatDate(date) {
       const options = {
@@ -208,7 +314,6 @@ export default {
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-
       };
       return new Date(date).toLocaleDateString("es-ES", options);
     },
@@ -340,7 +445,8 @@ export default {
     mostrarDetalles(charla) {
       this.charlaSeleccionada = charla;
       this.modalVisible = true;
-      this.cargarComentarios(charla.idCharla); 
+      this.cargarComentarios(charla.idCharla);
+      this.cargarRecursos(charla.idCharla);
     },
     // Cierra el modal
     cerrarModal() {
@@ -358,13 +464,12 @@ export default {
     },
   },
 
-
   created() {
     this.cargarCharlas();
   },
 };
 </script>
-
+ 
 <style scoped>
 /* Estilos para la tarjeta */
 .container {
@@ -525,7 +630,6 @@ export default {
   border-radius: 15px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil para destacar */
   margin-top: 10px;
-
 }
 
 .custom-descripcion {
@@ -557,7 +661,6 @@ export default {
 .comment-item:hover {
   background-color: #f1f1f1; /* Fondo más claro al pasar el mouse */
 }
-
 
 .no-comments {
   font-size: 16px;
@@ -656,5 +759,67 @@ export default {
     font-size: 11px;
   }
 }
+/* Estilo para la sección de recursos */
 
+.recurso-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.recurso-item {
+  background-color: #d1e7d7;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.recurso-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.recurso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recurso-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #527c58;
+  margin: 0;
+}
+
+.recurso-link {
+  font-size: 14px;
+  color: #527c58;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.recurso-link:hover {
+  text-decoration: underline;
+  color: #406b45;
+}
+
+.recurso-link i {
+  margin-right: 5px;
+}
+
+.recurso-description {
+  font-size: 14px;
+  color: #555;
+  margin-top: 10px;
+}
+
+.no-recursos {
+  font-size: 16px;
+  color: #888;
+  text-align: center;
+  margin-top: 10px;
+}
 </style>
