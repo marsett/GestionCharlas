@@ -107,6 +107,32 @@ export default class PerfilService {
         }).then(response => response.data);
     }
 
+    
+    updateRonda(ronda) {
+        return axios.put(`${Global.urlBase}api/Profesor/UpdateRonda`, ronda, {
+            headers: { Authorization: Cookies.get("bearer_token") },
+        });
+    }
+
+    deleteRonda(idRonda) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/Profesor/DeleteRonda/${idRonda}`;
+            const token = Cookies.get('bearer_token');
+        
+            axios.delete(Global.urlBase + endpoint, {
+                headers: {
+                Authorization: token,
+                },
+            })
+            .then(response => {
+                resolve(response.data); // Resolución con los datos de la respuesta
+            })
+            .catch(error => {
+                reject(error); // Rechazo con el error para que el bloque `catch` lo maneje
+            });
+        });
+    }
+
     // Este devuelve todos los cursos y sus alumnos
     getAlumnosCursoProfesor() {
         return new Promise((resolve, reject) => {
