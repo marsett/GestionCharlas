@@ -1,17 +1,16 @@
 <template>
-  <div class="container mt-5" v-if="usuario">
+  <div class="container my-3 my-md-5" v-if="usuario">
     <div class="profile-card">
       <div
         class="profile-header"
         style="display: flex; align-items: center; padding: 10px"
       >
         <button
-          class="btn btn-secondary"
+          class="btn btn-secondary detalles-btn"
           style="
             margin-left: auto;
             margin-bottom: auto;
             margin-top: 0px;
-            background-color: #314b78;
           "
           @click="mostrarDetalles"
         >
@@ -35,19 +34,18 @@
         </div>
         <div class="profile-buttons text-end">
           <button
-            class="btn btn-secondary"
+            class="btn btn-secondary me-2"
             style="
               margin-left: auto;
               margin-bottom: auto;
-              background-color: #yellow;
             "
             @click="mostrarFormularioContrasena()"
           >
             Editar Contraseña
           </button>
           <button
-            class="btn btn-primary botoncrearcurso"
-            style="margin-left: 10px; background-color: #28a745"
+            class="btn botoncrearcurso me-0"
+            style="margin-left: 10px;"
             @click="abrirModalCrearCurso"
           >
             Crear Curso
@@ -57,7 +55,7 @@
       <hr />
 
       <div v-if="cargando" class="text-center mb-4">
-        <div class="spinner-border" style="margin-top: 20px" role="status">
+        <div class="spinner-border text-success" style="margin-top: 20px" role="status">
           <span class="visually-hidden">Cargando cursos...</span>
         </div>
       </div>
@@ -91,8 +89,7 @@
             <div class="card-footer" style="margin-bottom: 20px">
               <small class="text-body-secondary pequeno">
                 <button
-                  class="btn mt-3"
-                  style="background-color: #314b78; color: white"
+                  class="btn btn-ver mt-3"
                   @click="
                     verAlumnos(cursoData.curso.idCurso, cursoData.curso.activo)
                   "
@@ -106,7 +103,7 @@
                   Eliminar
                 </button>
                 <button
-                  class="btn btn-warning mt-3"
+                  class="btn botoncrearcurso mt-3"
                   @click="modificarEstadoCurso(cursoData.curso)"
                 >
                   Editar
@@ -630,7 +627,7 @@ export default {
   right: 15px;
   font-size: 20px;
   color: white;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #314b78;
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
@@ -638,7 +635,7 @@ export default {
 }
 
 .edit-icon:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #41619a;
 }
 
 .card {
@@ -659,6 +656,51 @@ export default {
 
 .list-group-item strong {
   color: #314b78;
+}
+
+.btn-ver{
+  color: white;
+  background-color: #314b78 !important;
+}
+
+.detalles-btn {
+  margin-left: auto;
+  margin-bottom: auto;
+  margin-top: 0px;
+  background-color: #314b78 !important;
+  cursor: pointer;
+  color: white;
+}
+
+.detalles-btn:hover {
+  border-color: #41619a !important;
+  background-color: #41619a !important;
+  color: white;
+}
+
+.detalles-btn:active {
+  border-color: #41619a !important;
+  background-color: #41619a !important;
+  color: white;
+}
+
+.botoncrearcurso {
+  margin-left: 0px !important;
+  background-color: #40685c !important; 
+  color: white;
+  cursor: pointer;
+}
+
+.botoncrearcurso:active {
+  border-color: #578e73 !important;
+  background-color: #578e73 !important;
+  color: white;
+}
+
+.botoncrearcurso:hover {
+  border-color: #578e73 !important;
+  background-color: #578e73 !important;
+  color: white;
 }
 
 @media (min-width: 768px) {

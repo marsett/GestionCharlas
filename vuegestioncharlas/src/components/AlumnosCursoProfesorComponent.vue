@@ -1,10 +1,11 @@
 <template>
-  <!-- Botón de retroceder -->
-  <button class="btn-retroceder" @click="volverAtras">
-    <i class="fas fa-arrow-left"></i>
-    <!-- Ícono de retroceder -->
-  </button>
-  <div class="container my-4 p-4">
+  <div class="container my-3 my-md-5 p-4">
+    <!-- Botón de retroceder -->
+    <button class="btn-retroceder" @click="volverAtras">
+      <i class="fas fa-arrow-left"></i>
+      <!-- Ícono de retroceder -->
+    </button>
+
     <h2 class="mb-4 text-center" style="font-size: 42px; font-weight: 400px">
       Gestión de Alumnos
     </h2>
@@ -327,14 +328,33 @@ export default {
 }
 
 .btn-retroceder {
-  background-color: #cbcbcb;
+  background-color: #a3a3a3;
   border: none;
   padding: 8px 15px;
-  margin: 20px;
+  margin: 0px;
   border-radius: 15px;
   cursor: pointer;
   transition: background-color 0.3s;
   flex: 1;
+}
+
+.btn-activar {
+  margin-left: 0px !important;
+  background-color: #40685c !important; 
+  color: white;
+  cursor: pointer;
+}
+
+.btn-activar:active {
+  border-color: #578e73 !important;
+  background-color: #578e73 !important;
+  color: white;
+}
+
+.btn-activar:hover {
+  border-color: #578e73 !important;
+  background-color: #578e73 !important;
+  color: white;
 }
 
 @media (max-width: 991px) {

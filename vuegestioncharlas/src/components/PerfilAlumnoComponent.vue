@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-5" v-if="usuario">
+  <div class="container my-3 my-md-5" v-if="usuario">
     <div class="profile-card">
       <div class="profile-header" style="background-color: #7787bd; height: 200px;">
         <div class="profile-info text-center">
@@ -9,7 +9,7 @@
       <div class="profile-content row align-items-center position-relative">
         <div class="col-12 col-md-3 d-flex justify-content-center mb-3 mb-md-0">
           <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image" @click="triggerFileInput"/>
-          <i class="fa fa-pencil edit-icon" @click="triggerFileInput"></i>
+          <i class="fa fa-pencil edit-icon ms-2" @click="triggerFileInput"></i>
           <input type="file" ref="fileInput" accept="image/*" style="display: none" @change="handleFileChange" />
           <button class="button-detalle" @click="mostrarDetalles">Detalles</button>
         </div>
@@ -18,9 +18,9 @@
           <h1 class="name text-center text-md-start">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
           <p class="bio text-center text-md-start">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
           <div class="profile-buttons mt-3 d-flex justify-content-end flex-column flex-md-row">
-            <button class="btn btn-password me-2" @click="mostrarMisComentarios">Mis Comentarios</button>
+            <!-- <button class="btn btn-password me-2" @click="mostrarMisComentarios">Mis Comentarios</button> -->
             <button class="btn btn-password me-2" @click="mostrarFormularioContrasena">Editar Contraseña</button>
-            <button class="btn btn-activo" :class="{'active': usuario.estadoUsuario === 'Activo'}"
+            <button class="btn btn-activo" :class="{'btn-activo': usuario.estadoUsuario === 'Activo'}"
               :disabled="usuario.estadoUsuario === 'Activo'" style="pointer-events: none;">
               {{ usuario.estadoUsuario === true ? 'Activo' : 'Inactivo' }}
             </button>
@@ -320,7 +320,7 @@ export default {
   right: -120px;
   font-size: 20px;
   color: white;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #314b78;
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
@@ -328,7 +328,7 @@ export default {
 }
 
 .edit-icon:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #41619a;
 }
 
 @media (max-width: 768px) {
@@ -370,15 +370,15 @@ export default {
 .name {
   font-size: 24px;
   font-weight: bold;
-  color: #777;
+  color: #474747;
   text-align: center;
-  margin: 70px;
+  margin: 70px 70px 40px 70px;
   margin-top: -10px;
 }
 
 .bio {
   font-size: 14px;
-  color: #777;
+  color: #474747;
   font-weight: bold;
   margin: 30px 0;
   text-align: center;
@@ -468,7 +468,7 @@ export default {
   position: absolute;
   top: -180px;  
   right: 40px;
-  background-color: #5467a5;
+  background-color: #314b78 !important;
   color: white;
   padding: 10px 15px;
   border-radius: 5px;
@@ -480,7 +480,15 @@ export default {
 }
 
 .button-detalle:hover {
-  background-color: #fff;
+  border-color: #41619a !important;
+  background-color: #41619a !important;
+  color: white;
+}
+
+.button-detalle:active {
+  border-color: #41619a !important;
+  background-color: #41619a !important;
+  color: white;
 }
 
 @media (max-width: 768px) {
@@ -502,7 +510,6 @@ button {
   font-size: 1.2em;
   padding: 0 2em;
   cursor: pointer;
-
   outline: none;
 }
 
@@ -510,7 +517,6 @@ button:hover {
   background: #fff;
   color: #512399;
 }
-
 
 button:after {
   right: inherit;
@@ -522,6 +528,29 @@ button:after {
 button:hover:before, button:hover:after {
   width: 100%;
   transition: 800ms ease all;
+}
+
+.btn-activo {
+  background-color: #40685c !important; 
+  color: #fff;
+  border: none;
+  position: relative;
+  height: 50px;
+  font-size: 1.2em;
+  padding: 0 2em;
+  cursor: pointer;
+}
+
+.btn-activo:active {
+  border-color: #578e73 !important;
+  background-color: #578e73 !important;
+  color: white;
+}
+
+.btn-activo:hover {
+  border-color: #578e73 !important;
+  background-color: #578e73 !important;
+  color: white;
 }
 
 @media (max-width: 768px) {
