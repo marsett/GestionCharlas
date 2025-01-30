@@ -338,7 +338,7 @@ export default {
   right: -5px;
   font-size: 20px;
   color: white;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #314b78;
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
