@@ -187,7 +187,7 @@ export default {
       estadosDisponibles: [],
       rolActual: "ALUMNO",
       mostrarModal: false,
-      charlaSeleccionada: {},
+      charlaSeleccionada: null,
       mostrarDescripcion: false,
       mostrarComentarios: false
     };
@@ -226,9 +226,9 @@ export default {
     },
     getDetallesCompletos(idCharla) {
       serviceCharlas
-        .getDetallesCharla(idCharla)
+        .getDetallesCharla(idCharla) // Llamamos al método que devuelve una promesa
         .then((data) => {
-          this.charlaSeleccionada = data;
+          this.charlaSeleccionada = data; // Guardamos los datos en la variable
         })
         .catch((error) => {
           console.error("Error al obtener los detalles de la charla:", error);
