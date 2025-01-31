@@ -1241,7 +1241,7 @@ export default {
   }
 
   ::v-deep(.btn-primary) {
-    background-color: #40685c !important; 
+    background-color: #527c58 !important; 
     border: none;
     color: white;
     border-radius: 8px;
@@ -1250,7 +1250,7 @@ export default {
 
   ::v-deep(.btn-primary:active) {
     border-color: #40685c !important;
-    background-color: #578e73 !important;
+    background-color: #527c58 !important;
   }
 
   ::v-deep(.btn-primary:hover) {

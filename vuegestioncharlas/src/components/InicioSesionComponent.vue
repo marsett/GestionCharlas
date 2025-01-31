@@ -181,7 +181,7 @@ export default {
 
 <style scoped>
   .login-background {
-    background-color: #FDFAFA;
+    background-color: #fdfafa00;
   }
 
   .logo-container {
@@ -189,17 +189,17 @@ export default {
   }
 
   .login-container{
-    background-color: #F5ECD5;
+    background-color: #abceaf;
   }
 
   .btn-success{
-    background-color: #578E7E;
-    border-color: #578E7E;
+    background-color: #314B78;
+    border-color: #314B78;
   }
 
   .btn-success:active, .btn-success:hover{
-    border-color: #436c60;
-    background-color: #436c60;
+    border-color: #5772A6;
+    background-color: #5772A6;
   }
 
   .btn-success:disabled{
