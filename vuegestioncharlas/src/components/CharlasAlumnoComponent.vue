@@ -254,8 +254,7 @@ export default {
       newComment: "",
       recursos: [],
       mostrarRecursos: false,
-      defaultImage:
-        "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg",
+      defaultImage: require("../assets/banner_default.jpg"),
       cargando: true,
     };
   },
