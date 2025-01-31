@@ -764,7 +764,7 @@ body {
 }
 
 .profile-header {
-  background-color: #a0a0a0;
+  background-color: #7782c6 !important;
   height: 150px;
   border-radius: 10px 10px 0 0;
 }
