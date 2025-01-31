@@ -94,34 +94,28 @@
           <div class="modal-body">
             <p class="timestamp">
               <strong>Fecha Propuesta:</strong>
-              {{ charlaSeleccionada.fechaPropuesta }}
+              {{ formatearFecha(charlaSeleccionada.fechaPropuesta) }}
             </p>
             <p><strong>Usuario:</strong> {{ charlaSeleccionada.usuario }}</p>
             <p><strong>Curso:</strong> {{ charlaSeleccionada.nombreCurso }}</p>
             <p><strong>Estado:</strong> {{ charlaSeleccionada.estadoCharla }}</p>
             <!-- Botones para cambiar entre Descripción, Comentarios y Recursos -->
             <div class="d-flex custom-buttons-container">
-              <button
-                class="custom-button"
-                @click="mostrarDescripcion = !mostrarDescripcion; mostrarComentarios = false; mostrarRecursos = false;" 
-                :class="{'active': mostrarDescripcion}"         
-              >
+              <button class="custom-button"
+                @click="mostrarDescripcion = !mostrarDescripcion; mostrarComentarios = false; mostrarRecursos = false;"
+                :class="{ 'active': mostrarDescripcion }">
                 <i class="fa-solid fa-circle-info iconos"></i>
                 Descripción
               </button>
-              <button
-                class="custom-button"
+              <button class="custom-button"
                 @click="mostrarDescripcion = false; mostrarComentarios = !mostrarComentarios; mostrarRecursos = false;"
-                :class="{'active': mostrarComentarios}"
-              >
+                :class="{ 'active': mostrarComentarios }">
                 <i class="fa-solid fa-comments iconos"></i>
                 Comentarios
               </button>
-              <button
-                class="custom-button"
+              <button class="custom-button"
                 @click="mostrarDescripcion = false; mostrarComentarios = false; mostrarRecursos = !mostrarRecursos"
-                :class="{'active': mostrarRecursos}"
-              >
+                :class="{ 'active': mostrarRecursos }">
                 <i class="fa-solid fa-book iconos"></i>
                 Recursos
               </button>
@@ -139,13 +133,14 @@
                 <ul class="comment-list">
                   <li v-for="comentario in comentarios" :key="comentario.idComentario" class="comment-item">
                     <div class="comment-header">
-                      <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png" alt="avatar" class="avatar" />
+                      <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
+                        alt="avatar" class="avatar" />
                       <div>
                         <p class="username">{{ comentario.usuario }}</p>
                         <p class="timestamp">{{ comentario.fecha }}</p>
                       </div>
                     </div>
-                    <hr/>
+                    <hr />
                     <p class="comment-text">{{ comentario.contenido }}</p>
                   </li>
                 </ul>
@@ -154,7 +149,8 @@
                 <p class="no-comments">No hay comentarios aún.</p>
               </div>
               <div class="comment-form">
-                <textarea v-model="newComment" class="form-control" rows="3" placeholder="Escribe tu comentario aquí..."></textarea>
+                <textarea v-model="newComment" class="form-control" rows="3"
+                  placeholder="Escribe tu comentario aquí..."></textarea>
                 <button class="btn custom-button mt-2" @click="addComment">Agregar comentario</button>
               </div>
             </div>
@@ -204,7 +200,7 @@ export default {
       filtroEstado: "",
       charlasFiltradas: [],
       estadosDisponibles: [],
-      recursos: [], 
+      recursos: [],
       rolActual: "ALUMNO",
       mostrarModal: false,
       charlaSeleccionada: null,
@@ -235,8 +231,10 @@ export default {
         .then(response => {
           this.recursos = response.recursos;
         });
-    }
-    ,
+    },
+    formatearFecha(fecha) {
+      return moment(fecha).format('DD/MM/YYYY HH:mm');
+    },
     cerrarModal() {
       this.mostrarModal = false;
       this.charlaSeleccionada = null;
@@ -259,7 +257,7 @@ export default {
       serviceCharlas
         .getRecursosCharlas(idCharla)
         .then((response) => {
-          this.recursos = response.recursos || []; 
+          this.recursos = response.recursos || [];
           console.log(response.recursos)
         })
         .catch((error) => {
@@ -284,12 +282,12 @@ export default {
         });
     },
     filtrarCharlas() {
-  this.charlasFiltradas = this.charlas.filter(charla => {
-    const cumpleRonda = this.filtroRonda == 0 || charla.idRonda === this.filtroRonda;
-    const cumpleEstado = this.filtroEstado === "" || charla.estadoCharla === this.filtroEstado;
-    return cumpleRonda && cumpleEstado;
-  });
-},
+      this.charlasFiltradas = this.charlas.filter(charla => {
+        const cumpleRonda = this.filtroRonda == 0 || charla.idRonda === this.filtroRonda;
+        const cumpleEstado = this.filtroEstado === "" || charla.estadoCharla === this.filtroEstado;
+        return cumpleRonda && cumpleEstado;
+      });
+    },
     charlasPorRonda(idRonda) {
       return this.charlasFiltradas.filter(
         (charla) => charla.idRonda === idRonda
@@ -333,22 +331,19 @@ export default {
 
     // Método para agregar un nuevo comentario
     addComment() {
-      // Si el comentario está vacío, no hacer nada
       if (!this.newComment.trim()) {
         return;
       }
-
-      // Crear la fecha en formato español usando Moment.js
-      const fechaActual = moment().locale('es').format('DD/MM/YYYY HH:mm'); // Formato: 23/01/2025 12:30
+      const fechaActual = moment().locale('es').format('DD/MM/YYYY HH:mm'); 
 
       const comentario = {
-        idCharla: this.charlaSeleccionada.idCharla, // Usamos el id de la charla seleccionada
-        idUsuario: 13, // Suponiendo que el ID de usuario es fijo para este ejemplo
-        contenido: this.newComment, // Contenido del comentario
-        fecha: fechaActual, // Fecha formateada en el formato deseado
+        idCharla: this.charlaSeleccionada.idCharla,
+        idUsuario: 13, 
+        contenido: this.newComment,
+        fecha: fechaActual,
       };
 
-      this.isLoading = true; // Establecer el estado de carga mientras se crea el comentario
+      this.isLoading = true; 
 
       serviceCharlas
         .setComentario(comentario)
@@ -359,12 +354,8 @@ export default {
             title: "Comentario agregado exitosamente!",
           });
 
-          // Limpiar el campo de texto
           this.newComment = "";
-
-          // Recargar los comentarios de la charla
           this.cargarComentarios(this.charlaSeleccionada.idCharla);
-
           this.isLoading = false;
         })
         .catch((error) => {
@@ -380,12 +371,13 @@ export default {
     obtenerTiempoRestante(ronda) {
       const ahora = new Date();
       const fechaPresentacion = new Date(ronda.fechaPresentacion);
+      const fechaVotacion = new Date(ronda.fechaLimiteVotacion);
       const fechaCierre = new Date(ronda.fechaCierre);
 
       if (ahora < fechaPresentacion) {
         return `🕒 ${this.formatearTiempo(fechaPresentacion - ahora)}`;
       } else if (ahora >= fechaPresentacion && ahora <= fechaCierre) {
-        return `🗳️ ${this.formatearTiempo(fechaCierre - ahora)}`;
+        return `🗳️ ${this.formatearTiempo(fechaCierre - fechaVotacion)} - Vota ya!`;
       }
       return `🔚 Finalizado`;
     },
@@ -393,16 +385,19 @@ export default {
       const dias = Math.floor(ms / (1000 * 60 * 60 * 24));
       const horas = Math.floor(ms % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
       const minutos = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+      const segundos = Math.floor((ms % (1000 * 60)) / 1000);
       if (dias !== 0) {
         return `${dias} días`;
       }
       else {
         if (horas > 10)
           return `${horas} horas ${minutos} min`;
+        if (horas < 10)
+        return `${horas} hora ${minutos} min`;
         if (horas == 0)
           return `${minutos} min`;
-        else
-          return `${horas} hora ${minutos} min`;
+        if (minutos < 0)
+          return `${segundos} seg`;
       }
     }
   },
@@ -472,7 +467,8 @@ export default {
   z-index: 10;
   pointer-events: none;
 }
-.btn-verde{
+
+.btn-verde {
   background-color: #527c58;
   border: none;
 }
@@ -521,7 +517,7 @@ export default {
   background-color: #527c58;
   /* Fondo en active */
   color: #fff;
-  
+
 }
 
 .iconos {
@@ -552,29 +548,33 @@ export default {
 }
 
 .comment-list {
-  max-height: 400px; 
-  overflow-y: auto; 
-  padding-right: 10px; 
-  background-color: #d1e7d7; 
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+  background-color: #d1e7d7;
   border-radius: 10px;
-  margin-left: 0px !important; 
+  margin-left: 0px !important;
 }
 
 /* Estilo de cada comentario */
 .comment-item {
-  background-color: #ffffff; /* Fondo blanco para los comentarios */
+  background-color: #ffffff;
+  /* Fondo blanco para los comentarios */
   padding: 15px;
   margin-bottom: 15px;
   margin-top: 15px;
   list-style-type: none;
   border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más sutil */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  /* Sombra más sutil */
   transition: transform 0.3s ease-in-out;
-  color: #333; /* Color del texto más oscuro para asegurar buena visibilidad */
+  color: #333;
+  /* Color del texto más oscuro para asegurar buena visibilidad */
 }
 
 .comment-item:hover {
-  background-color: #f1f1f1; /* Fondo más claro al pasar el mouse */
+  background-color: #f1f1f1;
+  /* Fondo más claro al pasar el mouse */
 }
 
 
@@ -728,8 +728,8 @@ export default {
   text-align: center;
   margin-top: 10px;
 }
-.accordion-button:not(.collapsed) {
-    background-color: #E2F3FF;
-}
 
+.accordion-button:not(.collapsed) {
+  background-color: #E2F3FF;
+}
 </style>

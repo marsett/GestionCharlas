@@ -59,7 +59,7 @@
 
     <!-- Modal para mostrar los detalles de la charla -->
     <div
-      v-if="modalVisible"
+      v-if="modalVisible" @click.self="cerrarModal"
       class="modal fade show"
       tabindex="-1"
       role="dialog"
@@ -90,7 +90,7 @@
             <!-- Botones para cambiar entre Descripción, Comentarios y Recursos -->
             <div class="d-flex custom-buttons-container">
               <button
-                class="custom-button"
+                class="custom-button me-3"
                 @click="
                   mostrarDescripcion = !mostrarDescripcion;
                   mostrarComentarios = false;
@@ -102,7 +102,7 @@
                 Descripción
               </button>
               <button
-                class="custom-button"
+                class="custom-button me-3"
                 @click="
                   mostrarDescripcion = false;
                   mostrarComentarios = !mostrarComentarios;
@@ -236,14 +236,13 @@ export default {
       charlas: [],
       modalVisible: false,
       charlaSeleccionada: {},
-      mostrarDescripcion: true,
+      mostrarDescripcion: false,
       mostrarComentarios: false,
       comentarios: [],
       newComment: "",
       recursos: [],
       mostrarRecursos: false,
-      defaultImage:
-        "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg",
+      defaultImage: ""
     };
   },
   methods: {
@@ -454,7 +453,7 @@ export default {
 
     // Maneja el error al cargar una imagen
     onImageError(event) {
-      event.target.src = this.defaultImage;
+      event.target.src = require("../assets/banner_default.jpg");
     },
   },
 
@@ -470,10 +469,16 @@ export default {
   padding: 30px;
 }
 
-.chats {
+.chats:has(.card:nth-of-type(3)) {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 20px;
+  margin-top: -30px;
+}
+.chats:has(.card:nth-of-type(2)) {
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   margin-top: -30px;
 }

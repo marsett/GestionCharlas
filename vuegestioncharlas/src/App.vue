@@ -46,6 +46,14 @@ export default {
 </script>
 
 <style>
+h1{
+  font-family: 'Montserrat', sans-serif;
+}
+p{
+  font-family: "Nunito Sans", serif;
+}
+h2, h3, h4, h5{
+  font-family: "Hind Guntur", serif;}
 body{
   background-color: #FDFAFA!important;
   background: linear-gradient(
