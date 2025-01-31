@@ -44,7 +44,9 @@
         >
           <!-- Imagen de perfil -->
           <div class="profile-circle">
-            <img :src="imagen" alt="profile" class="img-fluid rounded-circle" />
+            <img :src="imagen || perro" alt="profile" class="img-fluid rounded-circle"
+     @error="setImagenAlternativa" />
+
           </div>
           <!-- Nombre del usuario -->
           <h2 class="profile-name ms-2">{{ nombre }} </h2>
@@ -86,6 +88,7 @@
 import PerfilService from "@/services/PerfilService";
 import Cookies from "cookies-js";
 import Swal from "sweetalert2";
+import perro from '@/assets/perro.jpg';
 const servicePerf = new PerfilService();
 export default {
   name: "MenuAlumnoComponent",
@@ -113,6 +116,10 @@ export default {
   },
   },
   methods: {
+    // Función para cambiar la imagen cuando falle la carga
+    setImagenAlternativa (event) {
+      event.target.src = perro;
+    },
     setActive(index) {
       this.activeIndex = index; // Define el índice activo
     },
