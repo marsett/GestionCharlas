@@ -278,7 +278,7 @@ export default {
 }
 
 .profile-header {
-  background-color: #7787bd;
+  background-color: #7782c6!important;
   height: 200px;
   border-radius: 10px 10px 0 0;
   display: flex;
