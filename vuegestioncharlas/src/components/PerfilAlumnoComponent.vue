@@ -1,28 +1,58 @@
 <template>
   <div class="container my-3 my-md-5" v-if="usuario">
     <div class="profile-card">
-      <div class="profile-header" style="background-color: #a0a0a0; height: 200px;">
-        <div class="profile-info text-center">
-        </div>
+      <div
+        class="profile-header"
+        style="background-color: #a0a0a0; height: 200px"
+      >
+        <div class="profile-info text-center"></div>
       </div>
 
       <div class="profile-content row align-items-center position-relative">
         <div class="col-12 col-md-3 d-flex justify-content-center mb-3 mb-md-0">
-          <img :src="usuario.imagen" alt="Foto de perfil" class="profile-image" @click="triggerFileInput"/>
+          <img
+            :src="usuario.imagen"
+            alt="Foto de perfil"
+            class="profile-image"
+            @click="triggerFileInput"
+          />
           <i class="fa fa-pencil edit-icon ms-2" @click="triggerFileInput"></i>
-          <input type="file" ref="fileInput" accept="image/*" style="display: none" @change="handleFileChange" />
-          <button class="button-detalle" @click="mostrarDetalles">Detalles</button>
+          <input
+            type="file"
+            ref="fileInput"
+            accept="image/*"
+            style="display: none"
+            @change="handleFileChange"
+          />
+          <button class="button-detalle" @click="mostrarDetalles">
+            Detalles
+          </button>
         </div>
 
         <div class="col-12 col-md-9 mt-3 pt-3">
-          <h1 class="name text-center text-md-start">{{ usuario.nombre }} {{ usuario.apellidos }}</h1>
-          <p class="bio text-center text-md-start">{{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}</p>
-          <div class="profile-buttons mt-3 d-flex justify-content-end flex-column flex-md-row">
+          <h1 class="name text-center text-md-start">
+            {{ usuario.nombre }} {{ usuario.apellidos }}
+          </h1>
+          <p class="bio text-center text-md-start">
+            {{ usuario.idRole === 2 ? "Alumno" : "Profesor" }}
+          </p>
+          <div
+            class="profile-buttons mt-3 d-flex justify-content-end flex-column flex-md-row"
+          >
             <!-- <button class="btn btn-password me-2" @click="mostrarMisComentarios">Mis Comentarios</button> -->
-            <button class="btn btn-password me-2" @click="mostrarFormularioContrasena">Editar Contraseña</button>
-            <button class="btn btn-activo" :class="{'btn-activo': usuario.estadoUsuario === 'Activo'}"
-              :disabled="usuario.estadoUsuario === 'Activo'" style="pointer-events: none;">
-              {{ usuario.estadoUsuario === true ? 'Activo' : 'Inactivo' }}
+            <button
+              class="btn btn-password me-2"
+              @click="mostrarFormularioContrasena"
+            >
+              Editar Contraseña
+            </button>
+            <button
+              class="btn btn-activo"
+              :class="{ 'btn-activo': usuario.estadoUsuario === 'Activo' }"
+              :disabled="usuario.estadoUsuario === 'Activo'"
+              style="pointer-events: none"
+            >
+              {{ usuario.estadoUsuario === true ? "Activo" : "Inactivo" }}
             </button>
           </div>
         </div>
@@ -33,45 +63,69 @@
   </div>
 
   <!-- Modal para mostrar los comentarios -->
-<!-- Modal para mostrar los comentarios -->
-<div v-if="modalVisible" class="modal fade show" tabindex="-1" role="dialog" style="display: block; background: rgba(0, 0, 0, 0.8)">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <!-- Encabezado del modal con fondo verde clarito -->
-      <div class="modal-header" style="background-color: #A8E6A1; color: #333;">
-        <h5 class="modal-title">Mis Comentarios</h5>
-        <button type="button" class="btn-close" aria-label="Close" @click="cerrarModal">X</button>
-      </div>
-      <div v-if="comentarios.length > 0" class="modal-body">
-        <div class="comments-container">
-          <div v-for="comentario in comentarios" :key="comentario.idComentario" class="comment-container mb-3">
-            <div class="comment-header">
-              <span class="comment-user">{{ comentario.usuarioNombre }}</span>
-              <span class="comment-date">{{ new Date(comentario.fecha).toLocaleString() }}</span>
+  <!-- Modal para mostrar los comentarios -->
+  <div
+    v-if="modalVisible"
+    class="modal fade show"
+    tabindex="-1"
+    role="dialog"
+    style="display: block; background: rgba(0, 0, 0, 0.8)"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <!-- Encabezado del modal con fondo verde clarito -->
+        <div
+          class="modal-header"
+          style="background-color: #a8e6a1; color: #333"
+        >
+          <h5 class="modal-title">Mis Comentarios</h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            @click="cerrarModal"
+          >
+            X
+          </button>
+        </div>
+        <div v-if="comentarios.length > 0" class="modal-body">
+          <div class="comments-container">
+            <div
+              v-for="comentario in comentarios"
+              :key="comentario.idComentario"
+              class="comment-container mb-3"
+            >
+              <div class="comment-header">
+                <span class="comment-user">{{ comentario.usuarioNombre }}</span>
+                <span class="comment-date">{{
+                  new Date(comentario.fecha).toLocaleString()
+                }}</span>
+              </div>
+              <div class="comment-content">
+                {{ comentario.contenido }}
+              </div>
+              <div class="comment-actions mt-2">
+                <button
+                  class="btn btn-trash"
+                  @click="eliminarComentario(comentario.idComentario)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+              <hr />
             </div>
-            <div class="comment-content">
-              {{ comentario.contenido }}
-            </div>
-            <div class="comment-actions mt-2">
-              <button class="btn btn-trash" @click="eliminarComentario(comentario.idComentario)">
-                <i class="fa fa-trash"></i>
-              </button>
-            </div>
-            <hr />
           </div>
         </div>
-      </div>
-      <div v-else>
-        <p>No tienes comentarios registrados.</p>
+        <div v-else>
+          <p>No tienes comentarios registrados.</p>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
 </template>
 
 <script>
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import PerfilService from "@/services/PerfilService";
 import CharlasService from "@/services/CharlasService";
 const charlasService = new CharlasService();
@@ -80,14 +134,14 @@ import CharlasAlumnoComponent from "@/components/CharlasAlumnoComponent";
 export default {
   name: "PerfilAlumnoComponent",
   components: {
-    CharlasAlumnoComponent
+    CharlasAlumnoComponent,
   },
   data() {
     return {
       usuario: null,
       perfilService: new PerfilService(),
       comentarios: [],
-      modalVisible: false
+      modalVisible: false,
     };
   },
   methods: {
@@ -97,12 +151,16 @@ export default {
         this.usuario = data.usuario;
       } catch (error) {
         console.error("Error al cargar el perfil:", error);
-        Swal.fire('Error', 'No se pudo cargar la información del perfil.', 'error');
+        Swal.fire(
+          "Error",
+          "No se pudo cargar la información del perfil.",
+          "error"
+        );
       }
     },
     mostrarDetalles() {
       Swal.fire({
-        title: "Detalles del Usuario", 
+        title: "Detalles del Usuario",
         html: `
         <div style="text-align: left;">
           <strong>Nombre:</strong> ${this.usuario.nombre} <br>
@@ -132,9 +190,8 @@ export default {
     cargarComentarios() {
       charlasService
         .getComentarioUsuario()
-        .then((response) => { 
-            this.comentarios = response;
-          
+        .then((response) => {
+          this.comentarios = response;
         })
         .catch((error) => {
           console.error("Error al cargar los comentarios:", error);
@@ -143,37 +200,40 @@ export default {
     },
 
     eliminarComentario(idComentario) {
-  // Confirmación antes de eliminar el comentario
-  Swal.fire({
-    title: '¿Estás seguro?',
-    text: "¡No podrás recuperar este comentario!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Sí, eliminarlo',
-    cancelButtonText: 'Cancelar',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Lógica para eliminar un comentario
-      console.log("Comentario a eliminar:", idComentario);
-      charlasService
-        .deleteComentario(idComentario)  // Suponiendo que este método hace la eliminación
-        .then((response) => {
-          if (response && response.status === 200) {
-            // Si la eliminación fue exitosa, recargar los comentarios
-            Swal.fire("¡Eliminado!", "El comentario ha sido eliminado.", "success");
-            this.cargarComentarios();  // Recargar los comentarios después de eliminar
-          } else {
-            throw new Error("Error al eliminar el comentario.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error al eliminar el comentario:", error);
-          Swal.fire("Error", "No se pudo eliminar el comentario.", "error");
-        });
-    }
-  });
-},
-
+      // Confirmación antes de eliminar el comentario
+      Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás recuperar este comentario!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "Cancelar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Lógica para eliminar un comentario
+          console.log("Comentario a eliminar:", idComentario);
+          charlasService
+            .deleteComentario(idComentario) // Suponiendo que este método hace la eliminación
+            .then((response) => {
+              if (response && response.status === 200) {
+                // Si la eliminación fue exitosa, recargar los comentarios
+                Swal.fire(
+                  "¡Eliminado!",
+                  "El comentario ha sido eliminado.",
+                  "success"
+                );
+                this.cargarComentarios(); // Recargar los comentarios después de eliminar
+              } else {
+                throw new Error("Error al eliminar el comentario.");
+              }
+            })
+            .catch((error) => {
+              console.error("Error al eliminar el comentario:", error);
+              Swal.fire("Error", "No se pudo eliminar el comentario.", "error");
+            });
+        }
+      });
+    },
 
     mostrarFormularioContrasena() {
       Swal.fire({
@@ -257,20 +317,19 @@ export default {
     },
 
     mostrarEstadoActivo() {
-      if (this.usuario.estadoUsuario === 'Activo') {
-        return; 
+      if (this.usuario.estadoUsuario === "Activo") {
+        return;
       }
-    }
+    },
   },
 
   created() {
     this.cargarPerfil();
-  }
+  },
 };
 </script>
 
 <style scoped>
-
 .profile-card {
   background-color: #e0e0e0;
   border-radius: 10px;
@@ -278,12 +337,12 @@ export default {
 }
 
 .profile-header {
-  background-color: #7782c6!important;
+  background-color: #7782c6 !important;
   height: 200px;
   border-radius: 10px 10px 0 0;
   display: flex;
-  justify-content: center; 
-  align-items: center;   
+  justify-content: center;
+  align-items: center;
 }
 
 .profile-info {
@@ -293,14 +352,13 @@ export default {
   height: 100%;
 }
 
-
 .profile-image {
   width: 250px;
   height: 250px;
-  border-radius: 20px; 
+  border-radius: 20px;
   border: 8px solid #e0e0e0;
   object-fit: cover;
-  border: 4px solid #314B78;
+  border: 4px solid #314b78;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: -200px;
   margin-right: -120px; /* Añadimos este margen */
@@ -310,7 +368,6 @@ export default {
   position: relative;
   display: inline-block;
 }
-
 
 .edit-icon {
   height: 10%;
@@ -332,26 +389,25 @@ export default {
 
 @media (max-width: 768px) {
   .edit-icon {
-  height: 10%;
-  position: relative;
-  top: -100px;
-  right: -5px;
-  font-size: 20px;
-  color: white;
-  background-color: #314b78;
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 10;
+    height: 10%;
+    position: relative;
+    top: -100px;
+    right: -5px;
+    font-size: 20px;
+    color: white;
+    background-color: #314b78;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+  }
 }
-}
-
 
 @media (max-width: 768px) {
   .profile-image {
     width: 200px;
     height: 200px;
-    border-radius: 20px; 
+    border-radius: 20px;
     border: 8px solid #e0e0e0;
     object-fit: cover;
     margin-top: -100px;
@@ -360,11 +416,10 @@ export default {
 
   .col-12.col-md-4 {
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
   }
 }
-
 
 .name {
   font-size: 24px;
@@ -383,7 +438,6 @@ export default {
   text-align: center;
   margin: 70px;
   margin-top: -30px;
-
 }
 
 .profile-buttons {
@@ -399,14 +453,13 @@ export default {
   padding: 10px 15px;
 }
 
-
 @media (max-width: 768px) {
   .profile-buttons {
     flex-direction: row;
     justify-content: flex-end;
   }
-  }
-  .swal-popup-bootstrap {
+}
+.swal-popup-bootstrap {
   border-radius: 0px !important;
   width: 100% !important;
   max-width: 500px;
@@ -429,7 +482,8 @@ export default {
   margin-bottom: 10px;
 }
 
-.swal-confirm-btn, .swal-cancel-btn {
+.swal-confirm-btn,
+.swal-cancel-btn {
   width: 48%;
   font-size: 16px;
   padding: 12px 0;
@@ -437,7 +491,7 @@ export default {
 }
 
 .swal-confirm-btn {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
 }
@@ -462,10 +516,9 @@ export default {
   }
 }
 
-
 .button-detalle {
   position: absolute;
-  top: -180px;  
+  top: -180px;
   right: 40px;
   background-color: #314b78 !important;
   color: white;
@@ -473,7 +526,7 @@ export default {
   border-radius: 5px;
   font-size: 14px;
   cursor: pointer;
-  z-index: 10;  
+  z-index: 10;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   font-size: 1.2em;
 }
@@ -493,11 +546,11 @@ export default {
 @media (max-width: 768px) {
   .button-detalle {
     position: absolute;
-    top: -170px; 
-    left: 50%;  
-    transform: translateX(-50%);  
-    font-size: 1em; 
-    right: auto; 
+    top: -170px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1em;
+    right: auto;
   }
 }
 button {
@@ -529,13 +582,14 @@ button:after {
   bottom: 0;
 }
 
-button:hover:before, button:hover:after {
+button:hover:before,
+button:hover:after {
   width: 100%;
   transition: 800ms ease all;
 }
 
 .btn-activo {
-  background-color: #40685c !important; 
+  background-color: #40685c !important;
   color: #fff;
   border: none;
   position: relative;
@@ -565,7 +619,7 @@ button:hover:before, button:hover:after {
 }
 
 .modal-header {
-  background-color: #A8E6A1;
+  background-color: #a8e6a1;
   color: #333;
   font-weight: bold;
   border-bottom: 2px solid #ccc;
@@ -575,13 +629,11 @@ button:hover:before, button:hover:after {
   font-size: 1.5rem;
 }
 
-
 .comments-container {
-  max-height: 350px; 
-  overflow-y: scroll; 
-  padding-right: 10px; 
+  max-height: 350px;
+  overflow-y: scroll;
+  padding-right: 10px;
 }
-
 
 .comment-container {
   background-color: #fff;
@@ -592,12 +644,10 @@ button:hover:before, button:hover:after {
   transition: transform 0.3s ease-in-out;
 }
 
-
 .comment-container:hover {
-  transform: translateY(-5px); 
+  transform: translateY(-5px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
-
 
 .comment-header {
   display: flex;
@@ -616,18 +666,16 @@ button:hover:before, button:hover:after {
   color: #888;
 }
 
-
 .comment-content {
   font-size: 1rem;
   color: #333;
   margin-bottom: 10px;
 }
 
-
 .btn-trash {
   background-color: transparent;
   border: none;
-  color: #504c4d; 
+  color: #504c4d;
   font-size: 20px;
   cursor: pointer;
   padding: 5px;
@@ -635,7 +683,7 @@ button:hover:before, button:hover:after {
 }
 
 .btn-trash i {
-  margin-right: 5px; 
+  margin-right: 5px;
 }
 
 .btn-trash:hover {
@@ -646,6 +694,4 @@ button:hover:before, button:hover:after {
   display: flex;
   justify-content: flex-end;
 }
-
-
 </style>

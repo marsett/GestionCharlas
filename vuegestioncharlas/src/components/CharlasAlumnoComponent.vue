@@ -1,11 +1,23 @@
 <template>
   <div class="container mt-5">
-    <div v-if="charlas.length === 0" class="d-flex justify-content-center align-items-center" style="height: 200px;">
+    <div
+      v-if="cargando"
+      class="d-flex justify-content-center align-items-center"
+      style="height: 200px"
+    >
       <div class="spinner-border text-success" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
     </div>
 
+    <div
+      v-if="charlas.length == 0"
+      class="alert alert-gris text-center"
+      role="alert"
+    >
+      <i class="bi bi-info-circle"></i> No hay charlas disponibles en este
+      momento.
+    </div>
 
     <div v-else>
       <div class="chats">
@@ -201,7 +213,7 @@
                       <button
                         @click="editarRecurso(recurso)"
                         class="btn btn-lg"
-                        style="font-size: 1.5rem; padding: 0.75rem 1.25rem;"
+                        style="font-size: 1.5rem; padding: 0.75rem 1.25rem"
                       >
                         <i class="fa-solid fa-edit"></i>
                       </button>
@@ -244,6 +256,7 @@ export default {
       mostrarRecursos: false,
       defaultImage:
         "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-1.jpg",
+      cargando: true,
     };
   },
   methods: {
@@ -314,10 +327,12 @@ export default {
 
     // Carga las charlas del usuario
     async cargarCharlas() {
+      this.cargando = true;
       const perfilService = new PerfilService();
       try {
         const data = await perfilService.getCharlasUsuario();
         this.charlas = data;
+        this.cargando = false;
       } catch (error) {
         console.error("Error al cargar las charlas:", error);
         alert("No se pudo cargar las charlas.");
@@ -466,6 +481,10 @@ export default {
  
 <style scoped>
 /* Estilos para la tarjeta */
+.alert-gris {
+  background-color: #33333355;
+  font-family: "Poppins", sans-serif;
+}
 .container {
   padding: 30px;
 }
