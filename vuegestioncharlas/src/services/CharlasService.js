@@ -365,6 +365,28 @@ export default class CharlasService {
         });
     }
 
+    getComentarioUsuario(){
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/comentarios/comentariosusuario`;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token, 
+                    }
+                }
+            )
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener las charlas: ", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
     setComentario(form) {
         return new Promise((resolve, reject) => {
             const endpoint = 'api/comentarios';
@@ -400,6 +422,63 @@ export default class CharlasService {
             .catch(error => {
                 console.error("Error al crear el comentario:", error.response ? error.response.data : error);
                 reject(error); // Si hubo un error, lo rechazamos
+            });
+        });
+    }
+
+    editarCharla(charlaActualizada) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/Charlas`;
+            const token = Cookies.get('bearer_token');
+            axios.put(Global.urlBase + endpoint, charlaActualizada, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => {
+                console.error("Error al editar charla en el perfil alumno:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    editarRecurso(recursoActualizado){
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/Recursos`;
+            const token = Cookies.get('bearer_token');
+            axios.put(Global.urlBase + endpoint, recursoActualizado, {
+                headers: {
+                    Authorization: token,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => {
+                console.error("Error al editar recurso en el perfil alumno:", error.response ? error.response.data : error);
+                reject(error);
+            });
+        });
+    }
+
+    getRecursosCharlas(idCharla) {
+        return new Promise((resolve, reject) => {
+            const endpoint = `api/charlas/${idCharla}`;
+            const token = Cookies.get('bearer_token');
+            axios.get(
+                Global.urlBase + endpoint,
+                {
+                    headers: {
+                        Authorization: token,
+                    }
+                }
+            )
+            .then(response => {
+                console.log("Respuesta de la API para recursos:", response.data);
+                resolve(response.data);
+            })
+            .catch(error => {
+                console.error("Error al obtener los recursos: ", error.response ? error.response.data : error);
+                reject(error);
             });
         });
     }

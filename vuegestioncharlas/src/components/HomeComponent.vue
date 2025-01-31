@@ -15,8 +15,7 @@
       <div class="row row-cols-1 row-cols-md-2 mb-3 mt-4 pt-4">
         <!-- Card para ronda abierta -->
         <div class="col mb-3">
-          <div class="custom-card" :class="{'inactive-card': !isRondaAbierta, 'active-card': isRondaAbierta}">
-
+          <div class="custom-card active-card">
             <!-- Sección superior con forma de pestaña -->
             <div class="card-header">
               <div class="tab-header" :class="{'active-tab': isRondaAbierta, 'inactive-tab': !isRondaAbierta}">
@@ -52,7 +51,7 @@
 
         <!-- Card para votación activa (activa o no activa) -->
         <div class="col mb-3">
-          <div class="custom-card border-0" :class="{'card': true, 'inactive-card': !isVotacionActiva, 'active-card': isVotacionActiva}">
+          <div class="custom-card border-0 active-card">
             
             <!-- Sección superior con forma de pestaña -->
             <div class="card-header border-0">
@@ -204,6 +203,11 @@
               <span>{{ evento.descripcionModulo }}</span>
               <small class="text-muted ms-3">
                 {{ formatoMes(evento.fechaPresentacion) }}
+
+                <!-- Botón de edición -->
+                <button class="btn btn-primary btn-sm mt-0 ms-3" @click="editarRonda(evento.idRonda)">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
               </small>
             </div>
 
@@ -624,6 +628,207 @@ export default {
       this.mostrarTodos = !this.mostrarTodos;
     },
 
+    async editarRonda(idRonda) {
+      // Buscar la ronda a editar
+      const ronda = this.rondasProfe.find(r => r.idRonda === idRonda);
+      if (!ronda) return;
+
+      // Mostrar el formulario con SweetAlert2
+      const { isConfirmed, isDenied, value } = await Swal.fire({
+        title: 'Editar Ronda',
+        html: `
+          <div style="text-align: left; display: flex; flex-direction: column; gap: 15px; width: 100%;">
+            <label for="swal-descripcion">Descripción: <span class="text-danger">*</span></label>
+            <input id="swal-descripcion" class="swal2-input m-0" style="width: 100%; box-sizing: border-box;" value="${ronda.descripcionModulo || ''}">
+            <label for="swal-duracion">Duración (minutos): <span class="text-danger">*</span></label>
+            <input id="swal-duracion" type="number" class="swal2-input m-0" style="width: 100%; box-sizing: border-box;" value="${ronda.duracion || ''}">
+            <label for="swal-fechacierre">Fecha cierre: <span class="text-danger">*</span></label>
+            <input id="swal-fechacierre" type="date" class="swal2-input m-0" style="width: 100%; box-sizing: border-box;" 
+              value="${ronda.fechaCierre ? ronda.fechaCierre.split('T')[0] : ''}" 
+              min="${new Date().toISOString().split('T')[0]}"
+            >
+            <label for="swal-fechalimitevotacion">Fecha límite votación: <span class="text-danger">*</span></label>
+            <input id="swal-fechalimitevotacion" type="date" class="swal2-input m-0" style="width: 100%; box-sizing: border-box;" 
+              value="${ronda.fechaLimiteVotacion ? ronda.fechaLimiteVotacion.split('T')[0] : ''}" 
+              min="${ronda.fechaCierre ? ronda.fechaCierre.split('T')[0] : new Date().toISOString().split('T')[0]}"
+            >
+            <label for="swal-fechapresentacion">Fecha presentación: <span class="text-danger">*</span></label>
+            <input id="swal-fechapresentacion" type="date" class="swal2-input m-0" style="width: 100%; box-sizing: border-box;" 
+              value="${ronda.fechaPresentacion ? ronda.fechaPresentacion.split('T')[0] : ''}" 
+              min="${ronda.fechaLimiteVotacion ? ronda.fechaLimiteVotacion.split('T')[0] : (ronda.fechaCierre ? ronda.fechaCierre.split('T')[0] : new Date().toISOString().split('T')[0])}" 
+            >
+          </div>
+        `,
+        showCancelButton: true,
+        showDenyButton: true,
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: '<i class="fa-solid fa-check"></i> Actualizar',
+        denyButtonText: '<i class="fa-solid fa-trash-can"></i> Eliminar',
+        preConfirm: () => {
+          // Obtener los valores de los campos
+          const idCursoUsuario = ronda.idCursoUsuario;
+          const descripcionModulo = document.getElementById('swal-descripcion').value;
+          const duracion = parseInt(document.getElementById('swal-duracion').value, 10);
+          const fechaPresentacion = document.getElementById('swal-fechapresentacion').value;
+          const fechaCierre = document.getElementById('swal-fechacierre').value;
+          const fechaLimiteVotacion = document.getElementById('swal-fechalimitevotacion').value;
+
+          // Hacer un console.log para ver los valores obtenidos
+          console.log('Descripción:', descripcionModulo);
+          console.log('Duración:', duracion);
+          console.log('Fecha de Presentación:', fechaPresentacion);
+          console.log('Fecha de Cierre:', fechaCierre);
+          console.log('Fecha Límite de Votación:', fechaLimiteVotacion);
+
+          // Validar que todos los campos están completos
+          if (!descripcionModulo || !duracion || !fechaPresentacion || !fechaCierre || !fechaLimiteVotacion) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Todos los campos son obligatorios.'
+            });
+            return null;  // Retornar null para evitar continuar
+          }
+
+          // Retornar los valores para ser usados después
+          return {
+            idCursoUsuario,
+            descripcionModulo,
+            duracion,
+            fechaPresentacion,
+            fechaCierre,
+            fechaLimiteVotacion
+          };
+        }
+      });
+
+      // Si se confirma la actualización
+      if (isConfirmed && value) {
+        // Validación de fechas
+        const fechaCierre = new Date(value.fechaCierre);
+        const fechaLimiteVotacion = new Date(value.fechaLimiteVotacion);
+        const fechaPresentacion = new Date(value.fechaPresentacion);
+
+        // Validar que la fecha de límite de votación no sea antes de la fecha de cierre
+        if (fechaLimiteVotacion < fechaCierre) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'La fecha límite de votación no puede ser antes de la fecha de cierre.'
+          });
+          return;
+        }
+
+        // Validar que la fecha de presentación no sea antes de la fecha límite de votación
+        if (fechaPresentacion < fechaLimiteVotacion) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'La fecha de presentación no puede ser antes de la fecha límite de votación.'
+          });
+          return;
+        }
+
+        // Llamar a la función de actualización con los datos
+        const rondaActualizada = {
+          idRonda,
+          idCursoUsuario: value.idCursoUsuario,
+          fechaPresentacion: new Date(value.fechaPresentacion).toISOString(),
+          fechaCierre: new Date(value.fechaCierre).toISOString(),
+          duracion: value.duracion,
+          descripcionModulo: value.descripcionModulo,
+          fechaLimiteVotacion: new Date(value.fechaLimiteVotacion).toISOString()
+        };
+
+        try {
+          await this.actualizarRonda(rondaActualizada);
+          Swal.fire({
+            icon: 'success',
+            title: 'Actualización exitosa',
+            text: 'La ronda ha sido actualizada correctamente.'
+          });
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al actualizar la ronda. Intente nuevamente.'
+          });
+        }
+
+      } else if (isDenied) {
+        // Confirmar la eliminación
+        const confirmDelete = await Swal.fire({
+          title: '¿Estás seguro?',
+          text: "Esta acción eliminará la ronda permanentemente.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Eliminar',
+          cancelButtonText: 'Cancelar'
+        });
+
+        if (confirmDelete.isConfirmed) {
+          await this.eliminarRonda(idRonda);
+        }
+      }
+    },
+
+
+    async actualizarRonda(ronda) {
+      try {
+        await servicePerf.updateRonda(ronda);
+        Swal.fire('Actualizado', 'La ronda ha sido actualizada con éxito', 'success');
+        this.evaluarAlumnos(); 
+      } catch (error) {
+        error
+        Swal.fire('Error', 'Hubo un problema al actualizar la ronda', 'error');
+      }
+    },
+
+    async eliminarRonda(idRonda) {
+      try {
+        // Llamada a la función para eliminar la ronda
+        const response = await servicePerf.deleteRonda(idRonda);
+
+        // Evaluar el estado de la respuesta del servidor
+        if (response.status === 200 || response.status === 201) {
+          Swal.fire('Eliminado', 'La ronda ha sido eliminada con éxito', 'success');
+        } 
+        
+        this.evaluarAlumnos(); 
+      } catch (error) {
+        if (error.response) {
+          // Manejar errores específicos
+          if (error.response.status === 500) {
+            Swal.fire({
+              icon: 'error',
+              title: 'No se pudo eliminar',
+              text: 'Probablemente la ronda ya tiene charlas con votos registrados y no puede eliminarse.',
+            });
+          } else if (error.response.status === 404) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Ronda no encontrada',
+              text: 'La ronda que intentas eliminar no existe o ya fue eliminada.',
+            });
+          } else {
+            // Otro tipo de error HTTP
+            Swal.fire({
+              icon: 'error',
+              title: `Error`,
+              text: 'Ocurrió un problema inesperado. Vuelve a intentarlo más tarde.',
+            });
+          }
+        } else {
+          // Error sin respuesta del servidor (problema de red, CORS, etc.)
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'No se pudo conectar con el servidor. Verifica tu conexión a internet.',
+          });
+        }
+      }
+    },
+
     mostrarGrafico(tipo) {
       this.graficoSeleccionado = tipo;
 
@@ -919,15 +1124,9 @@ export default {
 
 <style scoped>
   .container{
-    /* background-color: #FDFAFA!important; */
     padding:55px 20px 0px 20px;
     margin-top: 0px !important;
     margin-bottom: 30px !important;
-    /* background: linear-gradient(
-      to top,
-      hsla(128, 21%, 57%, 0.5) 0%,   
-      #FDFAFA 60%    
-    ); */
     border-radius: 18px;
     color: inherit;
   }
@@ -1275,4 +1474,14 @@ export default {
       transform: translate(-50%, -50%);
     }
   }
+
+  div:where(.swal2-container) input:where(.swal2-input):focus, 
+  div:where(.swal2-container) input:where(.swal2-file):focus, 
+  div:where(.swal2-container) textarea:where(.swal2-textarea):focus {
+      border: 1px solid #4CAF50 !important; /* Borde verde */
+      outline: none;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.06), 0 0 0 3px rgba(76, 175, 80, 0.5) !important; /* Sombra verde */
+  }
+
+
 </style>

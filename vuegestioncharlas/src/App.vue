@@ -87,4 +87,12 @@ body{
   border-top-color: #578e73;
   border-bottom-color: #578e73;
 }
+
+div:where(.swal2-container) input:where(.swal2-input):focus, 
+div:where(.swal2-container) input:where(.swal2-file):focus, 
+div:where(.swal2-container) textarea:where(.swal2-textarea):focus {
+    border: 1px solid #578e73 !important; /* Borde verde */
+    outline: none;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.06), 0 0 0 3px #578e737f !important; /* Sombra verde */
+}
 </style>
