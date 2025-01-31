@@ -304,7 +304,7 @@ export default {
         case "PROPUESTA":
           return "btn btn-secondary";
         case "ACEPTADA":
-          return "btn btn-success";
+          return "btn btn-success btn-verde";
         case "RECHAZADA":
           return "btn btn-danger";
         default:
@@ -472,6 +472,10 @@ export default {
   z-index: 10;
   pointer-events: none;
 }
+.btn-verde{
+  background-color: #527c58;
+  border: none;
+}
 
 .modal-body {
   padding: 15px 30px 15px 30px !important;
@@ -552,7 +556,8 @@ export default {
   overflow-y: auto; 
   padding-right: 10px; 
   background-color: #d1e7d7; 
-  border-radius: 10px; 
+  border-radius: 10px;
+  margin-left: 0px !important; 
 }
 
 /* Estilo de cada comentario */

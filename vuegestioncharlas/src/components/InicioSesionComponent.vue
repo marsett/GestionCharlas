@@ -3,9 +3,9 @@
     <!-- Contenedor principal -->
     <div class="row shadow-lg mx-2 mx-md-2 mx-lg-0 rounded-3 overflow-hidden login-container" style="max-width: 900px;">
       <!-- Columna de Ilustración -->
-      <div class="col-md-4 p-5 m-0 m-md-3 bg-white d-flex align-items-center justify-content-center rounded-3">
+      <div class="col-md-4 p-4 m-0 m-md-3 bg-white d-flex align-items-center justify-content-center rounded-3">
         <img
-          src="../assets/icono.png"
+          src="../assets/ilustracion_login.jpg"
           alt="Ilustración de inicio de sesión"
           class="imagen-ajustada"
         />
