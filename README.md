@@ -211,4 +211,4 @@ La aplicación consume una API .NET que proporciona endpoints para:
 
 ## 👥 Equipo de Desarrollo
 
-Desarrollado como proyecto educativo para la gestión de charlas estudiantiles en el entorno académico.
+Desarrollado como proyecto educativo para la gestión de charlas estudiantiles en el entorno académico de Tajamar por **Bárbara**, **Amanda**, **Sofía** y **Mario**.
