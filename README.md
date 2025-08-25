@@ -4,7 +4,7 @@
 
 Aplicación web desarrollada con Vue.js que facilita la gestión completa de charlas estudiantiles mediante un sistema de rondas de presentación. Permite a estudiantes proponer charlas, a profesores gestionar rondas y evaluar propuestas, y a administradores supervisar todo el proceso educativo.
 
-🔗 **Ver Proyecto en Vivo** [https://charlasalumnostajamar.azurewebsites.net/login]
+🔗 **[Ver Api en Vivo](https://charlasalumnostajamar.azurewebsites.net/login)**
 
 ## 🛠️ Tecnologías Utilizadas
 
